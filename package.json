@@ -18,8 +18,11 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.948.0",
+    "@payloadcms/db-postgres": "3.68.3",
     "@payloadcms/next": "3.68.3",
     "@payloadcms/richtext-lexical": "3.68.3",
+    "@payloadcms/storage-s3": "^3.68.4",
     "@payloadcms/ui": "3.68.3",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
@@ -28,8 +31,7 @@
     "payload": "3.68.3",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "sharp": "0.34.2",
-    "@payloadcms/db-postgres": "3.68.3"
+    "sharp": "0.34.2"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
