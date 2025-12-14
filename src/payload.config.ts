@@ -14,7 +14,10 @@ import { Tags } from './collections/Tags'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-
+const dbURI = process.env.DATABASE_URI
+if (!dbURI) {
+  throw new Error('Missing DATABASE_URI in runtime environment (Vercel)')
+}
 const serverURL =
   process.env.PAYLOAD_PUBLIC_SERVER_URL ||
   process.env.NEXT_PUBLIC_PAYLOAD_URL ||
@@ -44,7 +47,7 @@ export default buildConfig({
 
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: dbURI,
     },
   }),
 
