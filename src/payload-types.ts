@@ -234,6 +234,7 @@ export interface Category {
   title: string;
   slug: string;
   description?: string | null;
+  site: number | Site;
   updatedAt: string;
   createdAt: string;
 }
@@ -245,6 +246,7 @@ export interface Tag {
   id: number;
   name: string;
   slug: string;
+  site: number | Site;
   updatedAt: string;
   createdAt: string;
 }
@@ -422,6 +424,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  site?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -432,6 +435,7 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface TagsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  site?: T;
   updatedAt?: T;
   createdAt?: T;
 }

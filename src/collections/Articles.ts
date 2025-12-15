@@ -209,6 +209,15 @@ export const Articles: CollectionConfig = {
       relationTo: 'categories',
       hasMany: true,
       admin: { position: 'sidebar' },
+      filterOptions: ({ data }) => {
+        const site = (data as any)?.site
+        const siteId =
+          typeof site === 'string' || typeof site === 'number'
+            ? String(site)
+            : site?.id ? String(site.id) : null
+        if (!siteId) return true
+        return { site: { equals: siteId } }
+      },
     },
     {
       name: 'tags',
@@ -216,6 +225,15 @@ export const Articles: CollectionConfig = {
       relationTo: 'tags',
       hasMany: true,
       admin: { position: 'sidebar' },
+      filterOptions: ({ data }) => {
+        const site = (data as any)?.site
+        const siteId =
+          typeof site === 'string' || typeof site === 'number'
+            ? String(site)
+            : site?.id ? String(site.id) : null
+        if (!siteId) return true
+        return { site: { equals: siteId } }
+      },
     },
     {
       name: 'site',

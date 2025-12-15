@@ -18,8 +18,45 @@ export const searchArticlesEndpoint: Endpoint = {
       })
     }
 
-    // Resolve site using shared helper
-    const site = await resolveSiteForRequest(req.payload, req.headers)
+    // Resolve site: try siteSlug query param, then x-site-slug header, then fallback to host resolution
+    let site: { id: string } | null = null
+
+    const siteSlug = typeof req?.query?.siteSlug === 'string' ? req.query.siteSlug.trim() : null
+    const siteSlugHeader =
+      typeof req?.headers?.get === 'function'
+        ? req.headers.get('x-site-slug')
+        : req?.headers?.['x-site-slug'] || req?.headers?.['X-Site-Slug'] || null
+
+    if (siteSlug) {
+      // Lookup by slug
+      const bySlug = await req.payload.find({
+        collection: 'sites',
+        where: { slug: { equals: siteSlug } },
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+      })
+      if (bySlug.docs?.[0]?.id) {
+        site = { id: String(bySlug.docs[0].id) }
+      }
+    } else if (siteSlugHeader) {
+      // Lookup by slug from header
+      const bySlug = await req.payload.find({
+        collection: 'sites',
+        where: { slug: { equals: siteSlugHeader } },
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+      })
+      if (bySlug.docs?.[0]?.id) {
+        site = { id: String(bySlug.docs[0].id) }
+      }
+    }
+
+    // Fallback to host-based resolution
+    if (!site) {
+      site = await resolveSiteForRequest(req.payload, req.headers)
+    }
 
     if (!site?.id) {
       return new Response(
@@ -56,6 +93,21 @@ export const searchArticlesEndpoint: Endpoint = {
       filter,
     })
 
+    // Shape results: exclude large contentText, keep essential fields
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const shapedResults = res.hits.map((hit: any) => {
+      const { contentText, ...rest } = hit
+      // Optionally include a snippet if needed
+      const contentTextSnippet =
+        typeof contentText === 'string' && contentText.length > 0
+          ? contentText.substring(0, 300).trim() + (contentText.length > 300 ? '...' : '')
+          : null
+      return {
+        ...rest,
+        ...(contentTextSnippet ? { contentTextSnippet } : {}),
+      }
+    })
+
     return new Response(
       JSON.stringify({
         ok: true,
@@ -64,7 +116,7 @@ export const searchArticlesEndpoint: Endpoint = {
         page,
         limit,
         total: res.estimatedTotalHits ?? res.hits.length,
-        results: res.hits,
+        results: shapedResults,
       }),
       { status: 200, headers: { 'content-type': 'application/json' } },
     )

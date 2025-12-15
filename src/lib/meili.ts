@@ -35,6 +35,7 @@ function getClient(): MeiliSearch | null {
 
 function extractTextFromLexical(value: unknown): string {
   const chunks: string[] = []
+  const seen = new WeakSet<object>()
 
   const walk = (node: unknown) => {
     if (!node) return
@@ -47,6 +48,10 @@ function extractTextFromLexical(value: unknown): string {
     if (typeof node !== 'object') return
     const obj = node as Record<string, unknown>
 
+    // Prevent re-walking the same object
+    if (seen.has(obj as object)) return
+    seen.add(obj as object)
+
     // Text nodes usually store actual text here
     if (typeof obj.text === 'string') chunks.push(obj.text)
 
@@ -56,12 +61,9 @@ function extractTextFromLexical(value: unknown): string {
     // Standard Lexical trees use children arrays
     if (Array.isArray(obj.children)) walk(obj.children)
 
-    // Some nodes nest content under "value", "fields", etc — be permissive
-    for (const v of Object.values(obj)) {
-      // Avoid infinite loops on obvious primitives
-      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') continue
-      if (v && typeof v === 'object') walk(v)
-    }
+    // Only walk specific known nested fields to avoid re-walking
+    if (obj.fields && typeof obj.fields === 'object') walk(obj.fields)
+    if (obj.value && typeof obj.value === 'object') walk(obj.value)
   }
 
   walk(value)
