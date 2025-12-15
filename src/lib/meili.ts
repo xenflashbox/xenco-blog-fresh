@@ -14,21 +14,38 @@ function getClient(): MeiliSearch | null {
 }
 
 function extractTextFromLexical(value: unknown): string {
-  // Very defensive “best effort” extractor that won’t throw.
   const chunks: string[] = []
 
   const walk = (node: unknown) => {
-    if (!node || typeof node !== 'object') return
+    if (!node) return
+
+    if (Array.isArray(node)) {
+      for (const n of node) walk(n)
+      return
+    }
+
+    if (typeof node !== 'object') return
     const obj = node as Record<string, unknown>
 
+    // Text nodes usually store actual text here
     if (typeof obj.text === 'string') chunks.push(obj.text)
 
-    const children = obj.children
-    if (Array.isArray(children)) children.forEach(walk)
+    // Payload Lexical content commonly nests under root.children
+    if (obj.root && typeof obj.root === 'object') walk(obj.root)
+
+    // Standard Lexical trees use children arrays
+    if (Array.isArray(obj.children)) walk(obj.children)
+
+    // Some nodes nest content under "value", "fields", etc — be permissive
+    for (const v of Object.values(obj)) {
+      // Avoid infinite loops on obvious primitives
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') continue
+      if (v && typeof v === 'object') walk(v)
+    }
   }
 
-  // Payload Lexical is usually { root: { children: [...] } } but we handle anything
   walk(value)
+
   return chunks.join(' ').replace(/\s+/g, ' ').trim()
 }
 
