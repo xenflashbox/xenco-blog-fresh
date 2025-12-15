@@ -8,10 +8,13 @@ import { s3Storage } from '@payloadcms/storage-s3'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Sites } from './collections/Sites'
 import { Articles } from './collections/Articles'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
+import { searchArticlesEndpoint } from './endpoints/searchArticles'
+import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -36,9 +39,9 @@ export default buildConfig({
     },
   },
 
-  collections: [Users, Media, Articles, Categories, Tags],
+  collections: [Users, Media, Sites, Articles, Categories, Tags],
 
-  endpoints: [reindexArticlesEndpoint],
+  endpoints: [reindexArticlesEndpoint, searchArticlesEndpoint, backfillArticleSitesEndpoint],
 
   editor: lexicalEditor(),
 

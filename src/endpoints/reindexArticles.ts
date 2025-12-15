@@ -1,6 +1,5 @@
 import type { Endpoint } from 'payload'
-
-import { getMeiliClient, toMeiliArticleDoc } from '@/lib/meili'
+import { getMeiliClient, toMeiliArticleDoc, ensureArticlesIndexSettings } from '../lib/meili'
 
 export const reindexArticlesEndpoint: Endpoint = {
   path: '/reindex/articles',
@@ -20,12 +19,15 @@ export const reindexArticlesEndpoint: Endpoint = {
       )
     }
 
+    await ensureArticlesIndexSettings()
+
     const indexName = process.env.MEILISEARCH_ARTICLES_INDEX || 'articles'
     const index = meili.index(indexName)
 
     const limit = 100
     let page = 1
     let indexed = 0
+    let skippedMissingSite = 0
 
     while (true) {
       const res = await req.payload.find({
@@ -39,9 +41,15 @@ export const reindexArticlesEndpoint: Endpoint = {
 
       if (!res.docs?.length) break
 
-      const docs = res.docs
+      const mapped = res.docs
         .map((d) => toMeiliArticleDoc(d))
         .filter((d): d is NonNullable<ReturnType<typeof toMeiliArticleDoc>> => Boolean(d))
+
+      const docs = mapped.filter((d) => {
+        const ok = Boolean(d.site)
+        if (!ok) skippedMissingSite++
+        return ok
+      })
 
       if (docs.length) {
         await index.updateDocuments(docs)
@@ -52,6 +60,6 @@ export const reindexArticlesEndpoint: Endpoint = {
       page++
     }
 
-    return Response.json({ ok: true, indexed })
+    return Response.json({ ok: true, indexed, skippedMissingSite })
   },
 }

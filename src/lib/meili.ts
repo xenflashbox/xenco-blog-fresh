@@ -8,6 +8,7 @@ export function toMeiliArticleDoc(doc: unknown) {
 
   return {
     id: String(id),
+    site: asString(a.site),
     title: typeof a.title === 'string' ? a.title : '',
     slug: typeof a.slug === 'string' ? a.slug : '',
     excerpt: typeof a.excerpt === 'string' ? a.excerpt : '',
@@ -68,6 +69,15 @@ function extractTextFromLexical(value: unknown): string {
   return chunks.join(' ').replace(/\s+/g, ' ').trim()
 }
 
+function asString(value: unknown): string | null {
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (value && typeof value === 'object' && 'id' in (value as Record<string, unknown>)) {
+    const id = (value as Record<string, unknown>).id
+    if (typeof id === 'string' || typeof id === 'number') return String(id)
+  }
+  return null
+}
+
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return value
@@ -99,12 +109,80 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   }
 }
 
+let ensureSettingsPromise: Promise<void> | null = null
+
+export async function ensureArticlesIndexSettings(): Promise<void> {
+  const c = getClient()
+  if (!c) return
+
+  if (!ensureSettingsPromise) {
+    ensureSettingsPromise = (async () => {
+      const index = c.index(INDEX_NAME)
+
+      // Ensure index exists (create if missing)
+      try {
+        // Works in most Meili versions
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (index as any).getRawInfo?.()
+      } catch (e: unknown) {
+        // Create index if it doesn't exist
+        const error = e as { status?: number; response?: { status?: number } }
+        const status = error?.status ?? error?.response?.status
+        if (status === 404) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const task = await (c as any).createIndex(INDEX_NAME, { primaryKey: 'id' })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (task?.taskUid && typeof (c as any).waitForTask === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await withTimeout((c as any).waitForTask(task.taskUid), 8000)
+          }
+        } else {
+          throw e
+        }
+      }
+
+      // Set best-practice search settings for Articles
+      // (site/status/categories/tags filterable; dates sortable; content searchable)
+      const task = await index.updateSettings({
+        searchableAttributes: ['title', 'excerpt', 'contentText'],
+        filterableAttributes: ['site', 'status', 'categories', 'tags'],
+        sortableAttributes: ['publishedAt', 'updatedAt', 'title'],
+        displayedAttributes: [
+          'id',
+          'site',
+          'title',
+          'slug',
+          'excerpt',
+          'status',
+          'publishedAt',
+          'updatedAt',
+          'categories',
+          'tags',
+          'contentText',
+        ],
+      })
+
+      // Wait if supported (helps make tests deterministic)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (task?.taskUid && typeof (c as any).waitForTask === 'function') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await withTimeout((c as any).waitForTask(task.taskUid), 8000)
+      }
+    })()
+  }
+
+  return ensureSettingsPromise
+}
+
 export async function upsertArticleToMeili(doc: unknown): Promise<void> {
   const c = getClient()
   if (!c) return
 
+  await ensureArticlesIndexSettings()
+
   const payloadDoc = toMeiliArticleDoc(doc)
   if (!payloadDoc) return
+  if (!payloadDoc.site) return
 
   const index = c.index(INDEX_NAME)
   await withTimeout(index.updateDocuments([payloadDoc]), 4000)
