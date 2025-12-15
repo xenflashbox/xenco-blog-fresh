@@ -18,13 +18,13 @@ const dbURI = process.env.DATABASE_URI
 if (!dbURI) {
   throw new Error('Missing DATABASE_URI in runtime environment (Vercel)')
 }
-const serverURL =
-  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
-  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
-  ''
+//const serverURL =
+//  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+//  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
+//  ''
 
 export default buildConfig({
-  serverURL,
+  //serverURL,
 
   admin: {
     user: Users.slug,
