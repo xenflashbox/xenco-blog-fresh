@@ -4,6 +4,7 @@
   "description": "A blank template to get started with Payload 3.0",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@10.25.0",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "prebuild": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" pnpm run generate:importmap && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" pnpm run generate:types",
@@ -28,6 +29,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
+    "meilisearch": "^0.54.0",
     "next": "15.4.10",
     "payload": "3.68.4",
     "react": "19.2.1",
@@ -53,7 +55,7 @@
     "vitest": "3.2.3"
   },
   "engines": {
-    "node": "^18.20.2 || >=20.9.0",
+    "node": "20.x",
     "pnpm": "^9 || ^10"
   },
   "pnpm": {
