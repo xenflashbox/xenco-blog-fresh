@@ -11,7 +11,7 @@ import { Media } from './collections/Media'
 import { Articles } from './collections/Articles'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
-import { getMeiliClient, toMeiliArticleDoc } from './lib/meili'
+import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -19,12 +19,6 @@ const dbURI = process.env.DATABASE_URI
 if (!dbURI) {
   throw new Error('Missing DATABASE_URI in runtime environment (Vercel)')
 }
-
-const json = (body: any, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { 'content-type': 'application/json' },
-  })
 //const serverURL =
 //  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
 //  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
@@ -44,62 +38,7 @@ export default buildConfig({
 
   collections: [Users, Media, Articles, Categories, Tags],
 
-  endpoints: [
-    {
-      path: '/reindex/articles',
-      method: 'post',
-      handler: async ({ payload, req }) => {
-        const headers: any = (req as any)?.headers
-        const apiKey =
-          typeof headers?.get === 'function'
-            ? headers.get('x-api-key')
-            : headers?.['x-api-key'] ?? headers?.['X-Api-Key']
-
-        if (!apiKey || apiKey !== process.env.REINDEX_API_KEY) {
-          return json({ ok: false, error: 'Unauthorized' }, 401)
-        }
-
-        const meili = getMeiliClient()
-        if (!meili) {
-          return json(
-            { ok: false, error: 'MeiliSearch not configured (MEILISEARCH_HOST/KEY missing)' },
-            500,
-          )
-        }
-
-        const indexName = process.env.MEILISEARCH_ARTICLES_INDEX || 'articles'
-        const index = meili.index(indexName)
-
-        const limit = 100
-        let page = 1
-        let indexed = 0
-
-        while (true) {
-          const res = await payload.find({
-            collection: 'articles',
-            where: { status: { equals: 'published' } },
-            limit,
-            page,
-            depth: 0,
-            overrideAccess: true,
-          })
-
-          if (!res.docs?.length) break
-
-          const docs = res.docs.map(toMeiliArticleDoc).filter(Boolean) as any[]
-          if (docs.length) {
-            await index.updateDocuments(docs)
-            indexed += docs.length
-          }
-
-          if (page >= (res.totalPages ?? 1)) break
-          page++
-        }
-
-        return json({ ok: true, indexed })
-      },
-    },
-  ],
+  endpoints: [reindexArticlesEndpoint],
 
   editor: lexicalEditor(),
 
