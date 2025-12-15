@@ -1,5 +1,5 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
-import { resolveSiteForRequest } from '../lib/site'
+import { resolveSiteForRequest, getDefaultSiteId } from '../lib/site'
 import { ensureUniqueSlugForSite } from '../lib/uniqueSlug'
 
 function slugify(input: string): string {
@@ -14,11 +14,24 @@ function slugify(input: string): string {
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   if (!data) return data
 
-  // site assignment on create
+  // Preserve site on update if not provided
+  if (operation === 'update' && !data.site && (originalDoc as any)?.site) {
+    data.site = (originalDoc as any).site
+  }
+
+  // site assignment on create with fallback
   if (operation === 'create' && !data.site) {
     const site = await resolveSiteForRequest(req.payload, req.headers)
-    if (!site?.id) throw new Error('No default site found. Create a Site with isDefault=true.')
-    data.site = site.id
+    if (!site?.id) {
+      // Fallback to default site
+      const defaultSiteId = await getDefaultSiteId(req.payload)
+      if (!defaultSiteId) {
+        throw new Error('No default site found. Create a Site with isDefault=true.')
+      }
+      data.site = defaultSiteId
+    } else {
+      data.site = site.id
+    }
   }
 
   // slug from title if missing
@@ -70,6 +83,12 @@ export const Categories: CollectionConfig = {
       relationTo: 'sites',
       required: true,
       admin: { position: 'sidebar' },
+      defaultValue: async ({ req }) => {
+        const site = await resolveSiteForRequest(req.payload, req.headers)
+        if (site?.id) return site.id
+        const defaultSiteId = await getDefaultSiteId(req.payload)
+        return defaultSiteId
+      },
     },
   ],
 }

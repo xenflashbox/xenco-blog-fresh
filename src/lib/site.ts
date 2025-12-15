@@ -48,7 +48,7 @@ export function getHostFromHeaders(headers: Headers | Record<string, string> | a
   return first || null
 }
 
-async function getDefaultSiteId(payload: PayloadLike): Promise<string | null> {
+export async function getDefaultSiteId(payload: PayloadLike): Promise<string | null> {
   const now = Date.now()
   if (cachedDefaultSiteId && now - cachedDefaultSiteAt < 60_000) return cachedDefaultSiteId
 
