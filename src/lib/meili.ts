@@ -113,3 +113,11 @@ export async function deleteArticleFromMeili(id: string): Promise<void> {
   const index = c.index(INDEX_NAME)
   await withTimeout(index.deleteDocument(id), 4000)
 }
+// Add this export (keep your existing getClient() and everything else)
+export function getMeiliClient(): MeiliSearch {
+  const c = getClient()
+  if (!c) {
+    throw new Error('MeiliSearch not configured (MEILISEARCH_HOST / MEILISEARCH_KEY missing)')
+  }
+  return c
+}
