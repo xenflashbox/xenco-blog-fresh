@@ -1,6 +1,25 @@
 // src/lib/meili.ts
 import { MeiliSearch } from 'meilisearch'
 
+export function toMeiliArticleDoc(doc: unknown) {
+  const a = doc as Record<string, unknown>
+  const id = a.id
+  if (typeof id !== 'string' && typeof id !== 'number') return null
+
+  return {
+    id: String(id),
+    title: typeof a.title === 'string' ? a.title : '',
+    slug: typeof a.slug === 'string' ? a.slug : '',
+    excerpt: typeof a.excerpt === 'string' ? a.excerpt : '',
+    status: typeof a.status === 'string' ? a.status : '',
+    publishedAt: a.publishedAt ? String(a.publishedAt) : null,
+    updatedAt: a.updatedAt ? String(a.updatedAt) : null,
+    categories: asStringArray(a.categories),
+    tags: asStringArray(a.tags),
+    contentText: extractTextFromLexical(a.content),
+  }
+}
+
 const MEILI_HOST = process.env.MEILISEARCH_HOST
 const MEILI_KEY = process.env.MEILISEARCH_KEY
 const INDEX_NAME = process.env.MEILISEARCH_ARTICLES_INDEX || 'articles'
@@ -84,22 +103,8 @@ export async function upsertArticleToMeili(doc: unknown): Promise<void> {
   const c = getClient()
   if (!c) return
 
-  const a = doc as Record<string, unknown>
-  const id = a.id
-  if (typeof id !== 'string' && typeof id !== 'number') return
-
-  const payloadDoc = {
-    id: String(id),
-    title: typeof a.title === 'string' ? a.title : '',
-    slug: typeof a.slug === 'string' ? a.slug : '',
-    excerpt: typeof a.excerpt === 'string' ? a.excerpt : '',
-    status: typeof a.status === 'string' ? a.status : '',
-    publishedAt: a.publishedAt ? String(a.publishedAt) : null,
-    updatedAt: a.updatedAt ? String(a.updatedAt) : null,
-    categories: asStringArray(a.categories),
-    tags: asStringArray(a.tags),
-    contentText: extractTextFromLexical(a.content),
-  }
+  const payloadDoc = toMeiliArticleDoc(doc)
+  if (!payloadDoc) return
 
   const index = c.index(INDEX_NAME)
   await withTimeout(index.updateDocuments([payloadDoc]), 4000)
@@ -113,11 +118,6 @@ export async function deleteArticleFromMeili(id: string): Promise<void> {
   const index = c.index(INDEX_NAME)
   await withTimeout(index.deleteDocument(id), 4000)
 }
-// Add this export (keep your existing getClient() and everything else)
-export function getMeiliClient(): MeiliSearch {
-  const c = getClient()
-  if (!c) {
-    throw new Error('MeiliSearch not configured (MEILISEARCH_HOST / MEILISEARCH_KEY missing)')
-  }
-  return c
+export function getMeiliClient(): MeiliSearch | null {
+  return getClient()
 }
