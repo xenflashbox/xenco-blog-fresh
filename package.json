@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.948.0",
-    "@payloadcms/db-postgres": "3.68.3",
+    "@payloadcms/db-postgres": "3.68.4",
     "@payloadcms/next": "3.68.4",
-    "@payloadcms/richtext-lexical": "3.68.3",
+    "@payloadcms/richtext-lexical": "3.68.4",
     "@payloadcms/storage-s3": "3.68.4",
     "@payloadcms/ui": "3.68.4",
     "cross-env": "^7.0.3",
