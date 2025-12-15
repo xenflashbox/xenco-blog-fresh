@@ -11,6 +11,7 @@ import { Media } from './collections/Media'
 import { Articles } from './collections/Articles'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
+import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -36,6 +37,9 @@ export default buildConfig({
   },
 
   collections: [Users, Media, Articles, Categories, Tags],
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endpoints: [reindexArticlesEndpoint as any],
 
   editor: lexicalEditor(),
 
