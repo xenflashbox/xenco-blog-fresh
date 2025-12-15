@@ -1,4 +1,4 @@
-import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
+import type { CollectionConfig, CollectionBeforeChangeHook, CollectionBeforeDeleteHook } from 'payload'
 
 function normalizeDomain(raw: string | null | undefined): string | null {
   if (!raw) return null
@@ -30,6 +30,60 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc
         return null
       })
       .filter((d: any) => d !== null)
+
+    // Deduplicate normalized domains inside the same Site
+    const seen = new Set<string>()
+    data.domains = data.domains.filter((d: any) => {
+      const dom = d?.domain
+      if (typeof dom !== 'string') return false
+      if (seen.has(dom)) return false
+      seen.add(dom)
+      return true
+    })
+  }
+
+  // If no default exists yet, force this site to become default.
+  // This prevents the platform from getting stuck (Articles requires a default fallback).
+  const currentId = (originalDoc as any)?.id
+  const existingDefault = await req.payload.find({
+    collection: 'sites',
+    where: {
+      and: [
+        { isDefault: { equals: true } },
+        ...(currentId ? [{ id: { not_equals: currentId } }] : []),
+      ],
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  if (!existingDefault.docs?.length) {
+    data.isDefault = true
+  }
+
+  // Block unsetting the last default
+  const wasDefault = Boolean((originalDoc as any)?.isDefault)
+  const willBeDefault = data.isDefault === true
+
+  if (wasDefault && !willBeDefault) {
+    // ensure there is another default; otherwise block
+    const otherDefault = await req.payload.find({
+      collection: 'sites',
+      where: {
+        and: [
+          { isDefault: { equals: true } },
+          { id: { not_equals: String((originalDoc as any)?.id) } },
+        ],
+      },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    if (!otherDefault.docs?.length) {
+      throw new Error('You cannot unset the last default site. Set another site as default first.')
+    }
   }
 
   // If setting isDefault=true, unset other defaults
@@ -42,7 +96,6 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc
       overrideAccess: true,
     })
 
-    const currentId = (originalDoc as any)?.id
     for (const site of allSites.docs || []) {
       if (String(site.id) !== String(currentId)) {
         await req.payload.update({
@@ -87,6 +140,34 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc
   return data
 }
 
+const beforeDelete: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const site = await req.payload.findByID({
+    collection: 'sites',
+    id: String(id),
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  if (site?.isDefault) {
+    const otherDefault = await req.payload.find({
+      collection: 'sites',
+      where: {
+        and: [
+          { isDefault: { equals: true } },
+          { id: { not_equals: String(id) } },
+        ],
+      },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    if (!otherDefault.docs?.length) {
+      throw new Error('You cannot delete the last default site. Set another site as default first.')
+    }
+  }
+}
+
 export const Sites: CollectionConfig = {
   slug: 'sites',
   admin: { useAsTitle: 'name' },
@@ -98,6 +179,7 @@ export const Sites: CollectionConfig = {
   },
   hooks: {
     beforeChange: [beforeChange],
+    beforeDelete: [beforeDelete],
   },
   fields: [
     { name: 'name', type: 'text', required: true },
