@@ -1,5 +1,5 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
-import { resolveSiteForRequest, getDefaultSiteId } from '../lib/site'
+import { resolveSiteForRequest } from '../lib/site'
 import { ensureUniqueSlugForSite } from '../lib/uniqueSlug'
 
 function slugify(input: string): string {
@@ -11,40 +11,40 @@ function slugify(input: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
+const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation: _operation, originalDoc }) => {
   if (!data) return data
-
-  // Preserve site on update if not provided
-  if (operation === 'update' && !data.site && (originalDoc as any)?.site) {
-    data.site = (originalDoc as any).site
-  }
-
-  // site assignment on create with fallback
-  if (operation === 'create' && !data.site) {
-    const site = await resolveSiteForRequest(req.payload, req.headers)
-    if (!site?.id) {
-      // Fallback to default site
-      const defaultSiteId = await getDefaultSiteId(req.payload)
-      if (!defaultSiteId) {
-        throw new Error('No default site found. Create a Site with isDefault=true.')
-      }
-      data.site = defaultSiteId
-    } else {
-      data.site = site.id
-    }
-  }
 
   // slug from name if missing
   if (typeof data.name === 'string' && (!data.slug || typeof data.slug !== 'string')) {
     data.slug = slugify(data.name)
   }
 
-  const siteId =
+  // Safer siteId extraction with fallback to originalDoc.site
+  let siteId: string | null =
     typeof data.site === 'string' || typeof data.site === 'number'
       ? String(data.site)
       : (data.site as any)?.id
         ? String((data.site as any).id)
         : null
+
+  // IMPORTANT: on update, Payload admin may omit relationship fields from `data`
+  if (!siteId && originalDoc && (originalDoc as any).site) {
+    const orig = (originalDoc as any).site
+    siteId =
+      typeof orig === 'string' || typeof orig === 'number'
+        ? String(orig)
+        : orig?.id
+          ? String(orig.id)
+          : null
+  }
+
+  // If still missing, resolve (works for create AND "weird admin payloads")
+  if (!siteId) {
+    const site = await resolveSiteForRequest(req.payload, req.headers)
+    if (!site?.id) throw new Error('No default site found. Create a Site with isDefault=true.')
+    data.site = site.id
+    siteId = String(site.id)
+  }
 
   if (!siteId) throw new Error('Tag.site is required.')
 
@@ -86,9 +86,7 @@ export const Tags: CollectionConfig = {
       admin: { position: 'sidebar' },
       defaultValue: async ({ req }) => {
         const site = await resolveSiteForRequest(req.payload, req.headers)
-        if (site?.id) return site.id
-        const defaultSiteId = await getDefaultSiteId(req.payload)
-        return defaultSiteId
+        return site?.id ?? undefined
       },
     },
   ],
