@@ -214,7 +214,9 @@ export const Articles: CollectionConfig = {
         const siteId =
           typeof site === 'string' || typeof site === 'number'
             ? String(site)
-            : site?.id ? String(site.id) : null
+            : site?.id
+              ? String(site.id)
+              : null
         if (!siteId) return true
         return { site: { equals: siteId } }
       },
@@ -230,7 +232,9 @@ export const Articles: CollectionConfig = {
         const siteId =
           typeof site === 'string' || typeof site === 'number'
             ? String(site)
-            : site?.id ? String(site.id) : null
+            : site?.id
+              ? String(site.id)
+              : null
         if (!siteId) return true
         return { site: { equals: siteId } }
       },
