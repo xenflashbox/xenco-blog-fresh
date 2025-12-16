@@ -120,7 +120,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
         siteId = defaultSiteId
       }
 
-      ;(data as any).site = siteId
+      ;(data as any).site = Number(siteId)
     }
   }
 
@@ -245,6 +245,10 @@ export const Articles: CollectionConfig = {
       relationTo: 'sites',
       admin: { position: 'sidebar' },
       required: true,
+      defaultValue: async ({ req }) => {
+        const site = await resolveSiteForRequest(req.payload, req.headers)
+        return site?.id ? Number(site.id) : undefined
+      },
     },
 
     {
