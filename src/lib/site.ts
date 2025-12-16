@@ -91,11 +91,12 @@ export async function resolveSiteForRequest(
     return id ? { id } : null
   }
 
-  // Try both variants: exact, without www, and with www
-  const hostNoWww = host.startsWith('www.') ? host.slice(4) : host
-  const hostWithWww = hostNoWww.startsWith('www.') ? hostNoWww : `www.${hostNoWww}`
+  // IMPORTANT: allow cms.<domain> to match stored <domain>
+  const noCms = host.startsWith('cms.') ? host.slice(4) : host
+  const noWww = noCms.startsWith('www.') ? noCms.slice(4) : noCms
+  const withWww = `www.${noWww}`
 
-  const candidates = Array.from(new Set([host, hostNoWww, hostWithWww]))
+  const candidates = Array.from(new Set([host, noCms, noWww, withWww]))
 
   for (const candidate of candidates) {
     const id = await findSiteByDomain(payload, candidate)

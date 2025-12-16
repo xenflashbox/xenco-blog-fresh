@@ -1,33 +1,32 @@
-import type { CollectionConfig, CollectionBeforeChangeHook, CollectionBeforeDeleteHook } from 'payload'
-
-function normalizeDomain(raw: string | null | undefined): string | null {
-  if (!raw) return null
-  const s = String(raw)
-    .trim()
-    .toLowerCase()
-    .replace(/^https?:\/\//, '')
-    .split('/')[0]
-    .replace(/:\d+$/, '')
-    .replace(/\/+$/, '')
-  return s || null
-}
+import type {
+  CollectionConfig,
+  CollectionBeforeChangeHook,
+  CollectionBeforeDeleteHook,
+} from 'payload'
+import { normalizeDomain } from '../lib/site'
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc }) => {
   if (!data) return data
 
-  // Normalize domains
+  // Normalize domains - store only root domains (remove cms. and www. prefixes)
   if (Array.isArray(data.domains)) {
     data.domains = data.domains
       .map((d: any) => {
+        let raw: string | null = null
         if (typeof d === 'string') {
-          const normalized = normalizeDomain(d)
-          return normalized ? { domain: normalized } : null
+          raw = d
+        } else if (d && typeof d === 'object' && typeof d.domain === 'string') {
+          raw = d.domain
         }
-        if (d && typeof d === 'object' && typeof d.domain === 'string') {
-          const normalized = normalizeDomain(d.domain)
-          return normalized ? { domain: normalized } : null
-        }
-        return null
+
+        if (!raw) return null
+
+        const normalized = normalizeDomain(raw)
+        if (!normalized) return null
+
+        // Strip cms. and www. prefixes to store only root domain
+        const canonical = normalized.replace(/^cms\./, '').replace(/^www\./, '')
+        return canonical ? { domain: canonical } : null
       })
       .filter((d: any) => d !== null)
 
@@ -152,10 +151,7 @@ const beforeDelete: CollectionBeforeDeleteHook = async ({ id, req }) => {
     const otherDefault = await req.payload.find({
       collection: 'sites',
       where: {
-        and: [
-          { isDefault: { equals: true } },
-          { id: { not_equals: String(id) } },
-        ],
+        and: [{ isDefault: { equals: true } }, { id: { not_equals: String(id) } }],
       },
       limit: 1,
       depth: 0,
@@ -198,4 +194,3 @@ export const Sites: CollectionConfig = {
     { name: 'isDefault', type: 'checkbox', defaultValue: false },
   ],
 }
-
