@@ -11,7 +11,7 @@ let cachedDefaultSiteAt = 0
 export function normalizeDomain(raw: string | null | undefined): string | null {
   if (!raw) return null
 
-  const s = String(raw)
+  let s = String(raw)
     .trim()
     .toLowerCase()
     .replace(/^https?:\/\//, '')
@@ -21,6 +21,9 @@ export function normalizeDomain(raw: string | null | undefined): string | null {
     .replace(/:\d+$/, '')
     .replace(/\.$/, '') // strip trailing dot
     .replace(/\/+$/, '')
+
+  // IMPORTANT: map cms.<domain> -> <domain>
+  if (s.startsWith('cms.')) s = s.slice(4)
 
   return s || null
 }

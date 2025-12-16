@@ -12,7 +12,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
   // Assign site on create if missing
   if (operation === 'create' && !data.site) {
     const site = await resolveSiteForRequest(req.payload, req.headers)
-    if (site?.id) data.site = site.id
+    if (site?.id) data.site = Number(site.id)
   }
 
   return data
@@ -36,7 +36,7 @@ export const Media: CollectionConfig = {
       admin: { position: 'sidebar' },
       defaultValue: async ({ req }) => {
         const site = await resolveSiteForRequest(req.payload, req.headers)
-        return site?.id ?? undefined
+        return site?.id ? Number(site.id) : undefined
       },
       index: true,
     },

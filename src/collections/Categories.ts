@@ -11,7 +11,7 @@ function slugify(input: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
+const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation: _operation, originalDoc }) => {
   if (!data) return data
 
   // slug from title if missing
@@ -42,7 +42,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
   if (!siteId) {
     const site = await resolveSiteForRequest(req.payload, req.headers)
     if (!site?.id) throw new Error('No default site found. Create a Site with isDefault=true.')
-    data.site = site.id
+    data.site = Number(site.id)
     siteId = String(site.id)
   }
 
@@ -87,7 +87,7 @@ export const Categories: CollectionConfig = {
       admin: { position: 'sidebar' },
       defaultValue: async ({ req }) => {
         const site = await resolveSiteForRequest(req.payload, req.headers)
-        return site?.id ?? undefined
+        return site?.id ? Number(site.id) : undefined
       },
     },
   ],

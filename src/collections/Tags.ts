@@ -47,7 +47,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({
   if (!siteId) {
     const site = await resolveSiteForRequest(req.payload, req.headers)
     if (!site?.id) throw new Error('No default site found. Create a Site with isDefault=true.')
-    data.site = site.id
+    data.site = Number(site.id)
     siteId = String(site.id)
   }
 
@@ -91,7 +91,7 @@ export const Tags: CollectionConfig = {
       admin: { position: 'sidebar' },
       defaultValue: async ({ req }) => {
         const site = await resolveSiteForRequest(req.payload, req.headers)
-        return site?.id ?? undefined
+        return site?.id ? Number(site.id) : undefined
       },
     },
   ],
