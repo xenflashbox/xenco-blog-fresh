@@ -11,7 +11,12 @@ function slugify(input: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation: _operation, originalDoc }) => {
+const beforeChange: CollectionBeforeChangeHook = async ({
+  data,
+  req,
+  operation: _operation,
+  originalDoc,
+}) => {
   if (!data) return data
 
   // slug from title if missing
