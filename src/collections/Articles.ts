@@ -81,6 +81,22 @@ async function ensureUniqueSlugForSite(args: {
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   if (!data) return data
 
+  // Parse content from JSON string (Make.com sends Lexical JSON as a string)
+  const raw = (data as any).content
+
+  // If Make accidentally sends ["{...}"] instead of "{...}"
+  if (Array.isArray(raw) && raw.length === 1 && typeof raw[0] === 'string') {
+    ;(data as any).content = raw[0]
+  }
+
+  if (typeof (data as any).content === 'string') {
+    try {
+      ;(data as any).content = JSON.parse((data as any).content)
+    } catch {
+      throw new Error('Article.content must be valid Lexical JSON.')
+    }
+  }
+
   // Normalize/auto-slug if missing
   if (typeof data.title === 'string' && (!data.slug || typeof data.slug !== 'string')) {
     data.slug = slugify(data.title)
