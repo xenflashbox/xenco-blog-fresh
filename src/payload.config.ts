@@ -10,6 +10,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Sites } from './collections/Sites'
 import { Articles } from './collections/Articles'
+import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
@@ -39,7 +40,7 @@ export default buildConfig({
     },
   },
 
-  collections: [Users, Media, Sites, Articles, Categories, Tags],
+  collections: [Users, Media, Sites, Articles, Authors, Categories, Tags],
 
   endpoints: [reindexArticlesEndpoint, searchArticlesEndpoint, backfillArticleSitesEndpoint],
 

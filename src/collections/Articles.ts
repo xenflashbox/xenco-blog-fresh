@@ -256,6 +256,29 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+      name: 'author',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: { position: 'sidebar' },
+      // enforce only when publishing
+      validate: (val: unknown, { data }: { data: Record<string, unknown> }) => {
+        if (data?.status === 'published' && !val) return 'Author is required to publish.'
+        return true
+      },
+      // filter authors by site in admin UI
+      filterOptions: ({ data }) => {
+        const site = (data as any)?.site
+        const siteId =
+          typeof site === 'string' || typeof site === 'number'
+            ? String(site)
+            : site?.id
+              ? String(site.id)
+              : null
+        if (!siteId) return true
+        return { site: { equals: siteId } }
+      },
+    },
+    {
       name: 'site',
       type: 'relationship',
       relationTo: 'sites',

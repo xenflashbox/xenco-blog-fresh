@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     sites: Site;
     articles: Article;
+    authors: Author;
     categories: Category;
     tags: Tag;
     'payload-kv': PayloadKv;
@@ -84,6 +85,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     sites: SitesSelect<false> | SitesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -133,6 +135,9 @@ export interface User {
   role: 'admin' | 'editor';
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -220,6 +225,7 @@ export interface Article {
   } | null;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
+  author?: (number | null) | Author;
   site: number | Site;
   status: 'draft' | 'published';
   publishedAt?: string | null;
@@ -248,6 +254,22 @@ export interface Tag {
   name: string;
   slug: string;
   site: number | Site;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: number;
+  name: string;
+  slug: string;
+  bio?: string | null;
+  avatar?: (number | null) | Media;
+  website?: string | null;
+  site: number | Site;
+  isDefault?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -290,6 +312,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'articles';
         value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'authors';
+        value: number | Author;
       } | null)
     | ({
         relationTo: 'categories';
@@ -349,6 +375,9 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -412,9 +441,25 @@ export interface ArticlesSelect<T extends boolean = true> {
   content?: T;
   categories?: T;
   tags?: T;
+  author?: T;
   site?: T;
   status?: T;
   publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  bio?: T;
+  avatar?: T;
+  website?: T;
+  site?: T;
+  isDefault?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function ensureUniqueSlugForSite(args: {
   payload: { find: (args: any) => Promise<any> }
-  collection: 'categories' | 'tags'
+  collection: 'categories' | 'tags' | 'authors'
   siteId: string
   desiredSlug: string
   currentId?: string
