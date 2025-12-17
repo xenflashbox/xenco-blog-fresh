@@ -5,15 +5,21 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
+
+  // ✅ Enable per-user API keys
+  auth: {
+    useAPIKey: true,
+  },
+
   access: {
-    // First user or authenticated users can do everything
+    // NOTE: this is currently wide-open (OK for dev, risky for prod)
     create: () => true,
     read: () => true,
     update: () => true,
     delete: () => true,
     admin: () => true,
   },
+
   fields: [
     {
       name: 'role',
