@@ -223,30 +223,57 @@ export const Articles: CollectionConfig = {
       admin: { description: 'Short summary used on listing pages / previews.' },
     },
 
+    // Featured image - smaller square/4x6 format for cards and listings
+    {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Main image for article cards and social sharing (recommended: 1200x630)',
+      },
+    },
+
+    // Hero background image - full-width background for article pages
+    {
+      name: 'heroImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Optional hero background image (full-width, can be same as featured)',
+      },
+    },
+
     {
       name: 'content',
       type: 'richText',
       editor: lexicalEditor({
-        features: ({ defaultFeatures }) => [
-          ...defaultFeatures,
-          // Explicitly enable upload feature for media
-          UploadFeature({
-            collections: {
-              media: {
-                fields: [
-                  {
-                    name: 'caption',
-                    type: 'text',
-                    label: 'Caption',
-                  },
-                ],
+        features: ({ defaultFeatures }) => {
+          // Filter out default Upload/List features to avoid duplicates
+          const filteredFeatures = defaultFeatures.filter(
+            (feature) =>
+              !['upload', 'unorderedList', 'orderedList'].includes(feature.key),
+          )
+          return [
+            ...filteredFeatures,
+            // Explicitly enable upload feature for media with caption support
+            UploadFeature({
+              collections: {
+                media: {
+                  fields: [
+                    {
+                      name: 'caption',
+                      type: 'text',
+                      label: 'Caption',
+                    },
+                  ],
+                },
               },
-            },
-          }),
-          // Explicitly enable list features
-          UnorderedListFeature(),
-          OrderedListFeature(),
-        ],
+            }),
+            // Explicitly enable list features
+            UnorderedListFeature(),
+            OrderedListFeature(),
+          ]
+        },
       }),
     },
 

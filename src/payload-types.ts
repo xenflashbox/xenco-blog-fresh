@@ -208,6 +208,14 @@ export interface Article {
    * Short summary used on listing pages / previews.
    */
   excerpt?: string | null;
+  /**
+   * Main image for article cards and social sharing (recommended: 1200x630)
+   */
+  featuredImage?: (number | null) | Media;
+  /**
+   * Optional hero background image (full-width, can be same as featured)
+   */
+  heroImage?: (number | null) | Media;
   content?: {
     root: {
       type: string;
@@ -438,6 +446,8 @@ export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   excerpt?: T;
+  featuredImage?: T;
+  heroImage?: T;
   content?: T;
   categories?: T;
   tags?: T;
