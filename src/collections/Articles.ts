@@ -5,6 +5,12 @@ import type {
   CollectionAfterDeleteHook,
   CollectionBeforeChangeHook,
 } from 'payload'
+import {
+  lexicalEditor,
+  UploadFeature,
+  UnorderedListFeature,
+  OrderedListFeature,
+} from '@payloadcms/richtext-lexical'
 
 import { upsertArticleToMeili, deleteArticleFromMeili } from '../lib/meili'
 import { resolveSiteForRequest } from '../lib/site'
@@ -217,7 +223,32 @@ export const Articles: CollectionConfig = {
       admin: { description: 'Short summary used on listing pages / previews.' },
     },
 
-    { name: 'content', type: 'richText' },
+    {
+      name: 'content',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          // Explicitly enable upload feature for media
+          UploadFeature({
+            collections: {
+              media: {
+                fields: [
+                  {
+                    name: 'caption',
+                    type: 'text',
+                    label: 'Caption',
+                  },
+                ],
+              },
+            },
+          }),
+          // Explicitly enable list features
+          UnorderedListFeature(),
+          OrderedListFeature(),
+        ],
+      }),
+    },
 
     {
       name: 'categories',
