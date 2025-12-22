@@ -8,15 +8,22 @@ export function toMeiliArticleDoc(doc: unknown) {
 
   return {
     id: String(id),
-    site: asString(a.site),
+
+    // IMPORTANT: store site as a FLAT string (prefer slug over id)
+    site: asSlugOrId(a.site),
+
     title: typeof a.title === 'string' ? a.title : '',
     slug: typeof a.slug === 'string' ? a.slug : '',
     excerpt: typeof a.excerpt === 'string' ? a.excerpt : '',
     status: typeof a.status === 'string' ? a.status : '',
+
     publishedAt: a.publishedAt ? String(a.publishedAt) : null,
     updatedAt: a.updatedAt ? String(a.updatedAt) : null,
-    categories: asStringArray(a.categories),
-    tags: asStringArray(a.tags),
+
+    // IMPORTANT: store categories/tags as FLAT string arrays (prefer slug over id)
+    categories: asSlugOrIdArray(a.categories),
+    tags: asSlugOrIdArray(a.tags),
+
     contentText: extractTextFromLexical(a.content),
   }
 }
@@ -48,66 +55,53 @@ function extractTextFromLexical(value: unknown): string {
     if (typeof node !== 'object') return
     const obj = node as Record<string, unknown>
 
-    // Prevent re-walking the same object
     if (seen.has(obj as object)) return
     seen.add(obj as object)
 
-    // Text nodes usually store actual text here
     if (typeof obj.text === 'string') chunks.push(obj.text)
 
-    // Payload Lexical content commonly nests under root.children
     if (obj.root && typeof obj.root === 'object') walk(obj.root)
-
-    // Standard Lexical trees use children arrays
     if (Array.isArray(obj.children)) walk(obj.children)
-
-    // Only walk specific known nested fields to avoid re-walking
     if (obj.fields && typeof obj.fields === 'object') walk(obj.fields)
     if (obj.value && typeof obj.value === 'object') walk(obj.value)
   }
 
   walk(value)
-
   return chunks.join(' ').replace(/\s+/g, ' ').trim()
 }
 
-function asString(value: unknown): string | null {
+/**
+ * Prefer slug when present, else id, else string/number.
+ * This is what fixes your site/categories/tags filters.
+ */
+function asSlugOrId(value: unknown): string | null {
   if (typeof value === 'string' || typeof value === 'number') return String(value)
-  if (value && typeof value === 'object' && 'id' in (value as Record<string, unknown>)) {
-    const id = (value as Record<string, unknown>).id
-    if (typeof id === 'string' || typeof id === 'number') return String(id)
+
+  if (value && typeof value === 'object') {
+    const v = value as Record<string, unknown>
+    if (typeof v.slug === 'string' && v.slug.trim()) return v.slug
+    if (typeof v.id === 'string' || typeof v.id === 'number') return String(v.id)
   }
+
   return null
 }
 
-function asStringArray(value: unknown): string[] {
+function asSlugOrIdArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return value
-    .map((v) => {
-      if (typeof v === 'string' || typeof v === 'number') return String(v)
-      if (v && typeof v === 'object' && 'id' in (v as Record<string, unknown>)) {
-        const id = (v as Record<string, unknown>).id
-        if (typeof id === 'string' || typeof id === 'number') return String(id)
-      }
-      return null
-    })
+    .map((v) => asSlugOrId(v))
     .filter((v): v is string => Boolean(v))
 }
 
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), ms)
-
+  const timeout = setTimeout(() => {}, ms)
   try {
-    // meilisearch client supports fetch under the hood; we can’t pass signal easily everywhere,
-    // so we just race it (still prevents long hangs).
     return await Promise.race([
       promise,
       new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Meili timeout')), ms)),
     ])
   } finally {
     clearTimeout(timeout)
-    controller.abort()
   }
 }
 
@@ -121,13 +115,10 @@ export async function ensureArticlesIndexSettings(): Promise<void> {
     ensureSettingsPromise = (async () => {
       const index = c.index(INDEX_NAME)
 
-      // Ensure index exists (create if missing)
       try {
-        // Works in most Meili versions
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (index as any).getRawInfo?.()
       } catch (e: unknown) {
-        // Create index if it doesn't exist
         const error = e as { status?: number; response?: { status?: number } }
         const status = error?.status ?? error?.response?.status
         if (status === 404) {
@@ -143,8 +134,7 @@ export async function ensureArticlesIndexSettings(): Promise<void> {
         }
       }
 
-      // Set best-practice search settings for Articles
-      // (site/status/categories/tags filterable; dates sortable; content searchable)
+      // Keep FLAT settings - site/categories/tags are now slugs not nested objects
       const task = await index.updateSettings({
         searchableAttributes: ['title', 'excerpt', 'contentText'],
         filterableAttributes: ['site', 'status', 'categories', 'tags'],
@@ -164,7 +154,6 @@ export async function ensureArticlesIndexSettings(): Promise<void> {
         ],
       })
 
-      // Wait if supported (helps make tests deterministic)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (task?.taskUid && typeof (c as any).waitForTask === 'function') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -184,6 +173,8 @@ export async function upsertArticleToMeili(doc: unknown): Promise<void> {
 
   const payloadDoc = toMeiliArticleDoc(doc)
   if (!payloadDoc) return
+
+  // IMPORTANT: site is now slug/id; must exist
   if (!payloadDoc.site) return
 
   const index = c.index(INDEX_NAME)
@@ -198,6 +189,7 @@ export async function deleteArticleFromMeili(id: string): Promise<void> {
   const index = c.index(INDEX_NAME)
   await withTimeout(index.deleteDocument(id), 4000)
 }
+
 export function getMeiliClient(): MeiliSearch | null {
   return getClient()
 }
