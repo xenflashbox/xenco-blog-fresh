@@ -150,7 +150,6 @@ export const meiliResyncEndpoint: Endpoint = {
       let page = 1
       let indexed = 0
       let skippedMissingSite = 0
-      let skippedWrongSite = 0
 
       while (true) {
         const whereClause: any = { status: { equals: 'published' } }
