@@ -1,40 +1,30 @@
 // src/endpoints/meiliAdmin.ts
 // Admin endpoints for MeiliSearch configuration and resync
-// Authenticated via Payload user API key (x-api-key header)
+// Authenticated via Payload user API key (Authorization header)
 
 import type { Endpoint } from 'payload'
 import { getMeiliClient, toMeiliArticleDoc, ensureArticlesIndexSettings } from '../lib/meili'
 
 /**
- * Verify API key from header against Users collection
+ * Verify user is authenticated and has admin role
+ * Uses Payload's built-in API key auth via Authorization header:
+ *   Authorization: users API-Key YOUR_API_KEY
  */
-async function verifyApiKey(req: any): Promise<{ valid: boolean; user?: any; error?: string }> {
-  const apiKeyHeader = req.headers?.get?.('x-api-key') || req.headers?.['x-api-key']
+async function verifyAdmin(req: any): Promise<{ valid: boolean; user?: any; error?: string }> {
+  // Payload automatically authenticates the user from the Authorization header
+  // and attaches it to req.user
+  const user = req.user
 
-  if (!apiKeyHeader) {
-    return { valid: false, error: 'Missing x-api-key header' }
+  if (!user) {
+    return {
+      valid: false,
+      error: 'Unauthorized. Use header: Authorization: users API-Key YOUR_API_KEY',
+    }
   }
-
-  // Find user by API key
-  const result = await req.payload.find({
-    collection: 'users',
-    where: {
-      apiKey: { equals: apiKeyHeader },
-    },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-  })
-
-  if (!result.docs?.length) {
-    return { valid: false, error: 'Invalid API key' }
-  }
-
-  const user = result.docs[0]
 
   // Check if user has admin role
   if (user.role !== 'admin') {
-    return { valid: false, error: 'API key does not have admin privileges' }
+    return { valid: false, error: 'User does not have admin privileges' }
   }
 
   return { valid: true, user }
@@ -48,8 +38,8 @@ export const meiliConfigureEndpoint: Endpoint = {
   path: '/admin/meilisearch/configure',
   method: 'post',
   handler: async (req) => {
-    // Verify API key
-    const auth = await verifyApiKey(req)
+    // Verify admin user
+    const auth = await verifyAdmin(req)
     if (!auth.valid) {
       return Response.json({ ok: false, error: auth.error }, { status: 401 })
     }
@@ -114,8 +104,8 @@ export const meiliResyncEndpoint: Endpoint = {
   path: '/admin/meilisearch/resync',
   method: 'post',
   handler: async (req) => {
-    // Verify API key
-    const auth = await verifyApiKey(req)
+    // Verify admin user
+    const auth = await verifyAdmin(req)
     if (!auth.valid) {
       return Response.json({ ok: false, error: auth.error }, { status: 401 })
     }
@@ -215,8 +205,8 @@ export const meiliStatusEndpoint: Endpoint = {
   path: '/admin/meilisearch/status',
   method: 'get',
   handler: async (req) => {
-    // Verify API key
-    const auth = await verifyApiKey(req)
+    // Verify admin user
+    const auth = await verifyAdmin(req)
     if (!auth.valid) {
       return Response.json({ ok: false, error: auth.error }, { status: 401 })
     }
