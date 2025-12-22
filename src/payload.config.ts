@@ -17,6 +17,11 @@ import { Tags } from './collections/Tags'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
+import {
+  meiliConfigureEndpoint,
+  meiliResyncEndpoint,
+  meiliStatusEndpoint,
+} from './endpoints/meiliAdmin'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -43,7 +48,14 @@ export default buildConfig({
 
   collections: [Users, Media, Sites, Articles, Authors, Categories, Tags],
 
-  endpoints: [reindexArticlesEndpoint, searchArticlesEndpoint, backfillArticleSitesEndpoint],
+  endpoints: [
+    reindexArticlesEndpoint,
+    searchArticlesEndpoint,
+    backfillArticleSitesEndpoint,
+    meiliConfigureEndpoint,
+    meiliResyncEndpoint,
+    meiliStatusEndpoint,
+  ],
 
   editor: lexicalEditor(),
 
