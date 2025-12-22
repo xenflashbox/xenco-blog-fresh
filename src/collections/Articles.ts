@@ -199,7 +199,11 @@ const afterDelete: CollectionAfterDeleteHook = async ({ id, req }) => {
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
-  admin: { useAsTitle: 'title' },
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'status', 'publishedAt', 'seoScore', 'site', 'slug'],
+    listSearchableFields: ['title', 'slug', 'excerpt'],
+  },
   access: {
     read: () => true,
     create: () => true,
@@ -363,6 +367,27 @@ export const Articles: CollectionConfig = {
       name: 'publishedAt',
       type: 'date',
       admin: { position: 'sidebar' },
+    },
+
+    // SEO fields (read-only, populated by external SEO scoring)
+    {
+      name: 'seoScore',
+      type: 'number',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Latest SEO score (0–100).',
+      },
+    },
+    {
+      name: 'seoGrade',
+      type: 'text',
+      admin: { position: 'sidebar', readOnly: true },
+    },
+    {
+      name: 'seoScoredAt',
+      type: 'date',
+      admin: { position: 'sidebar', readOnly: true },
     },
   ],
 }
