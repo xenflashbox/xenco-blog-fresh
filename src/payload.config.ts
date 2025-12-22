@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -81,6 +82,15 @@ export default buildConfig({
         // Commonly needed for S3-compatible endpoints (including many R2 setups)
         forcePathStyle: true,
       },
+    }),
+
+    // Hierarchical categories (parent/child with breadcrumbs)
+    nestedDocsPlugin({
+      collections: ['categories'],
+      generateLabel: (docs) =>
+        docs.map((doc) => doc.title).join(' > '),
+      generateURL: (docs) =>
+        docs.map((doc) => doc.slug).join('/'),
     }),
   ],
 

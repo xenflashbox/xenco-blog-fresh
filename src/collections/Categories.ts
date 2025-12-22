@@ -69,7 +69,10 @@ const beforeChange: CollectionBeforeChangeHook = async ({
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
-  admin: { useAsTitle: 'title' },
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'parent', 'site', 'slug'],
+  },
   access: {
     read: () => true,
     create: () => true,
@@ -83,6 +86,44 @@ export const Categories: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
     { name: 'description', type: 'textarea' },
+
+    // Parent category (for hierarchy) - filtered by same site
+    {
+      name: 'parent',
+      type: 'relationship',
+      relationTo: 'categories',
+      admin: {
+        position: 'sidebar',
+        description: 'Select parent category for hierarchy',
+      },
+      filterOptions: ({ id, data }) => {
+        // Get site from current document
+        const site = (data as any)?.site
+        const siteId =
+          typeof site === 'string' || typeof site === 'number'
+            ? String(site)
+            : site?.id
+              ? String(site.id)
+              : null
+
+        // Build filter: exclude self, same site only
+        const conditions: any[] = []
+
+        // Prevent selecting self as parent
+        if (id) {
+          conditions.push({ id: { not_equals: id } })
+        }
+
+        // Filter by same site
+        if (siteId) {
+          conditions.push({ site: { equals: siteId } })
+        }
+
+        // Return true (no filter) if no conditions, otherwise return filter
+        if (conditions.length === 0) return true
+        return { and: conditions }
+      },
+    },
 
     {
       name: 'site',
