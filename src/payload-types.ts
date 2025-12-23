@@ -237,6 +237,12 @@ export interface Article {
   site: number | Site;
   status: 'draft' | 'published';
   publishedAt?: string | null;
+  /**
+   * Latest SEO score (0–100).
+   */
+  seoScore?: number | null;
+  seoGrade?: string | null;
+  seoScoredAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -249,7 +255,19 @@ export interface Category {
   title: string;
   slug: string;
   description?: string | null;
+  /**
+   * Select parent category for hierarchy
+   */
+  parent?: (number | null) | Category;
   site: number | Site;
+  breadcrumbs?:
+    | {
+        doc?: (number | null) | Category;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -455,6 +473,9 @@ export interface ArticlesSelect<T extends boolean = true> {
   site?: T;
   status?: T;
   publishedAt?: T;
+  seoScore?: T;
+  seoGrade?: T;
+  seoScoredAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -481,7 +502,16 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  parent?: T;
   site?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
