@@ -96,22 +96,22 @@ export const searchArticlesEndpoint: Endpoint = {
 
     // Add tag filter: (tags = "slug1" OR tags = "slug2")
     if (tagParam) {
-      const tagSlugs = tagParam.split(',').map((t) => t.trim()).filter(Boolean)
+      const tagSlugs = tagParam.split(',').map((t: string) => t.trim()).filter(Boolean)
       if (tagSlugs.length === 1) {
         filterParts.push(`tags = "${tagSlugs[0]}"`)
       } else if (tagSlugs.length > 1) {
-        const tagOr = tagSlugs.map((t) => `tags = "${t}"`).join(' OR ')
+        const tagOr = tagSlugs.map((t: string) => `tags = "${t}"`).join(' OR ')
         filterParts.push(`(${tagOr})`)
       }
     }
 
     // Add category filter: (categories = "slug1" OR categories = "slug2")
     if (categoryParam) {
-      const catSlugs = categoryParam.split(',').map((c) => c.trim()).filter(Boolean)
+      const catSlugs = categoryParam.split(',').map((c: string) => c.trim()).filter(Boolean)
       if (catSlugs.length === 1) {
         filterParts.push(`categories = "${catSlugs[0]}"`)
       } else if (catSlugs.length > 1) {
-        const catOr = catSlugs.map((c) => `categories = "${c}"`).join(' OR ')
+        const catOr = catSlugs.map((c: string) => `categories = "${c}"`).join(' OR ')
         filterParts.push(`(${catOr})`)
       }
     }
