@@ -89,10 +89,27 @@ export async function ensureSupportIndexSettings(): Promise<void> {
         }
       }
 
+      // Common question words (both cases since MeiliSearch stop words are case-sensitive)
+      const stopWords = [
+        'how', 'How', 'what', 'What', 'where', 'Where', 'when', 'When', 'why', 'Why',
+        'who', 'Who', 'which', 'Which', 'do', 'Do', 'does', 'Does', 'did', 'Did',
+        'can', 'Can', 'could', 'Could', 'would', 'Would', 'should', 'Should',
+        'is', 'Is', 'are', 'Are', 'was', 'Was', 'were', 'Were',
+        'be', 'Be', 'been', 'Been', 'being', 'Being',
+        'have', 'Have', 'has', 'Has', 'had', 'Had',
+        'a', 'A', 'an', 'An', 'the', 'The',
+        'i', 'I', 'me', 'Me', 'my', 'My',
+        'to', 'To', 'for', 'For', 'of', 'Of', 'in', 'In', 'on', 'On', 'at', 'At',
+        'and', 'And', 'or', 'Or', 'but', 'But', 'if', 'If',
+        'it', 'It', 'its', 'Its', 'this', 'This', 'that', 'That',
+        'these', 'These', 'those', 'Those', 'with', 'With',
+      ]
+
       const task = await index.updateSettings({
         searchableAttributes: ['title', 'summary', 'bodyText', 'stepsText', 'triggersText'],
         filterableAttributes: ['appSlug', 'type', '_status', 'routes', 'severity'],
         sortableAttributes: ['updatedAt', 'title'],
+        stopWords,
         displayedAttributes: [
           'id',
           'type',
