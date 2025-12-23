@@ -48,14 +48,16 @@ function extractTextFromLexical(value: unknown): string {
 }
 
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  const timeout = setTimeout(() => {}, ms)
+  let t: ReturnType<typeof setTimeout> | undefined
   try {
     return await Promise.race([
       promise,
-      new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Meili timeout')), ms)),
+      new Promise<T>((_, reject) => {
+        t = setTimeout(() => reject(new Error('Meili timeout')), ms)
+      }),
     ])
   } finally {
-    clearTimeout(timeout)
+    if (t) clearTimeout(t)
   }
 }
 
