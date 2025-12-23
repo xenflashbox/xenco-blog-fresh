@@ -35,7 +35,7 @@ export const reindexArticlesEndpoint: Endpoint = {
         where: { status: { equals: 'published' } },
         limit,
         page,
-        depth: 0,
+        depth: 1, // IMPORTANT: depth 1 to get site/categories/tags with slugs
         overrideAccess: true,
       })
 
