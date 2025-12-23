@@ -10,6 +10,72 @@ import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
 const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'] as const
 type Severity = (typeof VALID_SEVERITIES)[number]
 
+// --- Support search helpers ---
+
+// Only allow lowercase alphanumeric + hyphens for app slugs
+const isSafeAppSlug = (s: string): boolean => /^[a-z0-9-]+$/.test(s)
+
+// Escape values for Meili filter strings inside double-quotes
+function escMeiliFilterValue(v: string): string {
+  return v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+}
+
+function normalizeQuery(raw: string): string {
+  return raw.trim().replace(/\s+/g, ' ')
+}
+
+/**
+ * Removes leading question "fluff" that hurts recall:
+ *  "How do I", "What is", "Can I", "Where can I", etc.
+ * Keeps the meaningful tail: "fix the support widget"
+ */
+function stripLeadingQuestionFluff(q: string): string {
+  const s = normalizeQuery(q)
+
+  // common lead-ins
+  const patterns: RegExp[] = [
+    /^(how|what|where|when|why)\s+(do|does|did|can|could|would|should|is|are|was|were)\s+(i|we|you|they|it)\s+/i,
+    /^(how|what|where|when|why)\s+(do|does|did|can|could|would|should|is|are|was|were)\s+/i,
+    /^(can|could|would|should|may|might)\s+(i|we|you|they|it)\s+/i,
+    /^(please|help)\s+/i,
+  ]
+
+  let out = s
+  for (const re of patterns) {
+    out = out.replace(re, '')
+  }
+
+  out = normalizeQuery(out)
+
+  // Don't return empty/too-short query
+  return out.length >= 3 ? out : s
+}
+
+function routeMatchesPattern(pattern: string, route: string): boolean {
+  if (!pattern || !route) return false
+  if (pattern === route) return true
+
+  // Simple wildcard support: "/api/support/*" means prefix match
+  if (pattern.endsWith('*')) {
+    const prefix = pattern.slice(0, -1)
+    return route.startsWith(prefix)
+  }
+
+  return false
+}
+
+function uniqById<T extends { id: string }>(arr: T[]): T[] {
+  const seen = new Set<string>()
+  const out: T[] = []
+  for (const item of arr) {
+    if (!item?.id) continue
+    if (seen.has(item.id)) continue
+    seen.add(item.id)
+    out.push(item)
+  }
+  return out
+}
+
 /**
  * Get database pool from Payload's db adapter
  * Payload uses @payloadcms/db-postgres which exposes the pool
@@ -130,102 +196,166 @@ export const supportAnswerEndpoint: Endpoint = {
       // Parse request body
       let body: Record<string, unknown> = {}
       try {
-        body = await req.json?.() || {}
+        body = (await req.json?.()) || {}
       } catch {
         return Response.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 })
       }
 
-      // Validate required fields
       const appSlug = typeof body.app_slug === 'string' ? body.app_slug.trim() : ''
-      const message = typeof body.message === 'string' ? body.message.trim() : ''
+      const messageRaw = typeof body.message === 'string' ? body.message : ''
 
       if (!appSlug) {
         return Response.json({ ok: false, error: 'app_slug is required' }, { status: 400 })
       }
-      if (!message) {
+      if (!messageRaw?.trim()) {
         return Response.json({ ok: false, error: 'message is required' }, { status: 400 })
+      }
+
+      // Strongly recommend enforcing safe slug (prevents filter injection + bad data)
+      if (!isSafeAppSlug(appSlug)) {
+        return Response.json({ ok: false, error: 'Invalid app_slug format' }, { status: 400 })
       }
 
       // Optional fields
       const route = typeof body.route === 'string' ? body.route : null
       const userId = typeof body.user_id === 'string' ? body.user_id : null
 
-      // Get MeiliSearch client
+      // Meili client
       const meili = getSupportMeiliClient()
       if (!meili) {
-        return Response.json(
-          { ok: false, error: 'MeiliSearch not configured' },
-          { status: 500 },
-        )
+        return Response.json({ ok: false, error: 'MeiliSearch not configured' }, { status: 500 })
       }
 
-      // Query support index
       const indexName = getSupportIndexName()
       const index = meili.index(indexName)
 
-      // Build filter: appSlug and published status (uses _status not status)
-      const filter = `appSlug = "${appSlug}" AND _status = "published"`
+      // Normalize + fallback query
+      const q1 = normalizeQuery(messageRaw)
+      const q2 = stripLeadingQuestionFluff(q1)
 
-      // Search for relevant support docs
-      const searchResult = await index.search(message, {
-        limit: 5,
-        filter,
-      })
+      const filter = `appSlug = "${escMeiliFilterValue(appSlug)}" AND _status = "published"`
 
-      // Extract context from search results (matches meiliSupport.ts document structure)
+      // Search (run up to 2 queries, merge results)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const contextDocs = searchResult.hits.map((hit: any) => ({
-        id: hit.id || '',
-        type: hit.type || '',
-        title: hit.title || '',
-        summary: hit.summary || '',
-        content: hit.bodyText || hit.stepsText || '',
-      }))
+      let hits: any[] = []
+      try {
+        const r1 = await index.search(q1, {
+          limit: 8,
+          filter,
+          attributesToRetrieve: [
+            'id',
+            'type',
+            'title',
+            'summary',
+            'bodyText',
+            'stepsText',
+            'triggersText',
+            'routes',
+            'severity',
+            '_status',
+            'appSlug',
+            'updatedAt',
+          ],
+        })
 
-      // If no docs found, return a fallback response
-      if (contextDocs.length === 0) {
+        hits = hits.concat(r1.hits || [])
+
+        if (q2 && q2 !== q1) {
+          const r2 = await index.search(q2, {
+            limit: 8,
+            filter,
+            attributesToRetrieve: [
+              'id',
+              'type',
+              'title',
+              'summary',
+              'bodyText',
+              'stepsText',
+              'triggersText',
+              'routes',
+              'severity',
+              '_status',
+              'appSlug',
+              'updatedAt',
+            ],
+          })
+          hits = hits.concat(r2.hits || [])
+        }
+      } catch (e: unknown) {
+        const err = e as Error
+        const msg = String(err?.message || '')
+        if (msg.includes('Index') && msg.includes('not found')) {
+          return Response.json(
+            {
+              ok: false,
+              error:
+                'Support search index not ready. Run /api/admin/meilisearch-support/configure then /api/admin/meilisearch-support/resync.',
+            },
+            { status: 503 },
+          )
+        }
+        throw e
+      }
+
+      // De-dupe hits
+      hits = uniqById(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        hits.map((h: any) => ({
+          id: String(h?.id || ''),
+          type: String(h?.type || ''),
+          title: String(h?.title || ''),
+          summary: String(h?.summary || ''),
+          bodyText: String(h?.bodyText || ''),
+          stepsText: String(h?.stepsText || ''),
+          triggersText: String(h?.triggersText || ''),
+          routes: Array.isArray(h?.routes) ? h.routes.map(String) : [],
+        })),
+      )
+
+      if (!hits.length) {
         return Response.json({
           ok: true,
-          answer: "I couldn't find specific documentation for your question. Please create a support ticket for further assistance.",
+          answer:
+            "I couldn't find specific documentation for your question. Please create a support ticket for further assistance.",
           sources: [],
           fallback: true,
+          query: q1,
+          appSlug,
         })
       }
 
-      // TODO: Call LLM gateway to generate answer from context
-      // For now, return the top matching doc as the answer
-      //
-      // To implement LLM integration, you'll need:
-      // 1. Set env var for your LLM API key (e.g., OPENAI_API_KEY or ANTHROPIC_API_KEY)
-      // 2. Call the LLM with the user's message and context docs
-      // 3. Return the generated answer
-      //
-      // Example with OpenAI:
-      // const completion = await openai.chat.completions.create({
-      //   model: 'gpt-4',
-      //   messages: [
-      //     { role: 'system', content: 'You are a helpful support assistant. Answer based on the provided documentation.' },
-      //     { role: 'user', content: `Context:\n${contextDocs.map(d => d.content).join('\n\n')}\n\nQuestion: ${message}` }
-      //   ]
-      // })
+      // If a route is provided, re-rank hits to prefer those whose routes match (exact or wildcard)
+      if (route) {
+        hits.sort((a, b) => {
+          const aMatch = (a.routes || []).some((p: string) => routeMatchesPattern(p, route))
+          const bMatch = (b.routes || []).some((p: string) => routeMatchesPattern(p, route))
+          return Number(bMatch) - Number(aMatch)
+        })
+      }
 
-      // For now, return the best matching doc content
-      const bestMatch = contextDocs[0]
+      const bestMatch = hits[0]
+      const bestContent =
+        bestMatch.summary ||
+        bestMatch.bodyText ||
+        bestMatch.stepsText ||
+        bestMatch.triggersText ||
+        ''
 
       return Response.json({
         ok: true,
-        answer: bestMatch.summary || bestMatch.content || 'Please see the documentation linked below.',
-        sources: contextDocs.map((doc: { id: string; type: string; title: string; summary: string; content: string }) => ({
+        answer: bestContent || 'Please see the documentation linked below.',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sources: hits.slice(0, 5).map((doc: any) => ({
           id: doc.id,
           type: doc.type,
           title: doc.title,
           summary: doc.summary,
         })),
-        query: message,
+        query: q1,
+        ...(q2 && q2 !== q1 ? { queryFallback: q2 } : {}),
         appSlug,
         ...(route ? { route } : {}),
         ...(userId ? { userId } : {}),
-        // Flag indicating LLM integration is pending
         llmEnabled: false,
       })
     } catch (err: unknown) {
