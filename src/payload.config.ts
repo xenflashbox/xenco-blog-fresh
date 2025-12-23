@@ -14,6 +14,9 @@ import { Articles } from './collections/Articles'
 import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
+import { SupportKBArticles } from './collections/SupportKBArticles'
+import { SupportPlaybooks } from './collections/SupportPlaybooks'
+import { SupportAnnouncements } from './collections/SupportAnnouncements'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
@@ -22,6 +25,12 @@ import {
   meiliResyncEndpoint,
   meiliStatusEndpoint,
 } from './endpoints/meiliAdmin'
+import {
+  meiliSupportConfigureEndpoint,
+  meiliSupportResyncEndpoint,
+  meiliSupportStatusEndpoint,
+} from './endpoints/meiliSupportAdmin'
+import { supportTicketEndpoint, supportAnswerEndpoint } from './endpoints/support'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -46,7 +55,18 @@ export default buildConfig({
     },
   },
 
-  collections: [Users, Media, Sites, Articles, Authors, Categories, Tags],
+  collections: [
+    Users,
+    Media,
+    Sites,
+    Articles,
+    Authors,
+    Categories,
+    Tags,
+    SupportKBArticles,
+    SupportPlaybooks,
+    SupportAnnouncements,
+  ],
 
   endpoints: [
     reindexArticlesEndpoint,
@@ -55,6 +75,11 @@ export default buildConfig({
     meiliConfigureEndpoint,
     meiliResyncEndpoint,
     meiliStatusEndpoint,
+    meiliSupportConfigureEndpoint,
+    meiliSupportResyncEndpoint,
+    meiliSupportStatusEndpoint,
+    supportTicketEndpoint,
+    supportAnswerEndpoint,
   ],
 
   editor: lexicalEditor(),
