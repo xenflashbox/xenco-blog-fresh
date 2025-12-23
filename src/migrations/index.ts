@@ -52,6 +52,6 @@ export const migrations = [
   {
     up: migration_20251223_add_support_collections.up,
     down: migration_20251223_add_support_collections.down,
-    name: '20251223_add_support_collections',
+    name: '20251223_add_support_collections'
   },
 ];

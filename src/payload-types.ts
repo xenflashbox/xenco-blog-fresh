@@ -74,6 +74,9 @@ export interface Config {
     authors: Author;
     categories: Category;
     tags: Tag;
+    support_kb_articles: SupportKbArticle;
+    support_playbooks: SupportPlaybook;
+    support_announcements: SupportAnnouncement;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +91,9 @@ export interface Config {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
+    support_kb_articles: SupportKbArticlesSelect<false> | SupportKbArticlesSelect<true>;
+    support_playbooks: SupportPlaybooksSelect<false> | SupportPlaybooksSelect<true>;
+    support_announcements: SupportAnnouncementsSelect<false> | SupportAnnouncementsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -301,6 +307,144 @@ export interface Author {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_kb_articles".
+ */
+export interface SupportKbArticle {
+  id: number;
+  /**
+   * App identifier (e.g., "chat-widget", "dashboard")
+   */
+  appSlug: string;
+  title: string;
+  /**
+   * Brief description shown in search results
+   */
+  summary?: string | null;
+  /**
+   * URL routes where this article is relevant
+   */
+  routes?:
+    | {
+        route: string;
+        id?: string | null;
+      }[]
+    | null;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_playbooks".
+ */
+export interface SupportPlaybook {
+  id: number;
+  /**
+   * App identifier (e.g., "chat-widget", "dashboard")
+   */
+  appSlug: string;
+  title: string;
+  /**
+   * Brief description of what this playbook handles
+   */
+  summary?: string | null;
+  /**
+   * Priority level for this playbook
+   */
+  severity?: ('low' | 'medium' | 'high' | 'critical') | null;
+  /**
+   * URL routes where this playbook is relevant
+   */
+  routes?:
+    | {
+        route: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Keywords/phrases that trigger this playbook
+   */
+  triggers?:
+    | {
+        phrase: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Step-by-step instructions for handling this scenario
+   */
+  steps: {
+    /**
+     * Brief title for this step
+     */
+    stepTitle: string;
+    /**
+     * Detailed instructions for this step
+     */
+    stepBody: string;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_announcements".
+ */
+export interface SupportAnnouncement {
+  id: number;
+  /**
+   * App identifier (e.g., "chat-widget", "dashboard", or "*" for all)
+   */
+  appSlug: string;
+  title: string;
+  /**
+   * The announcement message (shown in search results as summary)
+   */
+  message: string;
+  /**
+   * Severity level for visual styling
+   */
+  severity?: ('info' | 'warning' | 'critical') | null;
+  /**
+   * URL routes where this announcement should appear
+   */
+  routes?:
+    | {
+        route: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * When this announcement becomes active
+   */
+  startsAt?: string | null;
+  /**
+   * When this announcement should no longer appear
+   */
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -350,6 +494,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tags';
         value: number | Tag;
+      } | null)
+    | ({
+        relationTo: 'support_kb_articles';
+        value: number | SupportKbArticle;
+      } | null)
+    | ({
+        relationTo: 'support_playbooks';
+        value: number | SupportPlaybook;
+      } | null)
+    | ({
+        relationTo: 'support_announcements';
+        value: number | SupportAnnouncement;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -525,6 +681,78 @@ export interface TagsSelect<T extends boolean = true> {
   site?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_kb_articles_select".
+ */
+export interface SupportKbArticlesSelect<T extends boolean = true> {
+  appSlug?: T;
+  title?: T;
+  summary?: T;
+  routes?:
+    | T
+    | {
+        route?: T;
+        id?: T;
+      };
+  body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_playbooks_select".
+ */
+export interface SupportPlaybooksSelect<T extends boolean = true> {
+  appSlug?: T;
+  title?: T;
+  summary?: T;
+  severity?: T;
+  routes?:
+    | T
+    | {
+        route?: T;
+        id?: T;
+      };
+  triggers?:
+    | T
+    | {
+        phrase?: T;
+        id?: T;
+      };
+  steps?:
+    | T
+    | {
+        stepTitle?: T;
+        stepBody?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "support_announcements_select".
+ */
+export interface SupportAnnouncementsSelect<T extends boolean = true> {
+  appSlug?: T;
+  title?: T;
+  message?: T;
+  severity?: T;
+  routes?:
+    | T
+    | {
+        route?: T;
+        id?: T;
+      };
+  startsAt?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

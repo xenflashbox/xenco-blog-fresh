@@ -113,11 +113,53 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   `)
 
   await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS "_support_kb_articles_v_routes" (
+    CREATE TABLE IF NOT EXISTS "_support_kb_articles_v_version_routes" (
       "_order" integer NOT NULL,
       "_parent_id" integer NOT NULL,
-      "id" varchar PRIMARY KEY NOT NULL,
-      "route" varchar
+      "id" serial PRIMARY KEY NOT NULL,
+      "route" varchar,
+      "_uuid" varchar
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "_support_playbooks_v_version_routes" (
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL,
+      "id" serial PRIMARY KEY NOT NULL,
+      "route" varchar,
+      "_uuid" varchar
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "_support_playbooks_v_version_triggers" (
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL,
+      "id" serial PRIMARY KEY NOT NULL,
+      "phrase" varchar,
+      "_uuid" varchar
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "_support_playbooks_v_version_steps" (
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL,
+      "id" serial PRIMARY KEY NOT NULL,
+      "step_title" varchar,
+      "step_body" varchar,
+      "_uuid" varchar
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "_support_announcements_v_version_routes" (
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL,
+      "id" serial PRIMARY KEY NOT NULL,
+      "route" varchar,
+      "_uuid" varchar
     );
   `)
 
@@ -298,9 +340,13 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   `)
 
   // Drop version tables
+  await db.execute(sql`DROP TABLE IF EXISTS "_support_announcements_v_version_routes" CASCADE;`)
   await db.execute(sql`DROP TABLE IF EXISTS "_support_announcements_v" CASCADE;`)
+  await db.execute(sql`DROP TABLE IF EXISTS "_support_playbooks_v_version_steps" CASCADE;`)
+  await db.execute(sql`DROP TABLE IF EXISTS "_support_playbooks_v_version_triggers" CASCADE;`)
+  await db.execute(sql`DROP TABLE IF EXISTS "_support_playbooks_v_version_routes" CASCADE;`)
   await db.execute(sql`DROP TABLE IF EXISTS "_support_playbooks_v" CASCADE;`)
-  await db.execute(sql`DROP TABLE IF EXISTS "_support_kb_articles_v_routes" CASCADE;`)
+  await db.execute(sql`DROP TABLE IF EXISTS "_support_kb_articles_v_version_routes" CASCADE;`)
   await db.execute(sql`DROP TABLE IF EXISTS "_support_kb_articles_v" CASCADE;`)
 
   // Drop array tables
