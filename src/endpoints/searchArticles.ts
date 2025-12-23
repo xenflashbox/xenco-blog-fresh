@@ -84,8 +84,40 @@ export const searchArticlesEndpoint: Endpoint = {
 
     const offset = (page - 1) * limit
 
-    // Use site SLUG for MeiliSearch filter (articles store site as slug, not ID)
-    const filter = `site = "${site.slug}" AND status = "published"`
+    // Parse optional tag and category filters (comma-separated slugs)
+    const tagParam = typeof req?.query?.tag === 'string' ? req.query.tag.trim() : ''
+    const categoryParam = typeof req?.query?.category === 'string' ? req.query.category.trim() : ''
+
+    // Build filter parts
+    const filterParts: string[] = [
+      `site = "${site.slug}"`,
+      `status = "published"`,
+    ]
+
+    // Add tag filter: (tags = "slug1" OR tags = "slug2")
+    if (tagParam) {
+      const tagSlugs = tagParam.split(',').map((t) => t.trim()).filter(Boolean)
+      if (tagSlugs.length === 1) {
+        filterParts.push(`tags = "${tagSlugs[0]}"`)
+      } else if (tagSlugs.length > 1) {
+        const tagOr = tagSlugs.map((t) => `tags = "${t}"`).join(' OR ')
+        filterParts.push(`(${tagOr})`)
+      }
+    }
+
+    // Add category filter: (categories = "slug1" OR categories = "slug2")
+    if (categoryParam) {
+      const catSlugs = categoryParam.split(',').map((c) => c.trim()).filter(Boolean)
+      if (catSlugs.length === 1) {
+        filterParts.push(`categories = "${catSlugs[0]}"`)
+      } else if (catSlugs.length > 1) {
+        const catOr = catSlugs.map((c) => `categories = "${c}"`).join(' OR ')
+        filterParts.push(`(${catOr})`)
+      }
+    }
+
+    // Join all filter parts with AND
+    const filter = filterParts.join(' AND ')
 
     const res = await index.search(q, {
       limit,
@@ -114,6 +146,8 @@ export const searchArticlesEndpoint: Endpoint = {
         q,
         siteId: site.id,
         siteSlug: site.slug,
+        ...(tagParam ? { tags: tagParam.split(',').map((t: string) => t.trim()).filter(Boolean) } : {}),
+        ...(categoryParam ? { categories: categoryParam.split(',').map((c: string) => c.trim()).filter(Boolean) } : {}),
         page,
         limit,
         total: res.estimatedTotalHits ?? res.hits.length,
