@@ -19,25 +19,26 @@ export const searchArticlesEndpoint: Endpoint = {
     }
 
     // Resolve site: try siteSlug query param, then x-site-slug header, then fallback to host resolution
-    let site: { id: string } | null = null
+    // IMPORTANT: We need both id (for response) and slug (for MeiliSearch filter)
+    let site: { id: string; slug: string } | null = null
 
-    const siteSlug = typeof req?.query?.siteSlug === 'string' ? req.query.siteSlug.trim() : null
+    const siteSlugParam = typeof req?.query?.siteSlug === 'string' ? req.query.siteSlug.trim() : null
     const siteSlugHeader =
       typeof req?.headers?.get === 'function'
         ? req.headers.get('x-site-slug')
         : req?.headers?.['x-site-slug'] || req?.headers?.['X-Site-Slug'] || null
 
-    if (siteSlug) {
-      // Lookup by slug
+    if (siteSlugParam) {
+      // Lookup by slug from query param
       const bySlug = await req.payload.find({
         collection: 'sites',
-        where: { slug: { equals: siteSlug } },
+        where: { slug: { equals: siteSlugParam } },
         limit: 1,
         depth: 0,
         overrideAccess: true,
       })
       if (bySlug.docs?.[0]?.id) {
-        site = { id: String(bySlug.docs[0].id) }
+        site = { id: String(bySlug.docs[0].id), slug: bySlug.docs[0].slug }
       }
     } else if (siteSlugHeader) {
       // Lookup by slug from header
@@ -49,16 +50,19 @@ export const searchArticlesEndpoint: Endpoint = {
         overrideAccess: true,
       })
       if (bySlug.docs?.[0]?.id) {
-        site = { id: String(bySlug.docs[0].id) }
+        site = { id: String(bySlug.docs[0].id), slug: bySlug.docs[0].slug }
       }
     }
 
     // Fallback to host-based resolution
     if (!site) {
-      site = await resolveSiteForRequest(req.payload, req.headers)
+      const resolved = await resolveSiteForRequest(req.payload, req.headers)
+      if (resolved?.id && resolved?.slug) {
+        site = { id: String(resolved.id), slug: resolved.slug }
+      }
     }
 
-    if (!site?.id) {
+    if (!site?.id || !site?.slug) {
       return new Response(
         JSON.stringify({
           ok: false,
@@ -81,11 +85,10 @@ export const searchArticlesEndpoint: Endpoint = {
     const indexName = process.env.MEILISEARCH_ARTICLES_INDEX || 'articles'
     const index = meili.index(indexName)
 
-    const siteId = String(site.id)
     const offset = (page - 1) * limit
 
-    // Use single AND string filter (critical for multi-site safety)
-    const filter = `site = "${siteId}" AND status = "published"`
+    // Use site SLUG for MeiliSearch filter (articles store site as slug, not ID)
+    const filter = `site = "${site.slug}" AND status = "published"`
 
     const res = await index.search(q, {
       limit,
@@ -112,7 +115,8 @@ export const searchArticlesEndpoint: Endpoint = {
       JSON.stringify({
         ok: true,
         q,
-        siteId,
+        siteId: site.id,
+        siteSlug: site.slug,
         page,
         limit,
         total: res.estimatedTotalHits ?? res.hits.length,
