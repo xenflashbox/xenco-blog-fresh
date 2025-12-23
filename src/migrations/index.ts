@@ -7,6 +7,7 @@ import * as migration_20251215_142716_add_sites_and_article_site from './2025121
 import * as migration_20251215_161702_add_site_to_categories_tags from './20251215_161702_add_site_to_categories_tags';
 import * as migration_20251215_185759_fix_unique_indexes_categories_tags from './20251215_185759_fix_unique_indexes_categories_tags';
 import * as migration_20251223_add_support_collections from './20251223_add_support_collections';
+import * as migration_20251223_fix_announcements_columns from './20251223_fix_announcements_columns';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20251223_add_support_collections.up,
     down: migration_20251223_add_support_collections.down,
     name: '20251223_add_support_collections'
+  },
+  {
+    up: migration_20251223_fix_announcements_columns.up,
+    down: migration_20251223_fix_announcements_columns.down,
+    name: '20251223_fix_announcements_columns'
   },
 ];
