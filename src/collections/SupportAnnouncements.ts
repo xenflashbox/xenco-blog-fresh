@@ -24,7 +24,7 @@ const afterChange: CollectionAfterChangeHook = async ({ doc, req }) => {
 
 const afterDelete: CollectionAfterDeleteHook = async ({ id, req }) => {
   try {
-    await deleteSupportFromMeili(`${COLLECTION_SLUG}:${String(id)}`)
+    await deleteSupportFromMeili(`${COLLECTION_SLUG}_${String(id)}`)
   } catch (err) {
     req.payload.logger.error({ err }, 'MeiliSearch support delete failed (non-fatal).')
   }

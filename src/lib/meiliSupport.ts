@@ -127,7 +127,8 @@ export function toMeiliSupportDoc(collection: string, doc: any) {
   if (typeof id !== 'string' && typeof id !== 'number') return null
 
   const base = {
-    id: `${collection}:${String(id)}`,
+    // MeiliSearch IDs can only contain alphanumeric, hyphens, underscores (no colons)
+    id: `${collection}_${String(id)}`,
     type: collection,
     appSlug: typeof doc.appSlug === 'string' ? doc.appSlug : '',
     title: typeof doc.title === 'string' ? doc.title : '',
