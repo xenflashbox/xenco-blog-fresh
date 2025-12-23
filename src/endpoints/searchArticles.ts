@@ -56,10 +56,7 @@ export const searchArticlesEndpoint: Endpoint = {
 
     // Fallback to host-based resolution
     if (!site) {
-      const resolved = await resolveSiteForRequest(req.payload, req.headers)
-      if (resolved?.id && resolved?.slug) {
-        site = { id: String(resolved.id), slug: resolved.slug }
-      }
+      site = await resolveSiteForRequest(req.payload, req.headers)
     }
 
     if (!site?.id || !site?.slug) {

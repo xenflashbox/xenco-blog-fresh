@@ -69,7 +69,24 @@ export async function getDefaultSiteId(payload: PayloadLike): Promise<string | n
   return cachedDefaultSiteId
 }
 
-async function findSiteByDomain(payload: PayloadLike, domain: string): Promise<string | null> {
+async function getDefaultSite(payload: PayloadLike): Promise<{ id: string; slug: string } | null> {
+  const defaults = await payload.find({
+    collection: 'sites',
+    where: { isDefault: { equals: true } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const site = defaults.docs?.[0]
+  if (!site?.id || !site?.slug) return null
+  return { id: String(site.id), slug: site.slug }
+}
+
+async function findSiteByDomain(
+  payload: PayloadLike,
+  domain: string,
+): Promise<{ id: string; slug: string } | null> {
   const res = await payload.find({
     collection: 'sites',
     where: { 'domains.domain': { equals: domain } },
@@ -78,20 +95,20 @@ async function findSiteByDomain(payload: PayloadLike, domain: string): Promise<s
     overrideAccess: true,
   })
   const site = res.docs?.[0]
-  return site?.id ? String(site.id) : null
+  if (!site?.id || !site?.slug) return null
+  return { id: String(site.id), slug: site.slug }
 }
 
 export async function resolveSiteForRequest(
   payload: PayloadLike,
   headers: Headers | Record<string, string> | any,
-): Promise<{ id: string } | null> {
+): Promise<{ id: string; slug: string } | null> {
   const hostRaw = getHostFromHeaders(headers)
   const host = normalizeDomain(hostRaw)
 
   // If no host, fallback to default
   if (!host) {
-    const id = await getDefaultSiteId(payload)
-    return id ? { id } : null
+    return getDefaultSite(payload)
   }
 
   // IMPORTANT: allow cms.<domain> to match stored <domain>
@@ -102,11 +119,10 @@ export async function resolveSiteForRequest(
   const candidates = Array.from(new Set([host, noCms, noWww, withWww]))
 
   for (const candidate of candidates) {
-    const id = await findSiteByDomain(payload, candidate)
-    if (id) return { id }
+    const site = await findSiteByDomain(payload, candidate)
+    if (site) return site
   }
 
   // Fallback to default site
-  const defaultId = await getDefaultSiteId(payload)
-  return defaultId ? { id: defaultId } : null
+  return getDefaultSite(payload)
 }
