@@ -310,6 +310,7 @@ export const supportAnswerEndpoint: Endpoint = {
           stepsText: String(h?.stepsText || ''),
           triggersText: String(h?.triggersText || ''),
           routes: Array.isArray(h?.routes) ? h.routes.map(String) : [],
+          docAppSlug: String(h?.appSlug || ''),
         })),
       )
 
@@ -325,14 +326,26 @@ export const supportAnswerEndpoint: Endpoint = {
         })
       }
 
-      // If a route is provided, re-rank hits to prefer those whose routes match (exact or wildcard)
-      if (route) {
-        hits.sort((a, b) => {
-          const aMatch = (a.routes || []).some((p: string) => routeMatchesPattern(p, route))
-          const bMatch = (b.routes || []).some((p: string) => routeMatchesPattern(p, route))
-          return Number(bMatch) - Number(aMatch)
-        })
-      }
+      // Re-rank: app-specific docs beat global "*" docs, then route matches
+      hits.sort((a, b) => {
+        // 1. App-specific docs (exact match) rank higher than global "*"
+        const aAppSpecific = a.docAppSlug === appSlug ? 1 : 0
+        const bAppSpecific = b.docAppSlug === appSlug ? 1 : 0
+        if (aAppSpecific !== bAppSpecific) {
+          return bAppSpecific - aAppSpecific
+        }
+
+        // 2. If route provided, prefer docs whose routes match
+        if (route) {
+          const aRouteMatch = (a.routes || []).some((p: string) => routeMatchesPattern(p, route))
+          const bRouteMatch = (b.routes || []).some((p: string) => routeMatchesPattern(p, route))
+          if (aRouteMatch !== bRouteMatch) {
+            return Number(bRouteMatch) - Number(aRouteMatch)
+          }
+        }
+
+        return 0
+      })
 
       const bestMatch = hits[0]
       const bestContent =
