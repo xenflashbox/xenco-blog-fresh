@@ -12,8 +12,8 @@ type Severity = (typeof VALID_SEVERITIES)[number]
 
 // --- Support search helpers ---
 
-// Only allow lowercase alphanumeric + hyphens for app slugs
-const isSafeAppSlug = (s: string): boolean => /^[a-z0-9-]+$/.test(s)
+// Only allow lowercase alphanumeric + hyphens for app slugs (or "*" for global docs query)
+const isSafeAppSlug = (s: string): boolean => s === '*' || /^[a-z0-9-]+$/.test(s)
 
 // Escape values for Meili filter strings inside double-quotes
 function escMeiliFilterValue(v: string): string {
@@ -233,7 +233,8 @@ export const supportAnswerEndpoint: Endpoint = {
       const q1 = normalizeQuery(messageRaw)
       const q2 = stripLeadingQuestionFluff(q1)
 
-      const filter = `appSlug = "${escMeiliFilterValue(appSlug)}" AND _status = "published"`
+      // Include global docs (appSlug = "*") in results for any app query
+      const filter = `_status = "published" AND (appSlug = "${escMeiliFilterValue(appSlug)}" OR appSlug = "*")`
 
       // Search (run up to 2 queries, merge results)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

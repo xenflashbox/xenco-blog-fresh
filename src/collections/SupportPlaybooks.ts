@@ -12,6 +12,13 @@ const COLLECTION_SLUG = 'support_playbooks'
 
 const afterChange: CollectionAfterChangeHook = async ({ doc, req }) => {
   try {
+    const objectId = `${COLLECTION_SLUG}_${String(doc?.id)}`
+
+    if (doc?._status !== 'published') {
+      await deleteSupportFromMeili(objectId)
+      return doc
+    }
+
     await upsertSupportToMeili(COLLECTION_SLUG, doc)
   } catch (err) {
     req.payload.logger.error(
