@@ -126,14 +126,13 @@ export const meiliResyncEndpoint: Endpoint = {
       const index = meili.index(indexName)
 
       // Parse optional siteId from request body
-      let siteFilter: number | null = null
-      try {
-        const body = await req.json?.()
-        if (body?.siteId) {
-          siteFilter = Number(body.siteId)
-        }
-      } catch {
-        // No body or invalid JSON - continue without site filter
+      // Fix: Use req.body (Payload/Express style) instead of req.json()
+      // Keep as string to match CMS output (siteId: "1")
+      let siteFilter: string | null = null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const body = (req as any).body
+      if (body?.siteId !== undefined && body?.siteId !== null) {
+        siteFilter = String(body.siteId)
       }
 
       const limit = 100
@@ -173,7 +172,13 @@ export const meiliResyncEndpoint: Endpoint = {
         })
 
         if (docs.length) {
-          await index.updateDocuments(docs)
+          // Fix: Wait for task completion before continuing
+          const task = await index.updateDocuments(docs)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (task?.taskUid && typeof (meili as any).waitForTask === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (meili as any).waitForTask(task.taskUid)
+          }
           indexed += docs.length
         }
 

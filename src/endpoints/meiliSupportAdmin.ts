@@ -130,14 +130,12 @@ export const meiliSupportResyncEndpoint: Endpoint = {
       const index = meili.index(indexName)
 
       // Parse optional appSlug filter from request body
+      // Fix: Use req.body (Payload/Express style) instead of req.json()
       let appSlugFilter: string | null = null
-      try {
-        const body = await req.json?.()
-        if (body?.appSlug) {
-          appSlugFilter = String(body.appSlug)
-        }
-      } catch {
-        // No body or invalid JSON - continue without filter
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const body = (req as any).body
+      if (body?.appSlug) {
+        appSlugFilter = String(body.appSlug)
       }
 
       const results: Record<string, { indexed: number; skipped: number }> = {}
@@ -179,7 +177,13 @@ export const meiliSupportResyncEndpoint: Endpoint = {
           skipped += res.docs.length - docs.length
 
           if (docs.length) {
-            await index.updateDocuments(docs)
+            // Fix: Wait for task completion before continuing
+            const task = await index.updateDocuments(docs)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if (task?.taskUid && typeof (meili as any).waitForTask === 'function') {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (meili as any).waitForTask(task.taskUid)
+            }
             indexed += docs.length
           }
 

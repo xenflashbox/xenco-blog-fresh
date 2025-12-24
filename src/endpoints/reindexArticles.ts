@@ -5,7 +5,12 @@ export const reindexArticlesEndpoint: Endpoint = {
   path: '/reindex/articles',
   method: 'post',
   handler: async (req) => {
-    const apiKey = req.headers?.get?.('x-api-key')
+    // Fix: Use dual-mode header access pattern for compatibility
+    const apiKey =
+      typeof req.headers?.get === 'function'
+        ? req.headers.get('x-api-key')
+        : (req.headers as Record<string, string>)?.['x-api-key'] ||
+          (req.headers as Record<string, string>)?.['X-API-KEY']
 
     if (!apiKey || apiKey !== process.env.REINDEX_API_KEY) {
       return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -52,7 +57,13 @@ export const reindexArticlesEndpoint: Endpoint = {
       })
 
       if (docs.length) {
-        await index.updateDocuments(docs)
+        // Fix: Wait for task completion before continuing
+        const task = await index.updateDocuments(docs)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (task?.taskUid && typeof (meili as any).waitForTask === 'function') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (meili as any).waitForTask(task.taskUid)
+        }
         indexed += docs.length
       }
 
