@@ -85,7 +85,29 @@ type TriageCategory =
   | 'system_failure'
   | 'feature_request'
 
-function looksLikeSystemFailure(s: string): boolean {
+type TriageAction = 'answer_now' | 'create_ticket'
+type TriageReason = 'kb_hit' | 'system_signal' | 'bug_signal' | 'feature_signal' | 'forced' | 'no_kb_match'
+
+// Hard system signals: definitely infrastructure/system issues
+function hasHardSystemSignal(s: string): boolean {
+  const t = s.toLowerCase()
+  return [
+    '500',
+    '502',
+    '503',
+    '504',
+    '404',
+    'timeout',
+    'failed to fetch',
+    'unable to connect',
+    'network error',
+    'connection refused',
+    'dns error',
+  ].some((k) => t.includes(k))
+}
+
+// Soft system signals: could be system or just a bug
+function hasSoftSystemSignal(s: string): boolean {
   const t = s.toLowerCase()
   return [
     'stuck',
@@ -94,18 +116,11 @@ function looksLikeSystemFailure(s: string): boolean {
     'loading forever',
     'never finishes',
     'hang',
-    'timeout',
-    '504',
-    '502',
-    '503',
-    '500',
-    '404',
-    'not found',
+    'hanging',
     'blank page',
     'white screen',
-    'unable to connect',
-    'network error',
-    'failed to fetch',
+    'frozen',
+    'unresponsive',
   ].some((k) => t.includes(k))
 }
 
@@ -117,13 +132,14 @@ function looksLikeBugReport(s: string): boolean {
     "doesn't work",
     'doesnt work',
     'crash',
+    'crashed',
     'failed',
     'upload failed',
     'payment failed',
     'checkout failed',
     'processing loop',
-    'stuck',
-    'spinning',
+    'bug',
+    'glitch',
   ].some((k) => t.includes(k))
 }
 
@@ -136,6 +152,8 @@ function looksLikeFeatureRequest(s: string): boolean {
     'would be nice',
     'suggestion',
     'enhancement',
+    'wish list',
+    'wishlist',
   ].some((k) => t.includes(k))
 }
 
@@ -280,14 +298,19 @@ export const supportTicketEndpoint: Endpoint = {
             ? String(detailsObj.route)
             : null
 
-      const forceTicket = body.force_ticket === true
+      // Support force_ticket from both top-level and details
+      const forceTicket =
+        body.force_ticket === true ||
+        (typeof detailsObj.force_ticket === 'boolean' && detailsObj.force_ticket === true)
 
-      const isSystemFailure = looksLikeSystemFailure(message)
+      // Detect message signals
+      const hasHardSignal = hasHardSystemSignal(message)
+      const hasSoftSignal = hasSoftSystemSignal(message)
       const isBug = looksLikeBugReport(message)
       const isFeature = looksLikeFeatureRequest(message)
 
-      // ANSWER-FIRST: if it's NOT bug/feature/system and not forced, try KB and return immediately
-      if (!forceTicket && !isSystemFailure && !isBug && !isFeature) {
+      // ANSWER-FIRST: if no bug/feature signals and not forced, try KB first
+      if (!forceTicket && !hasHardSignal && !isBug && !isFeature) {
         const { hits } = await searchSupportDocs({ appSlug, message, route })
 
         if (hits.length) {
@@ -309,7 +332,8 @@ export const supportTicketEndpoint: Endpoint = {
               })),
               triage: {
                 category: 'user_error' as TriageCategory,
-                action: 'answer_now',
+                action: 'answer_now' as TriageAction,
+                reason: 'kb_hit' as TriageReason,
                 confidence: 0.75,
                 route,
               },
@@ -318,23 +342,46 @@ export const supportTicketEndpoint: Endpoint = {
         }
       }
 
-      // Determine triage category
-      let category: TriageCategory = 'valid_bug'
-      if (isSystemFailure) category = 'system_failure'
-      else if (isFeature) category = 'feature_request'
-      else if (isBug) category = 'valid_bug'
-      else category = 'user_error'
+      // Determine triage category and reason
+      let category: TriageCategory = 'user_error'
+      let reason: TriageReason = 'no_kb_match'
+
+      if (forceTicket) {
+        // Forced ticket - still categorize but note it was forced
+        reason = 'forced'
+        if (hasHardSignal) category = 'system_failure'
+        else if (isFeature) category = 'feature_request'
+        else if (isBug || hasSoftSignal) category = 'valid_bug'
+        else category = 'user_error'
+      } else if (hasHardSignal) {
+        // Hard system signals always mean system_failure
+        category = 'system_failure'
+        reason = 'system_signal'
+      } else if (isFeature) {
+        category = 'feature_request'
+        reason = 'feature_signal'
+      } else if (isBug) {
+        // Bug signals (error, broken, crash) without hard system signals
+        category = 'valid_bug'
+        reason = 'bug_signal'
+      } else if (hasSoftSignal) {
+        // Soft signals (stuck, spinning) without KB match = system_failure
+        category = 'system_failure'
+        reason = 'system_signal'
+      }
 
       const detailsFinal = {
         ...detailsObj,
         route: route ?? detailsObj.route ?? null,
         triage: {
           category,
+          action: 'create_ticket' as TriageAction,
+          reason,
           route,
           page_url: pageUrl,
           severity,
           forced: forceTicket,
-          confidence: isSystemFailure || isBug || isFeature ? 0.7 : 0.5,
+          confidence: hasHardSignal || isBug || isFeature ? 0.7 : hasSoftSignal ? 0.6 : 0.5,
         },
       }
 
@@ -367,6 +414,8 @@ export const supportTicketEndpoint: Endpoint = {
           severity,
           triage: {
             category,
+            action: 'create_ticket' as TriageAction,
+            reason,
             forced: forceTicket,
           },
         },
