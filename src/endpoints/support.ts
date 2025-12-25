@@ -76,6 +76,135 @@ function uniqById<T extends { id: string }>(arr: T[]): T[] {
   return out
 }
 
+// --- Smart Ticket triage helpers ---
+
+type TriageCategory =
+  | 'user_error'
+  | 'false_bug'
+  | 'valid_bug'
+  | 'system_failure'
+  | 'feature_request'
+
+function looksLikeSystemFailure(s: string): boolean {
+  const t = s.toLowerCase()
+  return [
+    'stuck',
+    'spin',
+    'spinning',
+    'loading forever',
+    'never finishes',
+    'hang',
+    'timeout',
+    '504',
+    '502',
+    '503',
+    '500',
+    '404',
+    'not found',
+    'blank page',
+    'white screen',
+    'unable to connect',
+    'network error',
+    'failed to fetch',
+  ].some((k) => t.includes(k))
+}
+
+function looksLikeBugReport(s: string): boolean {
+  const t = s.toLowerCase()
+  return [
+    'error',
+    'broken',
+    "doesn't work",
+    'doesnt work',
+    'crash',
+    'failed',
+    'upload failed',
+    'payment failed',
+    'checkout failed',
+    'processing loop',
+    'stuck',
+    'spinning',
+  ].some((k) => t.includes(k))
+}
+
+function looksLikeFeatureRequest(s: string): boolean {
+  const t = s.toLowerCase()
+  return [
+    'feature request',
+    'please add',
+    'can you add',
+    'would be nice',
+    'suggestion',
+    'enhancement',
+  ].some((k) => t.includes(k))
+}
+
+/**
+ * Internal helper to search support docs (reuses /support/answer logic)
+ */
+async function searchSupportDocs(opts: {
+  appSlug: string
+  message: string
+  route?: string | null
+}) {
+  const meili = getSupportMeiliClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (!meili) return { hits: [] as any[], q1: '', q2: '' }
+
+  const index = meili.index(getSupportIndexName())
+
+  const q1 = normalizeQuery(opts.message)
+  const q2 = stripLeadingQuestionFluff(q1)
+
+  const filter = `_status = "published" AND (appSlug = "${escMeiliFilterValue(opts.appSlug)}" OR appSlug = "*")`
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let hits: any[] = []
+  try {
+    const r1 = await index.search(q1, { limit: 8, filter })
+    hits = hits.concat(r1.hits || [])
+    if (q2 && q2 !== q1) {
+      const r2 = await index.search(q2, { limit: 8, filter })
+      hits = hits.concat(r2.hits || [])
+    }
+  } catch {
+    // Index might not exist yet, return empty
+    return { hits: [], q1, q2 }
+  }
+
+  // Normalize + dedupe
+  hits = uniqById(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hits.map((h: any) => ({
+      id: String(h?.id || ''),
+      type: String(h?.type || ''),
+      title: String(h?.title || ''),
+      summary: String(h?.summary || ''),
+      bodyText: String(h?.bodyText || ''),
+      stepsText: String(h?.stepsText || ''),
+      triggersText: String(h?.triggersText || ''),
+      routes: Array.isArray(h?.routes) ? h.routes.map(String) : [],
+      docAppSlug: String(h?.appSlug || ''),
+    })),
+  )
+
+  // Re-rank: app-specific > global, then route match (same as /answer)
+  hits.sort((a, b) => {
+    const aApp = a.docAppSlug === opts.appSlug ? 1 : 0
+    const bApp = b.docAppSlug === opts.appSlug ? 1 : 0
+    if (aApp !== bApp) return bApp - aApp
+
+    if (opts.route) {
+      const aRoute = (a.routes || []).some((p: string) => routeMatchesPattern(p, opts.route!))
+      const bRoute = (b.routes || []).some((p: string) => routeMatchesPattern(p, opts.route!))
+      if (aRoute !== bRoute) return Number(bRoute) - Number(aRoute)
+    }
+    return 0
+  })
+
+  return { hits, q1, q2 }
+}
+
 /**
  * Get database pool from Payload's db adapter
  * Payload uses @payloadcms/db-postgres which exposes the pool
@@ -140,6 +269,75 @@ export const supportTicketEndpoint: Endpoint = {
       const userId = typeof body.user_id === 'string' ? body.user_id : null
       const details = typeof body.details === 'object' && body.details !== null ? body.details : {}
 
+      // Smart Ticket: triage and answer-first logic
+      const detailsObj =
+        typeof details === 'object' && details !== null ? (details as Record<string, unknown>) : {}
+
+      const route =
+        typeof body.route === 'string'
+          ? body.route
+          : typeof detailsObj.route === 'string'
+            ? String(detailsObj.route)
+            : null
+
+      const forceTicket = body.force_ticket === true
+
+      const isSystemFailure = looksLikeSystemFailure(message)
+      const isBug = looksLikeBugReport(message)
+      const isFeature = looksLikeFeatureRequest(message)
+
+      // ANSWER-FIRST: if it's NOT bug/feature/system and not forced, try KB and return immediately
+      if (!forceTicket && !isSystemFailure && !isBug && !isFeature) {
+        const { hits } = await searchSupportDocs({ appSlug, message, route })
+
+        if (hits.length) {
+          const best = hits[0]
+          const answer =
+            best.summary || best.bodyText || best.stepsText || best.triggersText || ''
+
+          if (answer) {
+            return Response.json({
+              ok: true,
+              resolved: true,
+              answer,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              sources: hits.slice(0, 5).map((d: any) => ({
+                id: d.id,
+                type: d.type,
+                title: d.title,
+                summary: d.summary,
+              })),
+              triage: {
+                category: 'user_error' as TriageCategory,
+                action: 'answer_now',
+                confidence: 0.75,
+                route,
+              },
+            })
+          }
+        }
+      }
+
+      // Determine triage category
+      let category: TriageCategory = 'valid_bug'
+      if (isSystemFailure) category = 'system_failure'
+      else if (isFeature) category = 'feature_request'
+      else if (isBug) category = 'valid_bug'
+      else category = 'user_error'
+
+      const detailsFinal = {
+        ...detailsObj,
+        route: route ?? detailsObj.route ?? null,
+        triage: {
+          category,
+          route,
+          page_url: pageUrl,
+          severity,
+          forced: forceTicket,
+          confidence: isSystemFailure || isBug || isFeature ? 0.7 : 0.5,
+        },
+      }
+
       // Get database pool
       const pool = getDbPool(req.payload)
       if (!pool) {
@@ -155,7 +353,7 @@ export const supportTicketEndpoint: Endpoint = {
          (app_slug, message, severity, page_url, user_agent, sentry_event_id, user_id, details)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
          RETURNING id, created_at`,
-        [appSlug, message, severity, pageUrl, userAgent, sentryEventId, userId, JSON.stringify(details)],
+        [appSlug, message, severity, pageUrl, userAgent, sentryEventId, userId, JSON.stringify(detailsFinal)],
       )
 
       const ticket = result.rows[0]
@@ -167,6 +365,10 @@ export const supportTicketEndpoint: Endpoint = {
           created_at: ticket.created_at,
           app_slug: appSlug,
           severity,
+          triage: {
+            category,
+            forced: forceTicket,
+          },
         },
       })
     } catch (err: unknown) {
