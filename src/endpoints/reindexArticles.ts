@@ -9,8 +9,8 @@ export const reindexArticlesEndpoint: Endpoint = {
     const apiKey =
       typeof req.headers?.get === 'function'
         ? req.headers.get('x-api-key')
-        : (req.headers as Record<string, string>)?.['x-api-key'] ||
-          (req.headers as Record<string, string>)?.['X-API-KEY']
+        : (req.headers as unknown as Record<string, string>)?.['x-api-key'] ||
+          (req.headers as unknown as Record<string, string>)?.['X-API-KEY']
 
     if (!apiKey || apiKey !== process.env.REINDEX_API_KEY) {
       return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
