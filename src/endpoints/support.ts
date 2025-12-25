@@ -121,6 +121,9 @@ export const supportTicketEndpoint: Endpoint = {
       if (!appSlug) {
         return Response.json({ ok: false, error: 'app_slug is required' }, { status: 400 })
       }
+      if (!isSafeAppSlug(appSlug)) {
+        return Response.json({ ok: false, error: 'Invalid app_slug format' }, { status: 400 })
+      }
       if (!message) {
         return Response.json({ ok: false, error: 'message is required' }, { status: 400 })
       }
@@ -150,7 +153,7 @@ export const supportTicketEndpoint: Endpoint = {
       const result = await pool.query(
         `INSERT INTO support_tickets
          (app_slug, message, severity, page_url, user_agent, sentry_event_id, user_id, details)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
          RETURNING id, created_at`,
         [appSlug, message, severity, pageUrl, userAgent, sentryEventId, userId, JSON.stringify(details)],
       )
