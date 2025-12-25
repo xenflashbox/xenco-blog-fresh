@@ -157,6 +157,126 @@ function looksLikeFeatureRequest(s: string): boolean {
   ].some((k) => t.includes(k))
 }
 
+// --- Slack alerting ---
+
+interface SlackAlertPayload {
+  ticketId: string
+  createdAt: string
+  appSlug: string
+  category: TriageCategory
+  reason: TriageReason
+  forced: boolean
+  severity: string
+  route: string | null
+  pageUrl: string | null
+  message: string
+  userId: string | null
+  userAgent: string | null
+}
+
+/**
+ * Send a Slack alert for high-priority tickets (best-effort, non-blocking)
+ */
+async function sendSlackAlert(payload: SlackAlertPayload): Promise<boolean> {
+  const webhookUrl = process.env.SUPPORT_SLACK_WEBHOOK_URL
+  if (!webhookUrl) {
+    return false // Alerts disabled
+  }
+
+  try {
+    // Truncate message to 500 chars
+    const truncatedMessage =
+      payload.message.length > 500 ? payload.message.slice(0, 497) + '...' : payload.message
+
+    // Build Slack blocks
+    const severityEmoji =
+      payload.severity === 'critical'
+        ? '🔴'
+        : payload.severity === 'high'
+          ? '🟠'
+          : payload.severity === 'medium'
+            ? '🟡'
+            : '🟢'
+
+    const categoryEmoji =
+      payload.category === 'system_failure'
+        ? '💥'
+        : payload.category === 'valid_bug'
+          ? '🐛'
+          : payload.category === 'feature_request'
+            ? '✨'
+            : '❓'
+
+    const slackPayload = {
+      blocks: [
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: `${categoryEmoji} Support Ticket #${payload.ticketId}`,
+            emoji: true,
+          },
+        },
+        {
+          type: 'section',
+          fields: [
+            {
+              type: 'mrkdwn',
+              text: `*App:*\n${payload.appSlug}`,
+            },
+            {
+              type: 'mrkdwn',
+              text: `*Severity:*\n${severityEmoji} ${payload.severity}`,
+            },
+            {
+              type: 'mrkdwn',
+              text: `*Category:*\n${payload.category}`,
+            },
+            {
+              type: 'mrkdwn',
+              text: `*Reason:*\n${payload.reason}${payload.forced ? ' (forced)' : ''}`,
+            },
+          ],
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*Message:*\n\`\`\`${truncatedMessage}\`\`\``,
+          },
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: [
+                payload.route ? `Route: \`${payload.route}\`` : null,
+                payload.pageUrl ? `Page: ${payload.pageUrl}` : null,
+                payload.userId ? `User: ${payload.userId}` : null,
+                `Created: ${payload.createdAt}`,
+              ]
+                .filter(Boolean)
+                .join(' • '),
+            },
+          ],
+        },
+      ],
+    }
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(slackPayload),
+    })
+
+    return response.ok
+  } catch (err) {
+    console.error('Slack alert failed (non-fatal):', err)
+    return false
+  }
+}
+
 /**
  * Internal helper to search support docs (reuses /support/answer logic)
  */
@@ -405,6 +525,45 @@ export const supportTicketEndpoint: Endpoint = {
 
       const ticket = result.rows[0]
 
+      // Slack alerting for high-priority tickets
+      // Criteria: action=create_ticket AND (category=system_failure OR severity=high/critical)
+      let slackAlerted = false
+      const shouldAlert =
+        (category === 'system_failure' || severity === 'high' || severity === 'critical') &&
+        !detailsObj.alerted_at // Idempotency: skip if already alerted
+
+      if (shouldAlert) {
+        const alertSent = await sendSlackAlert({
+          ticketId: String(ticket.id),
+          createdAt: ticket.created_at,
+          appSlug,
+          category,
+          reason,
+          forced: forceTicket,
+          severity,
+          route,
+          pageUrl,
+          message,
+          userId,
+          userAgent,
+        })
+
+        if (alertSent) {
+          slackAlerted = true
+          // Update ticket with alerted_at timestamp for idempotency
+          try {
+            await pool.query(
+              `UPDATE support_tickets
+               SET details = details || $1::jsonb
+               WHERE id = $2`,
+              [JSON.stringify({ alerted_at: new Date().toISOString() }), ticket.id],
+            )
+          } catch (updateErr) {
+            console.error('Failed to update alerted_at (non-fatal):', updateErr)
+          }
+        }
+      }
+
       return Response.json({
         ok: true,
         ticket: {
@@ -418,6 +577,7 @@ export const supportTicketEndpoint: Endpoint = {
             reason,
             forced: forceTicket,
           },
+          ...(slackAlerted ? { slack_alerted: true } : {}),
         },
       })
     } catch (err: unknown) {
