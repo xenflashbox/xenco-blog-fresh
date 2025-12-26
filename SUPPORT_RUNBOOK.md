@@ -369,3 +369,41 @@ Content-Type: application/json
 
 {"appSlug": "resume-coach"}  # Optional: filter by app
 ```
+
+### Health Check
+
+```bash
+GET /api/support/health
+Authorization: Bearer YOUR_HEALTH_TOKEN  # Optional: if SUPPORT_HEALTH_TOKEN is set
+```
+
+**Response (200 OK):**
+```json
+{
+  "ok": true,
+  "status": "ok",
+  "checks": {
+    "db": { "ok": true, "error": null },
+    "meili": { "ok": true, "error": null, "index": "support" }
+  },
+  "duration_ms": 423,
+  "ts": "2025-12-26T17:19:15.010Z"
+}
+```
+
+**Response (503 Degraded):**
+```json
+{
+  "ok": false,
+  "status": "degraded",
+  "checks": {
+    "db": { "ok": true, "error": null },
+    "meili": { "ok": false, "error": "MeiliSearch not configured" }
+  }
+}
+```
+
+**Securing the endpoint:**
+- Set `SUPPORT_HEALTH_TOKEN` in Vercel env vars
+- Requests must include `Authorization: Bearer <token>`
+- If token not set, endpoint is public (for uptime monitors)
