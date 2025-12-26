@@ -865,3 +865,16 @@ export const supportHealthEndpoint: Endpoint = {
     )
   },
 }
+
+/**
+ * GET /api/support/uptime
+ * Lightweight public endpoint for uptime monitors
+ * Returns { ok: true } and nothing else
+ */
+export const supportUptimeEndpoint: Endpoint = {
+  path: '/support/uptime',
+  method: 'get',
+  handler: async () => {
+    return Response.json({ ok: true })
+  },
+}
