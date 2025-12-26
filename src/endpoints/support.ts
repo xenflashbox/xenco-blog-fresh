@@ -2,6 +2,8 @@
 // Support API endpoints for widget integration
 // - POST /api/support/ticket - Create support ticket
 // - POST /api/support/answer - Query support docs and generate AI answer
+//
+// v1.1: LLM-Synthesized answers with conversation-aware retrieval
 
 import type { Endpoint } from 'payload'
 import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
@@ -9,6 +11,41 @@ import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
 // Severity levels for tickets
 const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'] as const
 type Severity = (typeof VALID_SEVERITIES)[number]
+
+// --- LLM Configuration ---
+const LLM_CONFIG = {
+  enabled: process.env.SUPPORT_LLM_ENABLED === 'true',
+  baseUrl: process.env.HEROKU_INFERENCE_URL || 'https://us.inference.heroku.com/v1',
+  model: process.env.SUPPORT_LLM_MODEL || 'claude-3-5-haiku',
+  maxTokens: parseInt(process.env.SUPPORT_LLM_MAX_TOKENS || '300', 10),
+  apiKey: process.env.HEROKU_INFERENCE_API_KEY || '',
+}
+
+// --- LLM Types ---
+interface LLMSource {
+  id: string
+  type: string
+  title: string
+  summary?: string
+}
+
+interface LLMGate {
+  passed: boolean
+  reason: 'no_hits' | 'weak_match' | 'passed'
+  lexicalScore?: number
+  rankingScore?: number
+}
+
+interface LLMResult {
+  ok: true
+  answer?: string
+  sources: LLMSource[]
+  bestDocId?: string | null
+  confidence: number
+  gate: LLMGate
+  queryUsed: { q1: string; q2?: string; qContext?: string }
+  llmEnabled: boolean
+}
 
 // --- Support search helpers ---
 
@@ -343,6 +380,332 @@ async function searchSupportDocs(opts: {
   return { hits, q1, q2 }
 }
 
+// --- Relevance Gate Helpers ---
+
+/**
+ * Compute lexical overlap score between query and document text
+ * Returns 0.0 - 1.0 based on how many query tokens appear in the doc
+ */
+function computeLexicalScore(query: string, docText: string): number {
+  if (!query || !docText) return 0
+
+  // Tokenize: lowercase, split on non-alphanumeric
+  const qTokens = query.toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length >= 2)
+  const docLower = docText.toLowerCase()
+
+  if (!qTokens.length) return 0
+
+  let matches = 0
+  for (const token of qTokens) {
+    if (docLower.includes(token)) matches++
+  }
+
+  return matches / qTokens.length
+}
+
+/**
+ * Extract context from conversation history for improved retrieval
+ * Combines recent messages into a context query
+ */
+function extractConversationContext(
+  history?: Array<{ role: string; content: string }>
+): string | null {
+  if (!history?.length) return null
+
+  // Get last 3 messages (excluding the current one which is passed separately)
+  const recent = history.slice(-3)
+
+  // Extract key terms from conversation
+  const contextParts = recent
+    .map(m => normalizeQuery(m.content))
+    .filter(c => c.length > 3)
+
+  if (!contextParts.length) return null
+
+  // Join with space, will be used for broader context search
+  return contextParts.join(' ')
+}
+
+/**
+ * Check if a doc passes the relevance gate
+ * Requires: lexical score >= 0.2 OR ranking score >= 0.4
+ */
+function checkRelevanceGate(
+  query: string,
+  doc: {
+    title: string
+    summary: string
+    bodyText?: string
+    stepsText?: string
+    triggersText?: string
+  },
+  rankingScore?: number
+): { passed: boolean; lexicalScore: number; rankingScore?: number } {
+  // Combine all doc text for lexical check
+  const docText = [
+    doc.title || '',
+    doc.summary || '',
+    doc.bodyText || '',
+    doc.stepsText || '',
+    doc.triggersText || '',
+  ].join(' ')
+
+  const lexicalScore = computeLexicalScore(query, docText)
+
+  // Pass if lexical >= 0.2 OR ranking >= 0.4
+  const passed = lexicalScore >= 0.2 || (rankingScore !== undefined && rankingScore >= 0.4)
+
+  return { passed, lexicalScore, rankingScore }
+}
+
+/**
+ * Call LLM to synthesize an answer from KB content
+ */
+async function callLLM(
+  userMessage: string,
+  kbContent: string,
+  conversationHistory?: Array<{ role: string; content: string }>
+): Promise<string | null> {
+  if (!LLM_CONFIG.enabled || !LLM_CONFIG.apiKey) {
+    return null
+  }
+
+  try {
+    // Build conversation context
+    const contextMessages = (conversationHistory || []).slice(-3).map(m => ({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: m.content,
+    }))
+
+    const systemPrompt = `You are a helpful support assistant. Answer the user's question using ONLY the KB content provided below. Be concise (2-3 sentences max). If the KB content doesn't fully answer the question, say so and suggest they create a support ticket.
+
+KB Content:
+${kbContent}`
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...contextMessages,
+      { role: 'user', content: userMessage },
+    ]
+
+    const response = await fetch(`${LLM_CONFIG.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${LLM_CONFIG.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: LLM_CONFIG.model,
+        messages,
+        max_tokens: LLM_CONFIG.maxTokens,
+        temperature: 0.3,
+      }),
+    })
+
+    if (!response.ok) {
+      console.error('LLM API error:', response.status, await response.text())
+      return null
+    }
+
+    const data = await response.json()
+    return data?.choices?.[0]?.message?.content || null
+  } catch (err) {
+    console.error('LLM call failed:', err)
+    return null
+  }
+}
+
+/**
+ * getSupportAnswerWithLLM - Shared function for LLM-synthesized answers
+ *
+ * Features:
+ * - Conversation-aware retrieval (uses history for context)
+ * - Relevance gate (lexical + ranking score)
+ * - LLM synthesis when enabled
+ */
+async function getSupportAnswerWithLLM(opts: {
+  appSlug: string
+  message: string
+  route?: string | null
+  pageUrl?: string | null
+  conversationHistory?: Array<{ role: string; content: string }>
+}): Promise<LLMResult> {
+  const { appSlug, message, route, conversationHistory } = opts
+
+  const meili = getSupportMeiliClient()
+  if (!meili) {
+    return {
+      ok: true,
+      sources: [],
+      confidence: 0,
+      gate: { passed: false, reason: 'no_hits' },
+      queryUsed: { q1: message },
+      llmEnabled: LLM_CONFIG.enabled,
+    }
+  }
+
+  const index = meili.index(getSupportIndexName())
+  const filter = `_status = "published" AND (appSlug = "${escMeiliFilterValue(appSlug)}" OR appSlug = "*")`
+
+  // Query 1: Original message
+  const q1 = normalizeQuery(message)
+  // Query 2: Stripped question fluff
+  const q2 = stripLeadingQuestionFluff(q1)
+  // Query 3: Conversation context (if available)
+  const qContext = extractConversationContext(conversationHistory)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let hits: any[] = []
+
+  try {
+    // Run all queries and merge results
+    const queries = [q1]
+    if (q2 && q2 !== q1) queries.push(q2)
+    if (qContext) queries.push(qContext)
+
+    for (const query of queries) {
+      const result = await index.search(query, {
+        limit: 8,
+        filter,
+        showRankingScore: true,
+        attributesToRetrieve: [
+          'id', 'type', 'title', 'summary', 'bodyText',
+          'stepsText', 'triggersText', 'routes', 'appSlug',
+        ],
+      })
+      hits = hits.concat(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (result.hits || []).map((h: any) => ({
+          ...h,
+          _rankingScore: h._rankingScore,
+        }))
+      )
+    }
+  } catch {
+    return {
+      ok: true,
+      sources: [],
+      confidence: 0,
+      gate: { passed: false, reason: 'no_hits' },
+      queryUsed: { q1, q2: q2 !== q1 ? q2 : undefined, qContext: qContext || undefined },
+      llmEnabled: LLM_CONFIG.enabled,
+    }
+  }
+
+  // Dedupe and normalize
+  hits = uniqById(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    hits.map((h: any) => ({
+      id: String(h?.id || ''),
+      type: String(h?.type || ''),
+      title: String(h?.title || ''),
+      summary: String(h?.summary || ''),
+      bodyText: String(h?.bodyText || ''),
+      stepsText: String(h?.stepsText || ''),
+      triggersText: String(h?.triggersText || ''),
+      routes: Array.isArray(h?.routes) ? h.routes.map(String) : [],
+      docAppSlug: String(h?.appSlug || ''),
+      _rankingScore: typeof h?._rankingScore === 'number' ? h._rankingScore : undefined,
+    }))
+  )
+
+  if (!hits.length) {
+    return {
+      ok: true,
+      sources: [],
+      confidence: 0,
+      gate: { passed: false, reason: 'no_hits' },
+      queryUsed: { q1, q2: q2 !== q1 ? q2 : undefined, qContext: qContext || undefined },
+      llmEnabled: LLM_CONFIG.enabled,
+    }
+  }
+
+  // Re-rank: app-specific > global, then route match
+  hits.sort((a, b) => {
+    const aApp = a.docAppSlug === appSlug ? 1 : 0
+    const bApp = b.docAppSlug === appSlug ? 1 : 0
+    if (aApp !== bApp) return bApp - aApp
+
+    if (route) {
+      const aRoute = (a.routes || []).some((p: string) => routeMatchesPattern(p, route))
+      const bRoute = (b.routes || []).some((p: string) => routeMatchesPattern(p, route))
+      if (aRoute !== bRoute) return Number(bRoute) - Number(aRoute)
+    }
+    return 0
+  })
+
+  const bestDoc = hits[0]
+
+  // Check relevance gate
+  const gateResult = checkRelevanceGate(q1, bestDoc, bestDoc._rankingScore)
+
+  if (!gateResult.passed) {
+    return {
+      ok: true,
+      sources: hits.slice(0, 5).map(d => ({
+        id: d.id,
+        type: d.type,
+        title: d.title,
+        summary: d.summary,
+      })),
+      bestDocId: bestDoc.id,
+      confidence: gateResult.lexicalScore,
+      gate: {
+        passed: false,
+        reason: 'weak_match',
+        lexicalScore: gateResult.lexicalScore,
+        rankingScore: gateResult.rankingScore,
+      },
+      queryUsed: { q1, q2: q2 !== q1 ? q2 : undefined, qContext: qContext || undefined },
+      llmEnabled: LLM_CONFIG.enabled,
+    }
+  }
+
+  // Gate passed - prepare answer
+  const kbContent = [
+    bestDoc.title ? `Title: ${bestDoc.title}` : '',
+    bestDoc.summary ? `Summary: ${bestDoc.summary}` : '',
+    bestDoc.stepsText ? `Steps: ${bestDoc.stepsText}` : '',
+    bestDoc.bodyText ? `Details: ${bestDoc.bodyText}` : '',
+  ].filter(Boolean).join('\n\n')
+
+  let answer: string | undefined
+
+  // Try LLM synthesis if enabled
+  if (LLM_CONFIG.enabled) {
+    const llmAnswer = await callLLM(message, kbContent, conversationHistory)
+    if (llmAnswer) {
+      answer = llmAnswer
+    }
+  }
+
+  // Fallback to KB content if LLM not enabled or failed
+  if (!answer) {
+    answer = bestDoc.summary || bestDoc.bodyText || bestDoc.stepsText || undefined
+  }
+
+  return {
+    ok: true,
+    answer,
+    sources: hits.slice(0, 5).map(d => ({
+      id: d.id,
+      type: d.type,
+      title: d.title,
+      summary: d.summary,
+    })),
+    bestDocId: bestDoc.id,
+    confidence: Math.max(gateResult.lexicalScore, gateResult.rankingScore || 0),
+    gate: {
+      passed: true,
+      reason: 'passed',
+      lexicalScore: gateResult.lexicalScore,
+      rankingScore: gateResult.rankingScore,
+    },
+    queryUsed: { q1, q2: q2 !== q1 ? q2 : undefined, qContext: qContext || undefined },
+    llmEnabled: LLM_CONFIG.enabled,
+  }
+}
+
 /**
  * Get database pool from Payload's db adapter
  * Payload uses @payloadcms/db-postgres which exposes the pool
@@ -423,42 +786,51 @@ export const supportTicketEndpoint: Endpoint = {
         body.force_ticket === true ||
         (typeof detailsObj.force_ticket === 'boolean' && detailsObj.force_ticket === true)
 
+      // Parse conversation_history for LLM context
+      const conversationHistory = Array.isArray(body.conversation_history)
+        ? body.conversation_history
+            .filter((m): m is { role: string; content: string } =>
+              typeof m === 'object' &&
+              m !== null &&
+              typeof (m as Record<string, unknown>).role === 'string' &&
+              typeof (m as Record<string, unknown>).content === 'string'
+            )
+        : undefined
+
       // Detect message signals
       const hasHardSignal = hasHardSystemSignal(message)
       const hasSoftSignal = hasSoftSystemSignal(message)
       const isBug = looksLikeBugReport(message)
       const isFeature = looksLikeFeatureRequest(message)
 
-      // ANSWER-FIRST: if no bug/feature signals and not forced, try KB first
+      // ANSWER-FIRST: if no bug/feature signals and not forced, try KB first with LLM
       if (!forceTicket && !hasHardSignal && !isBug && !isFeature) {
-        const { hits } = await searchSupportDocs({ appSlug, message, route })
+        const llmResult = await getSupportAnswerWithLLM({
+          appSlug,
+          message,
+          route,
+          pageUrl,
+          conversationHistory,
+        })
 
-        if (hits.length) {
-          const best = hits[0]
-          const answer =
-            best.summary || best.bodyText || best.stepsText || best.triggersText || ''
-
-          if (answer) {
-            return Response.json({
-              ok: true,
-              resolved: true,
-              answer,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              sources: hits.slice(0, 5).map((d: any) => ({
-                id: d.id,
-                type: d.type,
-                title: d.title,
-                summary: d.summary,
-              })),
-              triage: {
-                category: 'user_error' as TriageCategory,
-                action: 'answer_now' as TriageAction,
-                reason: 'kb_hit' as TriageReason,
-                confidence: 0.75,
-                route,
-              },
-            })
-          }
+        // Only return KB answer if gate passed and we have content
+        if (llmResult.gate.passed && llmResult.answer) {
+          return Response.json({
+            ok: true,
+            resolved: true,
+            answer: llmResult.answer,
+            sources: llmResult.sources,
+            triage: {
+              category: 'user_error' as TriageCategory,
+              action: 'answer_now' as TriageAction,
+              reason: 'kb_hit' as TriageReason,
+              confidence: llmResult.confidence,
+              route,
+            },
+            gate: llmResult.gate,
+            queryUsed: llmResult.queryUsed,
+            llmEnabled: llmResult.llmEnabled,
+          })
         }
       }
 
@@ -594,12 +966,15 @@ export const supportTicketEndpoint: Endpoint = {
 /**
  * POST /api/support/answer
  * Query support docs from MeiliSearch and generate AI answer
+ * v1.1: Now uses getSupportAnswerWithLLM with conversation context and relevance gate
  *
  * Body: {
  *   app_slug: string (required)
  *   message: string (required)
  *   route?: string
+ *   page_url?: string
  *   user_id?: string
+ *   conversation_history?: Array<{ role: string; content: string }>
  * }
  */
 export const supportAnswerEndpoint: Endpoint = {
@@ -632,159 +1007,62 @@ export const supportAnswerEndpoint: Endpoint = {
 
       // Optional fields
       const route = typeof body.route === 'string' ? body.route : null
+      const pageUrl = typeof body.page_url === 'string' ? body.page_url : null
       const userId = typeof body.user_id === 'string' ? body.user_id : null
 
-      // Meili client
-      const meili = getSupportMeiliClient()
-      if (!meili) {
-        return Response.json({ ok: false, error: 'MeiliSearch not configured' }, { status: 500 })
-      }
+      // Parse conversation_history for LLM context
+      const conversationHistory = Array.isArray(body.conversation_history)
+        ? body.conversation_history
+            .filter((m): m is { role: string; content: string } =>
+              typeof m === 'object' &&
+              m !== null &&
+              typeof (m as Record<string, unknown>).role === 'string' &&
+              typeof (m as Record<string, unknown>).content === 'string'
+            )
+        : undefined
 
-      const indexName = getSupportIndexName()
-      const index = meili.index(indexName)
-
-      // Normalize + fallback query
-      const q1 = normalizeQuery(messageRaw)
-      const q2 = stripLeadingQuestionFluff(q1)
-
-      // Include global docs (appSlug = "*") in results for any app query
-      const filter = `_status = "published" AND (appSlug = "${escMeiliFilterValue(appSlug)}" OR appSlug = "*")`
-
-      // Search (run up to 2 queries, merge results)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let hits: any[] = []
-      try {
-        const r1 = await index.search(q1, {
-          limit: 8,
-          filter,
-          attributesToRetrieve: [
-            'id',
-            'type',
-            'title',
-            'summary',
-            'bodyText',
-            'stepsText',
-            'triggersText',
-            'routes',
-            'severity',
-            '_status',
-            'appSlug',
-            'updatedAt',
-          ],
-        })
-
-        hits = hits.concat(r1.hits || [])
-
-        if (q2 && q2 !== q1) {
-          const r2 = await index.search(q2, {
-            limit: 8,
-            filter,
-            attributesToRetrieve: [
-              'id',
-              'type',
-              'title',
-              'summary',
-              'bodyText',
-              'stepsText',
-              'triggersText',
-              'routes',
-              'severity',
-              '_status',
-              'appSlug',
-              'updatedAt',
-            ],
-          })
-          hits = hits.concat(r2.hits || [])
-        }
-      } catch (e: unknown) {
-        const err = e as Error
-        const msg = String(err?.message || '')
-        if (msg.includes('Index') && msg.includes('not found')) {
-          return Response.json(
-            {
-              ok: false,
-              error:
-                'Support search index not ready. Run /api/admin/meilisearch-support/configure then /api/admin/meilisearch-support/resync.',
-            },
-            { status: 503 },
-          )
-        }
-        throw e
-      }
-
-      // De-dupe hits
-      hits = uniqById(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        hits.map((h: any) => ({
-          id: String(h?.id || ''),
-          type: String(h?.type || ''),
-          title: String(h?.title || ''),
-          summary: String(h?.summary || ''),
-          bodyText: String(h?.bodyText || ''),
-          stepsText: String(h?.stepsText || ''),
-          triggersText: String(h?.triggersText || ''),
-          routes: Array.isArray(h?.routes) ? h.routes.map(String) : [],
-          docAppSlug: String(h?.appSlug || ''),
-        })),
-      )
-
-      if (!hits.length) {
-        return Response.json({
-          ok: true,
-          answer:
-            "I couldn't find specific documentation for your question. Please create a support ticket for further assistance.",
-          sources: [],
-          fallback: true,
-          query: q1,
-          appSlug,
-        })
-      }
-
-      // Re-rank: app-specific docs beat global "*" docs, then route matches
-      hits.sort((a, b) => {
-        // 1. App-specific docs (exact match) rank higher than global "*"
-        const aAppSpecific = a.docAppSlug === appSlug ? 1 : 0
-        const bAppSpecific = b.docAppSlug === appSlug ? 1 : 0
-        if (aAppSpecific !== bAppSpecific) {
-          return bAppSpecific - aAppSpecific
-        }
-
-        // 2. If route provided, prefer docs whose routes match
-        if (route) {
-          const aRouteMatch = (a.routes || []).some((p: string) => routeMatchesPattern(p, route))
-          const bRouteMatch = (b.routes || []).some((p: string) => routeMatchesPattern(p, route))
-          if (aRouteMatch !== bRouteMatch) {
-            return Number(bRouteMatch) - Number(aRouteMatch)
-          }
-        }
-
-        return 0
+      // Use the new LLM-aware answer function
+      const result = await getSupportAnswerWithLLM({
+        appSlug,
+        message: messageRaw.trim(),
+        route,
+        pageUrl,
+        conversationHistory,
       })
 
-      const bestMatch = hits[0]
-      const bestContent =
-        bestMatch.summary ||
-        bestMatch.bodyText ||
-        bestMatch.stepsText ||
-        bestMatch.triggersText ||
-        ''
+      // Check if gate didn't pass (no hits or weak match)
+      if (!result.gate.passed) {
+        const fallbackReason = result.gate.reason === 'no_hits'
+          ? "I couldn't find specific documentation for your question."
+          : "I found some related content, but it may not fully address your question."
 
+        return Response.json({
+          ok: true,
+          answer: `${fallbackReason} Please create a support ticket for further assistance.`,
+          sources: result.sources,
+          fallback: true,
+          gate: result.gate,
+          queryUsed: result.queryUsed,
+          appSlug,
+          ...(route ? { route } : {}),
+          ...(userId ? { userId } : {}),
+          llmEnabled: result.llmEnabled,
+        })
+      }
+
+      // Gate passed - return the answer
       return Response.json({
         ok: true,
-        answer: bestContent || 'Please see the documentation linked below.',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sources: hits.slice(0, 5).map((doc: any) => ({
-          id: doc.id,
-          type: doc.type,
-          title: doc.title,
-          summary: doc.summary,
-        })),
-        query: q1,
-        ...(q2 && q2 !== q1 ? { queryFallback: q2 } : {}),
+        answer: result.answer || 'Please see the documentation linked below.',
+        sources: result.sources,
+        bestDocId: result.bestDocId,
+        confidence: result.confidence,
+        gate: result.gate,
+        queryUsed: result.queryUsed,
         appSlug,
         ...(route ? { route } : {}),
         ...(userId ? { userId } : {}),
-        llmEnabled: false,
+        llmEnabled: result.llmEnabled,
       })
     } catch (err: unknown) {
       const error = err as Error
