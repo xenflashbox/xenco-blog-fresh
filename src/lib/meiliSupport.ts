@@ -172,15 +172,23 @@ export function toMeiliSupportDoc(collection: string, doc: any) {
         ? extractTextFromLexical(doc.body)
         : ''
 
-  // playbook steps/triggers
-  const stepsText = Array.isArray(doc.steps)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? doc.steps.map((s: any) => `${s?.stepTitle ?? ''} ${s?.stepBody ?? ''}`).join(' ')
-    : ''
-  const triggersText = Array.isArray(doc.triggers)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? doc.triggers.map((t: any) => t?.phrase).filter(Boolean).join(' ')
-    : ''
+  // stepsText: direct string field (KB articles) OR from playbook steps array
+  const stepsText =
+    typeof doc.stepsText === 'string'
+      ? doc.stepsText
+      : Array.isArray(doc.steps)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? doc.steps.map((s: any) => `${s?.stepTitle ?? ''} ${s?.stepBody ?? ''}`).join(' ')
+        : ''
+
+  // triggersText: direct string field (KB articles) OR from playbook triggers array
+  const triggersText =
+    typeof doc.triggersText === 'string'
+      ? doc.triggersText
+      : Array.isArray(doc.triggers)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? doc.triggers.map((t: any) => t?.phrase).filter(Boolean).join(' ')
+        : ''
 
   return { ...base, bodyText, stepsText, triggersText }
 }

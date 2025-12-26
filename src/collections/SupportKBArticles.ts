@@ -95,9 +95,23 @@ export const SupportKBArticles: CollectionConfig = {
       ],
     },
     {
+      name: 'stepsText',
+      type: 'textarea',
+      admin: {
+        description: 'Numbered steps (e.g., "1. Click Upload 2. Select file...")',
+      },
+    },
+    {
+      name: 'triggersText',
+      type: 'textarea',
+      admin: {
+        description: 'Keyword soup: synonyms, common phrasing, error messages',
+      },
+    },
+    {
       name: 'body',
       type: 'richText',
-      required: true,
+      required: false,
     },
   ],
 }
