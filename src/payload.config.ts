@@ -3,6 +3,7 @@ import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { migrations } from './migrations'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
@@ -101,6 +102,7 @@ export default buildConfig({
     pool: {
       connectionString: dbURI,
     },
+    prodMigrations: migrations,
   }),
 
   plugins: [
