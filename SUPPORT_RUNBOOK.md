@@ -94,9 +94,8 @@ The `details` JSONB column stores structured metadata:
 
 ```jsonc
 {
-  // User-provided context
-  "route": "/dashboard",           // Current route/page
-  "page_url": "https://...",       // Full page URL
+  // User-provided context (persisted in details)
+  "route": "/dashboard",           // Persisted as details.route
   "conversation_history": [...],   // Optional: prior chat messages
 
   // System-generated triage
@@ -105,7 +104,7 @@ The `details` JSONB column stores structured metadata:
     "action": "create_ticket",     // "answer_now" | "create_ticket"
     "reason": "system_signal",     // Why this action was taken
     "route": "/dashboard",         // Echoed from input
-    "page_url": "https://...",     // Echoed from input
+    "page_url": "https://...",     // Echoed from triage context
     "severity": "high",            // Ticket severity
     "forced": false,               // Was force_ticket used?
     "confidence": 0.7              // Triage confidence score
@@ -115,6 +114,15 @@ The `details` JSONB column stores structured metadata:
   "alerted_at": "2025-12-25T21:54:58.527Z"  // Set after Slack alert sent
 }
 ```
+
+**Note on `page_url`:**
+- `page_url` is a **separate DB column** on the `support_tickets` table
+- It may optionally be mirrored in `details.triage.page_url` for triage context
+- When querying, prefer the DB column; use `details.triage.page_url` for audit trails
+
+**Note on `route`:**
+- `route` is persisted as `details.route` (top-level in details JSONB)
+- Also echoed in `details.triage.route` for triage context
 
 ### Triage Reasons
 
@@ -131,7 +139,10 @@ The `details` JSONB column stores structured metadata:
 
 ## Smoke Tests
 
-Run these after any deployment to verify the system works:
+Run these after any deployment to verify the system works.
+
+> **Note:** The API returns different response envelopes for answer-first (`resolved: true` with `.triage.*`)
+> vs ticket creation (`.ticket.triage.*`). The jq selectors below handle both cases.
 
 ### Test 1: Answer-First (KB Hit)
 
@@ -139,7 +150,12 @@ Run these after any deployment to verify the system works:
 curl -s -X POST "https://cms.resumecoach.me/api/support/ticket" \
   -H "Content-Type: application/json" \
   -d '{"app_slug":"resume-coach","message":"How do I fix the support widget?"}' \
-| jq '{resolved, answer: .answer[0:80], action: .triage.action, reason: .triage.reason}'
+| jq '{
+  resolved,
+  answer: (.answer // "")[0:80],
+  action: (.triage.action // .ticket.triage.action),
+  reason: (.triage.reason // .ticket.triage.reason)
+}'
 ```
 
 **Expected output:**
@@ -158,7 +174,12 @@ curl -s -X POST "https://cms.resumecoach.me/api/support/ticket" \
 curl -s -X POST "https://cms.resumecoach.me/api/support/ticket" \
   -H "Content-Type: application/json" \
   -d '{"app_slug":"resume-coach","message":"How do I fix the support widget?","force_ticket":true}' \
-| jq '{ticket_id: .ticket.id, action: .ticket.triage.action, reason: .ticket.triage.reason, forced: .ticket.triage.forced}'
+| jq '{
+  ticket_id: .ticket.id,
+  action: (.triage.action // .ticket.triage.action),
+  reason: (.triage.reason // .ticket.triage.reason),
+  forced: (.triage.forced // .ticket.triage.forced)
+}'
 ```
 
 **Expected output:**
@@ -177,7 +198,12 @@ curl -s -X POST "https://cms.resumecoach.me/api/support/ticket" \
 curl -s -X POST "https://cms.resumecoach.me/api/support/ticket" \
   -H "Content-Type: application/json" \
   -d '{"app_slug":"resume-coach","message":"Getting 500 error on checkout","severity":"high"}' \
-| jq '{ticket_id: .ticket.id, category: .ticket.triage.category, reason: .ticket.triage.reason, slack_alerted: .ticket.slack_alerted}'
+| jq '{
+  ticket_id: .ticket.id,
+  category: (.triage.category // .ticket.triage.category),
+  reason: (.triage.reason // .ticket.triage.reason),
+  slack_alerted: (.slack_alerted // .ticket.slack_alerted // false)
+}'
 ```
 
 **Expected output:**
