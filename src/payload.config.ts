@@ -30,7 +30,11 @@ import {
   meiliSupportResyncEndpoint,
   meiliSupportStatusEndpoint,
 } from './endpoints/meiliSupportAdmin'
-import { supportTicketEndpoint, supportAnswerEndpoint } from './endpoints/support'
+import {
+  supportTicketEndpoint,
+  supportAnswerEndpoint,
+  supportHealthEndpoint,
+} from './endpoints/support'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -80,6 +84,7 @@ export default buildConfig({
     meiliSupportStatusEndpoint,
     supportTicketEndpoint,
     supportAnswerEndpoint,
+    supportHealthEndpoint,
   ],
 
   editor: lexicalEditor(),

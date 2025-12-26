@@ -796,3 +796,72 @@ export const supportAnswerEndpoint: Endpoint = {
     }
   },
 }
+
+/**
+ * GET /api/support/health
+ * Health check endpoint for monitoring DB and MeiliSearch status
+ * Optional auth via SUPPORT_HEALTH_TOKEN env var (Bearer token)
+ */
+export const supportHealthEndpoint: Endpoint = {
+  path: '/support/health',
+  method: 'get',
+  handler: async (req) => {
+    const startedAt = Date.now()
+
+    // Optional auth: if SUPPORT_HEALTH_TOKEN is set, require it
+    const token = process.env.SUPPORT_HEALTH_TOKEN?.trim()
+    if (token) {
+      const authHeader = req.headers.get('authorization') || ''
+      if (authHeader !== `Bearer ${token}`) {
+        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+      }
+    }
+
+    // --- DB health ---
+    let dbOk = false
+    let dbError: string | null = null
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) throw new Error('Database pool not available')
+      await pool.query('SELECT 1 AS ok')
+      dbOk = true
+    } catch (e: unknown) {
+      dbError = (e as Error)?.message || 'DB check failed'
+    }
+
+    // --- Meili health ---
+    let meiliOk = false
+    let meiliError: string | null = null
+    const indexName = getSupportIndexName()
+
+    try {
+      const meili = getSupportMeiliClient()
+      if (!meili) throw new Error('MeiliSearch not configured')
+
+      const index = meili.index(indexName)
+
+      // getStats is a quick way to confirm the index exists and is reachable
+      await index.getStats()
+      meiliOk = true
+    } catch (e: unknown) {
+      meiliError = (e as Error)?.message || 'Meili check failed'
+    }
+
+    const overallOk = dbOk && meiliOk
+    const durationMs = Date.now() - startedAt
+
+    return Response.json(
+      {
+        ok: overallOk,
+        status: overallOk ? 'ok' : 'degraded',
+        checks: {
+          db: { ok: dbOk, error: dbError },
+          meili: { ok: meiliOk, error: meiliError, index: indexName },
+        },
+        duration_ms: durationMs,
+        ts: new Date().toISOString(),
+      },
+      { status: overallOk ? 200 : 503 },
+    )
+  },
+}
