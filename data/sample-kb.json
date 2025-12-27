@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Test Article 1",
+    "summary": "This is a test article for demonstration",
+    "bodyText": "Full body text goes here with detailed information.",
+    "stepsText": "1. First step\n2. Second step\n3. Third step",
+    "triggersText": "test demo sample example keywords",
+    "routes": ["/test", "/demo"],
+    "type": "kb_article"
+  },
+  {
+    "appSlug": "job-search",
+    "title": "Test Article 2",
+    "summary": "Another test article with different app slug",
+    "routes": [{"route": "/search"}, {"route": "/jobs"}],
+    "_status": "draft"
+  }
+]

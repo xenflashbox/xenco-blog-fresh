@@ -1,0 +1,260 @@
+{
+  "version": "1.0",
+  "description": "Phase 1 QA Tests - Basic KB Coverage for ResumeCoach",
+  "tests": [
+    {
+      "name": "Upload resume - basic question",
+      "app_slug": "resume-coach",
+      "message": "How do I upload a resume?",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Upload a resume",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Upload resume - natural language",
+      "app_slug": "resume-coach",
+      "message": "What's the best way to submit my resume for analysis?",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Upload a resume",
+        "topN": 5
+      }
+    },
+    {
+      "name": "File format question",
+      "app_slug": "resume-coach",
+      "message": "What file formats do you support?",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Upload a resume",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Upload error - should find troubleshooting",
+      "app_slug": "resume-coach",
+      "message": "My upload keeps failing",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Fix upload errors",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Copy paste option",
+      "app_slug": "resume-coach",
+      "message": "Can I paste my resume instead of uploading?",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Copy and paste resume text",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Results location",
+      "app_slug": "resume-coach",
+      "message": "Where can I see my results?",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Find your results after submission",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Score explanation",
+      "app_slug": "resume-coach",
+      "message": "What does my resume score mean?",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Understanding your resume score",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Sign in help",
+      "app_slug": "resume-coach",
+      "message": "How do I log into my account?",
+      "route": "/login",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Sign in to your account",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Password reset",
+      "app_slug": "resume-coach",
+      "message": "I forgot my password",
+      "route": "/login",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Reset your password",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Account not found",
+      "app_slug": "resume-coach",
+      "message": "It says my account doesn't exist",
+      "route": "/login",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Account not recognized or email mismatch",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Pricing question",
+      "app_slug": "resume-coach",
+      "message": "How much does it cost?",
+      "route": "/pricing",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Billing plans and pricing FAQ",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Update payment method",
+      "app_slug": "resume-coach",
+      "message": "How do I change my credit card?",
+      "route": "/billing",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Update your payment method",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Cancel subscription",
+      "app_slug": "resume-coach",
+      "message": "I want to cancel my subscription",
+      "route": "/billing",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Cancel subscription or request refund",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Stuck processing",
+      "app_slug": "resume-coach",
+      "message": "My resume has been processing for 5 minutes",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Fix stuck spinning or processing forever",
+        "topN": 3
+      }
+    },
+    {
+      "name": "White screen bug",
+      "app_slug": "resume-coach",
+      "message": "I'm seeing a blank white screen",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Fix white screen or blank page",
+        "topN": 3
+      }
+    },
+    {
+      "name": "500 error",
+      "app_slug": "resume-coach",
+      "message": "I'm getting a 500 error when uploading",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Fix 500 or 404 errors",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Connection error",
+      "app_slug": "resume-coach",
+      "message": "Failed to fetch error",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Fix connection errors or failed to fetch",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Data privacy question",
+      "app_slug": "resume-coach",
+      "message": "Is my resume data secure?",
+      "route": "/privacy",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Data privacy and security overview",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Feature request - should create ticket",
+      "app_slug": "resume-coach",
+      "message": "Please add support for LinkedIn import",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "feature_signal"
+      }
+    },
+    {
+      "name": "No KB match - should create ticket",
+      "app_slug": "resume-coach",
+      "message": "Why is the moon made of cheese?",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "no_kb_match"
+      }
+    }
+  ]
+}

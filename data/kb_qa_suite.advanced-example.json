@@ -1,0 +1,216 @@
+{
+  "version": "1.0",
+  "description": "Advanced QA Test Examples - Conversation Context, Route Boosting, Edge Cases",
+  "tests": [
+    {
+      "name": "Conversation context - follow-up question",
+      "app_slug": "resume-coach",
+      "message": "What about pasting instead?",
+      "route": "/submit",
+      "conversation_history": [
+        { "role": "user", "content": "How do I upload a resume?" },
+        { "role": "assistant", "content": "You can upload your resume by clicking the Upload Resume button..." }
+      ],
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Copy and paste resume text",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Route boost - upload on submit page",
+      "app_slug": "resume-coach",
+      "message": "upload",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "expectedTitle": "Upload a resume",
+        "topN": 1
+      }
+    },
+    {
+      "name": "Route boost - results on dashboard",
+      "app_slug": "resume-coach",
+      "message": "results",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "expectedTitle": "Find your results after submission",
+        "topN": 2
+      }
+    },
+    {
+      "name": "Hard system signal - 500 error creates ticket",
+      "app_slug": "resume-coach",
+      "message": "Getting 500 error when uploading my resume",
+      "route": "/submit",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "system_signal"
+      }
+    },
+    {
+      "name": "Bug signal - upload broken",
+      "app_slug": "resume-coach",
+      "message": "Upload is broken, keeps failing with error message",
+      "route": "/submit",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "bug_signal"
+      }
+    },
+    {
+      "name": "Feature request - explicit request",
+      "app_slug": "resume-coach",
+      "message": "Feature request: Please add support for importing from LinkedIn",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "feature_signal"
+      }
+    },
+    {
+      "name": "Natural language - conversational upload question",
+      "app_slug": "resume-coach",
+      "message": "Hey, I'm trying to figure out how I can get my resume into the system",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "reason": "kb_hit",
+        "expectedTitle": "Upload a resume",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Multi-word trigger - stuck processing",
+      "app_slug": "resume-coach",
+      "message": "My resume has been stuck processing for 10 minutes now",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "expectedTitle": "Fix stuck spinning or processing forever",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Partial match - payment instead of billing",
+      "app_slug": "resume-coach",
+      "message": "How do I update my payment information?",
+      "route": "/billing",
+      "expected": {
+        "resolved": true,
+        "action": "answer_now",
+        "expectedTitle": "Update your payment method",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Ambiguous query - should still resolve with route context",
+      "app_slug": "resume-coach",
+      "message": "error",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix upload errors",
+        "topN": 5
+      }
+    },
+    {
+      "name": "No KB match - random question",
+      "app_slug": "resume-coach",
+      "message": "What's the weather like today?",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "no_kb_match"
+      }
+    },
+    {
+      "name": "Edge case - empty route should still work",
+      "app_slug": "resume-coach",
+      "message": "How do I sign in?",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Sign in to your account",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Global docs - app-specific should rank higher",
+      "app_slug": "resume-coach",
+      "message": "How do I upload?",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Upload a resume",
+        "topN": 1
+      }
+    },
+    {
+      "name": "Multiple keywords - combines triggers",
+      "app_slug": "resume-coach",
+      "message": "Can I upload a PDF or DOCX file?",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Upload a resume",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Stripped question fluff - how do I phrasing",
+      "app_slug": "resume-coach",
+      "message": "How do I cancel my subscription?",
+      "route": "/billing",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Cancel subscription or request refund",
+        "topN": 3
+      }
+    },
+    {
+      "name": "Conversation context - multi-turn support issue",
+      "app_slug": "resume-coach",
+      "message": "It's still not working",
+      "route": "/submit",
+      "conversation_history": [
+        { "role": "user", "content": "Upload failed" },
+        { "role": "assistant", "content": "Try checking your file format..." },
+        { "role": "user", "content": "I tried that already" }
+      ],
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "no_kb_match"
+      }
+    },
+    {
+      "name": "High confidence match - exact title in query",
+      "app_slug": "resume-coach",
+      "message": "Upload a resume documentation",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Upload a resume",
+        "topN": 1
+      }
+    },
+    {
+      "name": "Low confidence - should not resolve with weak match",
+      "app_slug": "resume-coach",
+      "message": "zebra sandwich quantum",
+      "expected": {
+        "resolved": false,
+        "action": "create_ticket",
+        "reason": "no_kb_match"
+      }
+    }
+  ]
+}

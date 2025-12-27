@@ -407,3 +407,73 @@ Authorization: Bearer YOUR_HEALTH_TOKEN  # Optional: if SUPPORT_HEALTH_TOKEN is 
 - Set `SUPPORT_HEALTH_TOKEN` in Vercel env vars
 - Requests must include `Authorization: Bearer <token>`
 - If token not set, endpoint is public (for uptime monitors)
+
+---
+
+## KB Import & QA Operations
+
+### Import KB Articles
+
+Idempotent upsert: creates new articles or updates existing ones by title+appSlug.
+
+```bash
+# Set credentials
+export PAYLOAD_ADMIN_EMAIL=your-admin@email.com
+export PAYLOAD_ADMIN_PASSWORD=your-password
+
+# Import both KB packs
+pnpm run support:kb:import
+
+# Or import specific files
+npx tsx scripts/import-support-kb.ts data/my-articles.json
+```
+
+**Output:** `Created: X, Updated: Y, Skipped: Z, Failed: N`
+
+### Resync MeiliSearch After Import
+
+```bash
+curl -X POST "https://cms.resumecoach.me/api/admin/meilisearch-support/resync" \
+  -H "Authorization: Bearer $SUPPORT_ADMIN_TOKEN"
+```
+
+### Run QA Test Suite
+
+```bash
+# Verify test suite structure first
+pnpm run support:kb:verify
+
+# Run QA tests against /api/support/ticket
+pnpm run support:kb:qa
+```
+
+**Output:** `support-kb-qa.report.json` with test results and failures.
+
+### npm Scripts Reference
+
+| Script | Command |
+|--------|---------|
+| `support:kb:import` | Import Phase 1+2 KB articles |
+| `support:kb:qa` | Run QA suite (exit code 1 on failures) |
+| `support:kb:verify` | Validate QA suite JSON structure |
+
+---
+
+## Widget Intelligence (v1.2)
+
+### Route Fallback
+
+If `route` is not explicitly provided, the system attempts to extract it from:
+1. `page_url` parameter (extracts pathname)
+2. `Referer` header (extracts pathname)
+
+This ensures route-aware ranking works even if the frontend forgets to send `route`.
+
+### Conversation Context
+
+Context extraction uses **USER messages only**:
+- Only includes messages with `role: "user"`
+- Never includes assistant messages (prevents drift)
+- Combines short messages with previous context for better matching
+
+**Example:** If user says "I can't find the button" after asking about uploads, the system combines both user messages for context search.

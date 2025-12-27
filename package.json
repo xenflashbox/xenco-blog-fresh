@@ -17,7 +17,11 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "test:kb-qa": "npx tsx scripts/run-support-kb-qa.ts",
+    "support:kb:import": "npx tsx scripts/import-support-kb.ts data/phase1-kb-articles.v1_1.json data/phase2-kb-articles.json",
+    "support:kb:qa": "npx tsx scripts/run-support-kb-qa.ts data/kb_qa_suite.phase1.json",
+    "support:kb:verify": "npx tsx scripts/verify-qa-setup.ts data/kb_qa_suite.phase1.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.948.0",

@@ -1,0 +1,114 @@
+================================================================================
+KB ARTICLE IMPORT SCRIPT - IMPLEMENTATION SUMMARY
+================================================================================
+
+CREATED FILES:
+--------------
+✅ /home/xen/docker/apps/xenco-blog-fresh/scripts/import-support-kb.ts
+   - Main idempotent import script with upsert strategy
+   - Accepts multiple JSON file paths as CLI arguments
+   - Normalizes data and handles duplicates intelligently
+
+✅ /home/xen/docker/apps/xenco-blog-fresh/data/sample-kb.json
+   - Sample test data demonstrating article structure
+   - Shows both array of strings and array of objects for routes
+
+✅ /home/xen/docker/apps/xenco-blog-fresh/scripts/README-import-kb.md
+   - Complete documentation with usage examples
+   - Troubleshooting guide and best practices
+
+✅ /home/xen/docker/apps/xenco-blog-fresh/scripts/IMPORT-KB-QUICKSTART.md
+   - Quick reference guide for common tasks
+   - Step-by-step instructions for first-time users
+
+SCRIPT FEATURES:
+----------------
+✅ Idempotent upsert strategy (safe to run multiple times)
+✅ Duplicate detection via title + appSlug combination
+✅ Automatic normalization of fields:
+   - appSlug defaults to 'resume-coach'
+   - _status defaults to 'published'
+   - routes converted to array of objects
+✅ Batch processing (multiple files in one command)
+✅ Detailed logging with progress indicators
+✅ Comprehensive error handling and reporting
+✅ Summary statistics (created/updated/skipped/failed)
+✅ Exit code 1 on failures for CI/CD integration
+
+USAGE EXAMPLES:
+---------------
+# Single file
+npx tsx scripts/import-support-kb.ts data/articles.json
+
+# Multiple files
+npx tsx scripts/import-support-kb.ts data/pack1.json data/pack2.json
+
+# With wildcards
+npx tsx scripts/import-support-kb.ts data/*.json
+
+ENVIRONMENT VARIABLES:
+----------------------
+PAYLOAD_URL              - Default: https://cms.resumecoach.me
+PAYLOAD_ADMIN_EMAIL      - Required
+PAYLOAD_ADMIN_PASSWORD   - Required
+
+ARTICLE STRUCTURE:
+------------------
+{
+  "appSlug": "resume-coach",        // Default if not provided
+  "title": "Article title",         // REQUIRED - used for duplicate check
+  "summary": "Short description",
+  "bodyText": "Full content",
+  "stepsText": "Step by step guide",
+  "triggersText": "search keywords",
+  "routes": ["/path1", "/path2"],   // Auto-normalized
+  "_status": "published",            // Default if not provided
+  "type": "kb_article"
+}
+
+UPSERT LOGIC:
+-------------
+1. Query: GET /api/support_kb_articles?where[title][equals]=X&where[appSlug][equals]=Y
+2. If found: PATCH /api/support_kb_articles/{id} (update fields)
+3. If not found: POST /api/support_kb_articles (create new)
+
+FIELDS UPDATED ON PATCH:
+- summary
+- bodyText
+- stepsText
+- triggersText
+- routes
+- _status
+- type
+
+FIELDS NOT UPDATED (used for lookup):
+- title
+- appSlug
+
+TESTING:
+--------
+Test the script works:
+  npx tsx scripts/import-support-kb.ts
+  
+Expected output:
+  ❌ No file paths provided
+  Usage: npx tsx scripts/import-support-kb.ts <file1.json> [file2.json] ...
+
+Test with sample data (requires credentials):
+  npx tsx scripts/import-support-kb.ts data/sample-kb.json
+
+NEXT STEPS:
+-----------
+1. Set environment variables (PAYLOAD_ADMIN_EMAIL, PAYLOAD_ADMIN_PASSWORD)
+2. Prepare JSON files with KB articles
+3. Run import script with file paths
+4. Review summary statistics
+5. Check Payload CMS to verify articles
+
+DOCUMENTATION:
+--------------
+- Full docs: scripts/README-import-kb.md
+- Quick start: scripts/IMPORT-KB-QUICKSTART.md
+- Sample data: data/sample-kb.json
+
+================================================================================

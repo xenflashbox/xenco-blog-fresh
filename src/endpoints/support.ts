@@ -113,6 +113,47 @@ function uniqById<T extends { id: string }>(arr: T[]): T[] {
   return out
 }
 
+/**
+ * Extract route from various sources with fallback logic
+ * Priority: explicit route > page_url pathname > referer pathname
+ */
+function resolveRoute(opts: {
+  route?: string | null
+  pageUrl?: string | null
+  referer?: string | null
+}): string | null {
+  // 1. If explicit route provided, use it
+  if (opts.route && opts.route.trim()) {
+    return opts.route.trim()
+  }
+
+  // 2. Try to extract from page_url
+  if (opts.pageUrl) {
+    try {
+      const url = new URL(opts.pageUrl)
+      if (url.pathname && url.pathname !== '/') {
+        return url.pathname
+      }
+    } catch {
+      // Invalid URL, continue to next fallback
+    }
+  }
+
+  // 3. Try to extract from Referer header
+  if (opts.referer) {
+    try {
+      const url = new URL(opts.referer)
+      if (url.pathname && url.pathname !== '/') {
+        return url.pathname
+      }
+    } catch {
+      // Invalid URL, return null
+    }
+  }
+
+  return null
+}
+
 // --- Smart Ticket triage helpers ---
 
 type TriageCategory =
@@ -405,22 +446,37 @@ function computeLexicalScore(query: string, docText: string): number {
 
 /**
  * Extract context from conversation history for improved retrieval
- * Combines recent messages into a context query
+ * IMPORTANT: Only uses USER messages - never include assistant messages
+ * This prevents the widget from drifting based on its own responses
  */
 function extractConversationContext(
-  history?: Array<{ role: string; content: string }>
+  history?: Array<{ role: string; content: string }>,
+  currentMessage?: string
 ): string | null {
   if (!history?.length) return null
 
-  // Get last 3 messages (excluding the current one which is passed separately)
-  const recent = history.slice(-3)
+  // CRITICAL: Only include USER messages (role === 'user')
+  // Never include assistant messages in context - they can cause drift
+  const userMessages = history.filter(m => m.role === 'user')
 
-  // Extract key terms from conversation
+  if (!userMessages.length) return null
+
+  // Get last 2-3 user messages
+  const recent = userMessages.slice(-3)
+
+  // Extract key terms from user messages only
   const contextParts = recent
     .map(m => normalizeQuery(m.content))
     .filter(c => c.length > 3)
 
   if (!contextParts.length) return null
+
+  // If current message is very short (e.g., "I can't find it"),
+  // combine with the most recent user message for better context
+  if (currentMessage && currentMessage.length < 30 && contextParts.length > 0) {
+    const lastUserMsg = contextParts[contextParts.length - 1]
+    return `${lastUserMsg} ${currentMessage}`
+  }
 
   // Join with space, will be used for broader context search
   return contextParts.join(' ')
@@ -551,8 +607,8 @@ async function getSupportAnswerWithLLM(opts: {
   const q1 = normalizeQuery(message)
   // Query 2: Stripped question fluff
   const q2 = stripLeadingQuestionFluff(q1)
-  // Query 3: Conversation context (if available)
-  const qContext = extractConversationContext(conversationHistory)
+  // Query 3: Conversation context (if available) - USER messages only
+  const qContext = extractConversationContext(conversationHistory, message)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let hits: any[] = []
@@ -774,12 +830,15 @@ export const supportTicketEndpoint: Endpoint = {
       const detailsObj =
         typeof details === 'object' && details !== null ? (details as Record<string, unknown>) : {}
 
-      const route =
+      // Resolve route with fallback: explicit route > page_url > Referer header
+      const routeRaw =
         typeof body.route === 'string'
           ? body.route
           : typeof detailsObj.route === 'string'
             ? String(detailsObj.route)
             : null
+      const referer = req.headers.get('referer') || null
+      const route = resolveRoute({ route: routeRaw, pageUrl: pageUrl, referer })
 
       // Support force_ticket from both top-level and details
       const forceTicket =
@@ -1006,9 +1065,13 @@ export const supportAnswerEndpoint: Endpoint = {
       }
 
       // Optional fields
-      const route = typeof body.route === 'string' ? body.route : null
+      const routeRaw = typeof body.route === 'string' ? body.route : null
       const pageUrl = typeof body.page_url === 'string' ? body.page_url : null
       const userId = typeof body.user_id === 'string' ? body.user_id : null
+
+      // Resolve route with fallback: explicit route > page_url > Referer header
+      const referer = req.headers.get('referer') || null
+      const route = resolveRoute({ route: routeRaw, pageUrl, referer })
 
       // Parse conversation_history for LLM context
       const conversationHistory = Array.isArray(body.conversation_history)
