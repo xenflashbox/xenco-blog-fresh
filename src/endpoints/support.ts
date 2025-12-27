@@ -12,18 +12,18 @@ import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
 const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'] as const
 type Severity = (typeof VALID_SEVERITIES)[number]
 
-// --- LLM Configuration (Provider-Agnostic) ---
-type LLMProvider = 'anthropic' | 'openai'
-
+// --- LLM Configuration (AI Gateway) ---
+// Uses unified AI gateway at research.xencolabs.com with automatic cost tracking,
+// load balancing, and failover. Gateway uses OpenAI-compatible format for all models.
 const LLM_CONFIG = {
   enabled: process.env.SUPPORT_LLM_ENABLED === 'true',
-  // Primary provider (default: anthropic for Haiku)
-  provider: (process.env.SUPPORT_LLM_PROVIDER || 'anthropic') as LLMProvider,
-  model: process.env.SUPPORT_LLM_MODEL || 'claude-3-5-haiku-20241022',
+  // AI Gateway endpoint (default: production gateway)
+  gatewayUrl: process.env.AI_GATEWAY_URL || 'https://research.xencolabs.com/api/ai/chat/completions',
+  // API key for gateway authentication
+  apiKey: process.env.AI_GATEWAY_API_KEY || '',
+  // Model to use (gateway supports: claude-3-haiku, claude-3-5-sonnet, gpt-4o, gpt-4o-mini, etc.)
+  model: process.env.SUPPORT_LLM_MODEL || 'claude-3-haiku',
   maxTokens: parseInt(process.env.SUPPORT_LLM_MAX_TOKENS || '300', 10),
-  // Fallback provider (optional)
-  fallbackProvider: process.env.SUPPORT_LLM_FALLBACK_PROVIDER as LLMProvider | undefined,
-  fallbackModel: process.env.SUPPORT_LLM_FALLBACK_MODEL || 'gpt-4o-mini',
 }
 
 // --- LLM Types ---
@@ -520,62 +520,27 @@ function checkRelevanceGate(
 }
 
 /**
- * Call LLM provider (Anthropic Haiku or OpenAI) to synthesize an answer
- * Provider-agnostic: supports Anthropic Messages API and OpenAI Chat Completions
+ * Call AI Gateway to synthesize an answer
+ * Uses unified gateway at research.xencolabs.com with OpenAI-compatible format.
+ * Gateway handles model routing, failover, load balancing, and cost tracking.
  */
-async function callLLMProvider(params: {
-  provider: LLMProvider
+async function callAIGateway(params: {
   model: string
   system: string
   user: string
   maxTokens: number
 }): Promise<string> {
-  const { provider, model, system, user, maxTokens } = params
+  const { model, system, user, maxTokens } = params
 
-  if (provider === 'anthropic') {
-    const key = process.env.ANTHROPIC_API_KEY
-    if (!key) throw new Error('ANTHROPIC_API_KEY missing')
-
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: maxTokens,
-        system,
-        messages: [{ role: 'user', content: user }],
-      }),
-    })
-
-    if (!resp.ok) {
-      const errorText = await resp.text()
-      throw new Error(`Anthropic LLM error: ${resp.status} - ${errorText}`)
-    }
-    const data = await resp.json()
-
-    // content is an array; extract text blocks safely
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const text = Array.isArray(data?.content)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? data.content.map((c: any) => c?.text).filter(Boolean).join('\n').trim()
-      : ''
-
-    return text
+  if (!LLM_CONFIG.apiKey) {
+    throw new Error('AI_GATEWAY_API_KEY missing')
   }
 
-  // provider === 'openai'
-  const key = process.env.OPENAI_API_KEY
-  if (!key) throw new Error('OPENAI_API_KEY missing')
-
-  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+  const resp = await fetch(LLM_CONFIG.gatewayUrl, {
     method: 'POST',
     headers: {
-      'content-type': 'application/json',
-      'authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${LLM_CONFIG.apiKey}`,
     },
     body: JSON.stringify({
       model,
@@ -590,18 +555,19 @@ async function callLLMProvider(params: {
 
   if (!resp.ok) {
     const errorText = await resp.text()
-    throw new Error(`OpenAI LLM error: ${resp.status} - ${errorText}`)
+    throw new Error(`AI Gateway error: ${resp.status} - ${errorText}`)
   }
+
   const data = await resp.json()
 
-  // Extract from OpenAI chat completions response
+  // OpenAI-compatible response format
   const text = data?.choices?.[0]?.message?.content?.trim() || ''
   return text
 }
 
 /**
  * Call LLM to synthesize an answer from KB content
- * Tries primary provider first, then fallback if configured
+ * Uses AI Gateway with automatic failover and load balancing
  */
 async function callLLM(
   userMessage: string,
@@ -632,10 +598,9 @@ ${kbContent}`
   contextParts.push(`Current question: ${userMessage}`)
   const fullUserMessage = contextParts.join('\n\n')
 
-  // Try primary provider
+  // Call AI Gateway (handles failover internally)
   try {
-    const result = await callLLMProvider({
-      provider: LLM_CONFIG.provider,
+    const result = await callAIGateway({
       model: LLM_CONFIG.model,
       system: systemPrompt,
       user: fullUserMessage,
@@ -643,23 +608,7 @@ ${kbContent}`
     })
     if (result) return result
   } catch (err) {
-    console.error(`Primary LLM (${LLM_CONFIG.provider}) failed:`, err)
-  }
-
-  // Try fallback provider if configured
-  if (LLM_CONFIG.fallbackProvider && LLM_CONFIG.fallbackModel) {
-    try {
-      const result = await callLLMProvider({
-        provider: LLM_CONFIG.fallbackProvider,
-        model: LLM_CONFIG.fallbackModel,
-        system: systemPrompt,
-        user: fullUserMessage,
-        maxTokens: LLM_CONFIG.maxTokens,
-      })
-      if (result) return result
-    } catch (err) {
-      console.error(`Fallback LLM (${LLM_CONFIG.fallbackProvider}) failed:`, err)
-    }
+    console.error(`AI Gateway (${LLM_CONFIG.model}) failed:`, err)
   }
 
   return null

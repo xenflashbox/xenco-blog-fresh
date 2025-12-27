@@ -480,36 +480,44 @@ Context extraction uses **USER messages only**:
 
 ---
 
-## LLM Synthesis (v1.3)
+## LLM Synthesis (v1.4)
 
-The support system can optionally synthesize natural language answers from KB content using LLM providers.
+The support system can optionally synthesize natural language answers from KB content using the AI Gateway.
 
-### Supported Providers
+### AI Gateway
 
-| Provider | Model | Use Case |
-|----------|-------|----------|
-| **Anthropic** (default) | `claude-3-5-haiku-20241022` | Primary provider, fast + accurate |
-| **OpenAI** (fallback) | `gpt-4o-mini` | Optional fallback if Anthropic fails |
+Uses the unified AI Gateway at `research.xencolabs.com` which provides:
+- Automatic cost tracking to PostgreSQL
+- Load balancing across 3 Docker Swarm replicas
+- Built-in failover between models
+- Multi-tenant org isolation
+- Support for Claude (Haiku, Sonnet, Opus) and GPT-4o models
+
+### Available Models
+
+| Model ID | Provider | Best For | Speed |
+|----------|----------|----------|-------|
+| `claude-3-haiku` | Anthropic | Fast responses, support chat | Very Fast |
+| `claude-3-5-sonnet` | Anthropic | General tasks, coding | Fast |
+| `gpt-4o-mini` | OpenAI | Simple tasks, fast | Very Fast |
+| `gpt-4o` | OpenAI | Multimodal, complex | Fast |
 
 ### Environment Variables
 
 **Required for LLM synthesis:**
 ```bash
 SUPPORT_LLM_ENABLED=true
-ANTHROPIC_API_KEY=sk-ant-...
+AI_GATEWAY_API_KEY=your-gateway-api-key
 ```
 
 **Optional configuration:**
 ```bash
-SUPPORT_LLM_PROVIDER=anthropic          # Default: anthropic
-SUPPORT_LLM_MODEL=claude-3-5-haiku-20241022  # Default model
-SUPPORT_LLM_MAX_TOKENS=300              # Max response tokens
-
-# Optional OpenAI fallback
-OPENAI_API_KEY=sk-...
-SUPPORT_LLM_FALLBACK_PROVIDER=openai
-SUPPORT_LLM_FALLBACK_MODEL=gpt-4o-mini
+AI_GATEWAY_URL=https://research.xencolabs.com/api/ai/chat/completions  # Default
+SUPPORT_LLM_MODEL=claude-3-haiku      # Default model (fast + cheap)
+SUPPORT_LLM_MAX_TOKENS=300            # Max response tokens
 ```
+
+**Note:** Get your API key from the AI Gateway admin. Keys are org-specific for cost tracking.
 
 ### How It Works
 
