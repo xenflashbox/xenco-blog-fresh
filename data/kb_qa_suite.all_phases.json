@@ -1,0 +1,897 @@
+[
+  {
+    "_comment": "=== PHASE 1: WHY DIFFERENT RESUMES ===",
+    "query": "why cant i use the same resume for every job",
+    "route": "/dashboard",
+    "expectedTitle": "Why you need a different resume for every job application"
+  },
+  {
+    "query": "do i need multiple resumes",
+    "route": "/submit",
+    "expectedTitle": "Why you need a different resume for every job application"
+  },
+  {
+    "query": "can i reuse my resume for all applications",
+    "route": "/pricing",
+    "expectedTitle": "Why you need a different resume for every job application"
+  },
+  {
+    "_comment": "=== PHASE 1: ATS EXPLAINED ===",
+    "query": "what is ATS",
+    "route": "/submit",
+    "expectedTitle": "What is ATS and why does my resume get rejected"
+  },
+  {
+    "query": "why am i not getting callbacks",
+    "route": "/results",
+    "expectedTitle": "What is ATS and why does my resume get rejected"
+  },
+  {
+    "query": "robots reading my resume",
+    "route": "/dashboard",
+    "expectedTitle": "What is ATS and why does my resume get rejected"
+  },
+  {
+    "query": "applicant tracking system how to beat",
+    "route": "/submit",
+    "expectedTitle": "What is ATS and why does my resume get rejected"
+  },
+  {
+    "_comment": "=== PHASE 1: JOB DESCRIPTION IMPORTANCE ===",
+    "query": "why do you need my job description",
+    "route": "/submit",
+    "expectedTitle": "Why the job description is required for resume optimization"
+  },
+  {
+    "query": "where do i paste the job posting",
+    "route": "/submit",
+    "expectedTitle": "Why the job description is required for resume optimization"
+  },
+  {
+    "query": "whats the point of the job description field",
+    "route": "/submit",
+    "expectedTitle": "Why the job description is required for resume optimization"
+  },
+  {
+    "_comment": "=== PHASE 1: SPOR ANALYSIS ===",
+    "query": "what is SPOR",
+    "route": "/results",
+    "expectedTitle": "What is SPOR Analysis on the Results page"
+  },
+  {
+    "query": "what does spor stand for",
+    "route": "/results",
+    "expectedTitle": "What is SPOR Analysis on the Results page"
+  },
+  {
+    "query": "how do you calculate my score",
+    "route": "/ats-analysis",
+    "expectedTitle": "What is SPOR Analysis on the Results page"
+  },
+  {
+    "_comment": "=== PHASE 1: SCORE MEANING ===",
+    "query": "what does my score mean",
+    "route": "/results",
+    "expectedTitle": "What does my resume score mean on the Results page"
+  },
+  {
+    "query": "i got a 45 is that bad",
+    "route": "/results",
+    "expectedTitle": "What does my resume score mean on the Results page"
+  },
+  {
+    "query": "what is a good score",
+    "route": "/results",
+    "expectedTitle": "What does my resume score mean on the Results page"
+  },
+  {
+    "query": "is 70 a passing score",
+    "route": "/results",
+    "expectedTitle": "What does my resume score mean on the Results page"
+  },
+  {
+    "_comment": "=== PHASE 1: NO JOB DESCRIPTION ===",
+    "query": "i dont have a job description",
+    "route": "/submit",
+    "expectedTitle": "What to do if you do not have a job description"
+  },
+  {
+    "query": "can i just enter the job title",
+    "route": "/submit",
+    "expectedTitle": "What to do if you do not have a job description"
+  },
+  {
+    "query": "the job posting expired what do i do",
+    "route": "/submit",
+    "expectedTitle": "What to do if you do not have a job description"
+  },
+  {
+    "_comment": "=== PHASE 1: JOB SEARCH ===",
+    "query": "how do i find jobs",
+    "route": "/dashboard",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "query": "where is job search",
+    "route": "/dashboard",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "query": "jobs near me",
+    "route": "/jobs",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "query": "engineering jobs california",
+    "route": "/jobs",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "_comment": "=== PHASE 1: CREATE RESUME FOR JOB ===",
+    "query": "how do i create a resume for a job i found",
+    "route": "/jobs",
+    "expectedTitle": "How to create a resume for a job from Job Search results"
+  },
+  {
+    "query": "create resume for this job button",
+    "route": "/jobs",
+    "expectedTitle": "How to create a resume for a job from Job Search results"
+  },
+  {
+    "query": "how to apply from job search",
+    "route": "/jobs",
+    "expectedTitle": "How to create a resume for a job from Job Search results"
+  },
+  {
+    "query": "apply button where",
+    "route": "/results",
+    "expectedTitle": "How to create a resume for a job from Job Search results"
+  },
+  {
+    "_comment": "=== PHASE 2: UPLOAD RESUME ===",
+    "query": "how do i upload my resume",
+    "route": "/dashboard",
+    "expectedTitle": "How to upload your resume using the Upload Resume button"
+  },
+  {
+    "query": "drag and drop resume",
+    "route": "/submit",
+    "expectedTitle": "How to upload your resume using the Upload Resume button"
+  },
+  {
+    "query": "where do i submit my resume",
+    "route": "/dashboard",
+    "expectedTitle": "How to upload your resume using the Upload Resume button"
+  },
+  {
+    "_comment": "=== PHASE 2: FILE FORMATS ===",
+    "query": "what file types can i upload",
+    "route": "/submit",
+    "expectedTitle": "Supported file formats and size limits for resume upload"
+  },
+  {
+    "query": "is PDF supported",
+    "route": "/submit",
+    "expectedTitle": "Supported file formats and size limits for resume upload"
+  },
+  {
+    "query": "max file size",
+    "route": "/upload",
+    "expectedTitle": "Supported file formats and size limits for resume upload"
+  },
+  {
+    "_comment": "=== PHASE 2: UPLOAD ERRORS ===",
+    "query": "upload failed",
+    "route": "/submit",
+    "expectedTitle": "Fix upload failed or file rejected error on Submit page"
+  },
+  {
+    "query": "my file was rejected",
+    "route": "/submit",
+    "expectedTitle": "Fix upload failed or file rejected error on Submit page"
+  },
+  {
+    "query": "unsupported file type error",
+    "route": "/upload",
+    "expectedTitle": "Fix upload failed or file rejected error on Submit page"
+  },
+  {
+    "query": "cant upload my resume",
+    "route": "/dashboard",
+    "expectedTitle": "Fix upload failed or file rejected error on Submit page"
+  },
+  {
+    "_comment": "=== PHASE 2: CANT FIND UPLOAD ===",
+    "query": "where is the upload button",
+    "route": "/dashboard",
+    "expectedTitle": "Where is the Upload Resume button - cannot find upload"
+  },
+  {
+    "query": "cant find upload button",
+    "route": "/dashboard",
+    "expectedTitle": "Where is the Upload Resume button - cannot find upload"
+  },
+  {
+    "query": "no upload button showing",
+    "route": "/submit",
+    "expectedTitle": "Where is the Upload Resume button - cannot find upload"
+  },
+  {
+    "query": "missing upload button on mobile",
+    "route": "/dashboard",
+    "expectedTitle": "Where is the Upload Resume button - cannot find upload"
+  },
+  {
+    "_comment": "=== PHASE 2: FIND RESULTS ===",
+    "query": "where are my results",
+    "route": "/dashboard",
+    "expectedTitle": "Where to find your results on the Results page after submission"
+  },
+  {
+    "query": "cant find my score",
+    "route": "/dashboard",
+    "expectedTitle": "Where to find your results on the Results page after submission"
+  },
+  {
+    "query": "where did my resume go after submitting",
+    "route": "/submit",
+    "expectedTitle": "Where to find your results on the Results page after submission"
+  },
+  {
+    "_comment": "=== PHASE 2: PROCESSING TIME ===",
+    "query": "how long does processing take",
+    "route": "/submit",
+    "expectedTitle": "What processing means and how long resume analysis takes"
+  },
+  {
+    "query": "still processing",
+    "route": "/submit",
+    "expectedTitle": "What processing means and how long resume analysis takes"
+  },
+  {
+    "query": "normal wait time after submit",
+    "route": "/results",
+    "expectedTitle": "What processing means and how long resume analysis takes"
+  },
+  {
+    "_comment": "=== PHASE 2: IMPROVE SCORE ===",
+    "query": "how do i improve my score",
+    "route": "/results",
+    "expectedTitle": "How to improve your resume score on the Results page"
+  },
+  {
+    "query": "why is my score so low",
+    "route": "/results",
+    "expectedTitle": "How to improve your resume score on the Results page"
+  },
+  {
+    "query": "how to get a higher score",
+    "route": "/results",
+    "expectedTitle": "How to improve your resume score on the Results page"
+  },
+  {
+    "_comment": "=== PHASE 2: PRICING ===",
+    "query": "how much does it cost",
+    "route": "/pricing",
+    "expectedTitle": "ResumeCoach pricing plans and subscription options"
+  },
+  {
+    "query": "what are the plans",
+    "route": "/dashboard",
+    "expectedTitle": "ResumeCoach pricing plans and subscription options"
+  },
+  {
+    "query": "how many resumes per month",
+    "route": "/pricing",
+    "expectedTitle": "ResumeCoach pricing plans and subscription options"
+  },
+  {
+    "query": "whats the lifetime plan",
+    "route": "/pricing",
+    "expectedTitle": "ResumeCoach pricing plans and subscription options"
+  },
+  {
+    "_comment": "=== PHASE 2: UPGRADE ===",
+    "query": "how do i upgrade my plan",
+    "route": "/billing",
+    "expectedTitle": "How to upgrade your plan from the Billing page"
+  },
+  {
+    "query": "ran out of resumes need more",
+    "route": "/dashboard",
+    "expectedTitle": "How to upgrade your plan from the Billing page"
+  },
+  {
+    "query": "hit my limit how to get more",
+    "route": "/submit",
+    "expectedTitle": "How to upgrade your plan from the Billing page"
+  },
+  {
+    "_comment": "=== PHASE 2: UPDATE CARD ===",
+    "query": "how do i update my credit card",
+    "route": "/billing",
+    "expectedTitle": "How to update your credit card on the Billing page"
+  },
+  {
+    "query": "change payment method",
+    "route": "/account",
+    "expectedTitle": "How to update your credit card on the Billing page"
+  },
+  {
+    "query": "card declined how to fix",
+    "route": "/billing",
+    "expectedTitle": "How to update your credit card on the Billing page"
+  },
+  {
+    "_comment": "=== PHASE 2: CANCEL ===",
+    "query": "how do i cancel my subscription",
+    "route": "/billing",
+    "expectedTitle": "How to cancel your subscription from the Billing page"
+  },
+  {
+    "query": "stop billing me",
+    "route": "/account",
+    "expectedTitle": "How to cancel your subscription from the Billing page"
+  },
+  {
+    "query": "unsubscribe from plan",
+    "route": "/billing",
+    "expectedTitle": "How to cancel your subscription from the Billing page"
+  },
+  {
+    "_comment": "=== PHASE 2: INVOICE ===",
+    "query": "how do i get a receipt",
+    "route": "/billing",
+    "expectedTitle": "How to download invoice or receipt from Billing History"
+  },
+  {
+    "query": "download invoice",
+    "route": "/account",
+    "expectedTitle": "How to download invoice or receipt from Billing History"
+  },
+  {
+    "query": "need receipt for expense report",
+    "route": "/billing",
+    "expectedTitle": "How to download invoice or receipt from Billing History"
+  },
+  {
+    "_comment": "=== PHASE 2: SIGN IN ===",
+    "query": "how do i log in",
+    "route": "/",
+    "expectedTitle": "How to sign in to your ResumeCoach account"
+  },
+  {
+    "query": "where is the sign in button",
+    "route": "/",
+    "expectedTitle": "How to sign in to your ResumeCoach account"
+  },
+  {
+    "query": "google login",
+    "route": "/login",
+    "expectedTitle": "How to sign in to your ResumeCoach account"
+  },
+  {
+    "_comment": "=== PHASE 2: RESET PASSWORD ===",
+    "query": "forgot my password",
+    "route": "/login",
+    "expectedTitle": "How to reset your password using Forgot Password"
+  },
+  {
+    "query": "how to reset password",
+    "route": "/signin",
+    "expectedTitle": "How to reset your password using Forgot Password"
+  },
+  {
+    "query": "password reset link not working",
+    "route": "/forgot-password",
+    "expectedTitle": "How to reset your password using Forgot Password"
+  },
+  {
+    "_comment": "=== PHASE 2: ACCOUNT NOT FOUND ===",
+    "query": "account not found",
+    "route": "/login",
+    "expectedTitle": "Fix account not found or email not recognized error"
+  },
+  {
+    "query": "email not recognized",
+    "route": "/signin",
+    "expectedTitle": "Fix account not found or email not recognized error"
+  },
+  {
+    "query": "which email did i use to sign up",
+    "route": "/login",
+    "expectedTitle": "Fix account not found or email not recognized error"
+  },
+  {
+    "_comment": "=== PHASE 2: PRIVACY ===",
+    "query": "what do you do with my data",
+    "route": "/privacy",
+    "expectedTitle": "Data privacy and how ResumeCoach handles your resume"
+  },
+  {
+    "query": "do you share my resume with anyone",
+    "route": "/account",
+    "expectedTitle": "Data privacy and how ResumeCoach handles your resume"
+  },
+  {
+    "query": "how to delete my data",
+    "route": "/settings",
+    "expectedTitle": "Data privacy and how ResumeCoach handles your resume"
+  },
+  {
+    "_comment": "=== PHASE 2: WHITE SCREEN ===",
+    "query": "white screen wont load",
+    "route": "/dashboard",
+    "expectedTitle": "Fix white screen or blank page not loading"
+  },
+  {
+    "query": "blank page nothing showing",
+    "route": "/submit",
+    "expectedTitle": "Fix white screen or blank page not loading"
+  },
+  {
+    "query": "page is empty",
+    "route": "/results",
+    "expectedTitle": "Fix white screen or blank page not loading"
+  },
+  {
+    "_comment": "=== PHASE 2: STUCK SPINNING ===",
+    "query": "stuck spinning forever",
+    "route": "/submit",
+    "expectedTitle": "Fix stuck spinning or loading forever after Submit"
+  },
+  {
+    "query": "loading never finishes",
+    "route": "/submit",
+    "expectedTitle": "Fix stuck spinning or loading forever after Submit"
+  },
+  {
+    "query": "spinner wont stop",
+    "route": "/results",
+    "expectedTitle": "Fix stuck spinning or loading forever after Submit"
+  },
+  {
+    "query": "processing stuck",
+    "route": "/submit",
+    "expectedTitle": "Fix stuck spinning or loading forever after Submit"
+  },
+  {
+    "_comment": "=== PHASE 2: 500 ERROR ===",
+    "query": "500 error",
+    "route": "/submit",
+    "expectedTitle": "Fix 500 error or Something went wrong server error"
+  },
+  {
+    "query": "something went wrong",
+    "route": "/dashboard",
+    "expectedTitle": "Fix 500 error or Something went wrong server error"
+  },
+  {
+    "query": "internal server error",
+    "route": "/results",
+    "expectedTitle": "Fix 500 error or Something went wrong server error"
+  },
+  {
+    "_comment": "=== PHASE 2: 404 ERROR ===",
+    "query": "page not found",
+    "route": "/dashboard",
+    "expectedTitle": "Fix 404 page not found error"
+  },
+  {
+    "query": "404 error",
+    "route": "/results",
+    "expectedTitle": "Fix 404 page not found error"
+  },
+  {
+    "query": "this page doesnt exist",
+    "route": "/dashboard",
+    "expectedTitle": "Fix 404 page not found error"
+  },
+  {
+    "_comment": "=== PHASE 2: CONNECTION ERROR ===",
+    "query": "failed to fetch",
+    "route": "/submit",
+    "expectedTitle": "Fix failed to fetch or connection error"
+  },
+  {
+    "query": "connection error",
+    "route": "/dashboard",
+    "expectedTitle": "Fix failed to fetch or connection error"
+  },
+  {
+    "query": "cant connect to server",
+    "route": "/jobs",
+    "expectedTitle": "Fix failed to fetch or connection error"
+  },
+  {
+    "query": "network error",
+    "route": "/submit",
+    "expectedTitle": "Fix failed to fetch or connection error"
+  },
+  {
+    "_comment": "=== FOLLOW-UP TESTS ===",
+    "query": "follow-up: what if my score is still low after updating",
+    "route": "/results",
+    "expectedTitle": "How to improve your resume score on the Results page"
+  },
+  {
+    "query": "follow-up: how long is the reset link valid",
+    "route": "/forgot-password",
+    "expectedTitle": "How to reset your password using Forgot Password"
+  },
+  {
+    "query": "follow-up: what info should I include in a ticket",
+    "route": "/submit",
+    "expectedTitle": "Fix stuck spinning or loading forever after Submit"
+  },
+  {
+    "_comment": "=== EDGE CASE TESTS ===",
+    "query": "nursing jobs near me",
+    "route": "/jobs",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "query": "software developer remote jobs",
+    "route": "/dashboard",
+    "expectedTitle": "How to use Job Search to find jobs in ResumeCoach"
+  },
+  {
+    "query": "my PDF wont upload",
+    "route": "/submit",
+    "expectedTitle": "Fix upload failed or file rejected error on Submit page"
+  },
+  {
+    "query": "where is apply button",
+    "route": "/results",
+    "expectedTitle": "How to create a resume for a job from Job Search results"
+  },
+  {
+    "_comment": "=== PHASE 3: RESUME EDITOR ===",
+    "query": "how do i edit my resume",
+    "route": "/results",
+    "expectedTitle": "How to edit your resume in the Resume Editor"
+  },
+  {
+    "query": "where is the edit button",
+    "route": "/results",
+    "expectedTitle": "How to edit your resume in the Resume Editor"
+  },
+  {
+    "query": "change my resume wording",
+    "route": "/resume",
+    "expectedTitle": "How to edit your resume in the Resume Editor"
+  },
+  {
+    "query": "edit the skills section",
+    "route": "/editor",
+    "expectedTitle": "How to edit your resume in the Resume Editor"
+  },
+  {
+    "_comment": "=== PHASE 3: DOWNLOAD RESUME ===",
+    "query": "how do i download my resume",
+    "route": "/results",
+    "expectedTitle": "How to download your resume as PDF or Word from the Results page"
+  },
+  {
+    "query": "where is download button",
+    "route": "/results",
+    "expectedTitle": "How to download your resume as PDF or Word from the Results page"
+  },
+  {
+    "query": "save as PDF",
+    "route": "/resume",
+    "expectedTitle": "How to download your resume as PDF or Word from the Results page"
+  },
+  {
+    "query": "export resume to Word",
+    "route": "/results",
+    "expectedTitle": "How to download your resume as PDF or Word from the Results page"
+  },
+  {
+    "_comment": "=== PHASE 3: PDF VS WORD ===",
+    "query": "should I download PDF or Word",
+    "route": "/results",
+    "expectedTitle": "When to use PDF vs Word format for your resume download"
+  },
+  {
+    "query": "which format is better for ATS",
+    "route": "/results",
+    "expectedTitle": "When to use PDF vs Word format for your resume download"
+  },
+  {
+    "query": "PDF vs DOCX",
+    "route": "/resume",
+    "expectedTitle": "When to use PDF vs Word format for your resume download"
+  },
+  {
+    "_comment": "=== PHASE 3: APPLY BUTTON ===",
+    "query": "how do I apply to the job",
+    "route": "/results",
+    "expectedTitle": "How to apply to a job using the Apply button"
+  },
+  {
+    "query": "where is the apply button",
+    "route": "/results",
+    "expectedTitle": "How to apply to a job using the Apply button"
+  },
+  {
+    "query": "apply to this job",
+    "route": "/jobs",
+    "expectedTitle": "How to apply to a job using the Apply button"
+  },
+  {
+    "query": "submit my application",
+    "route": "/results",
+    "expectedTitle": "How to apply to a job using the Apply button"
+  },
+  {
+    "_comment": "=== PHASE 3: DASHBOARD TRACKING ===",
+    "query": "how do I see all my resumes",
+    "route": "/dashboard",
+    "expectedTitle": "How to view and track your job applications on the Dashboard"
+  },
+  {
+    "query": "track my applications",
+    "route": "/dashboard",
+    "expectedTitle": "How to view and track your job applications on the Dashboard"
+  },
+  {
+    "query": "application history",
+    "route": "/dashboard",
+    "expectedTitle": "How to view and track your job applications on the Dashboard"
+  },
+  {
+    "_comment": "=== PHASE 3: PREVIOUS RESUME ===",
+    "query": "find my old resume",
+    "route": "/dashboard",
+    "expectedTitle": "How to access and reuse a previous resume from the Dashboard"
+  },
+  {
+    "query": "access previous submission",
+    "route": "/dashboard",
+    "expectedTitle": "How to access and reuse a previous resume from the Dashboard"
+  },
+  {
+    "query": "reuse resume from before",
+    "route": "/dashboard",
+    "expectedTitle": "How to access and reuse a previous resume from the Dashboard"
+  },
+  {
+    "_comment": "=== PHASE 3: NEW RESUME ===",
+    "query": "create another resume",
+    "route": "/dashboard",
+    "expectedTitle": "How to create a new resume for a different job from your existing profile"
+  },
+  {
+    "query": "apply to different job",
+    "route": "/dashboard",
+    "expectedTitle": "How to create a new resume for a different job from your existing profile"
+  },
+  {
+    "query": "make a new resume for new job",
+    "route": "/submit",
+    "expectedTitle": "How to create a new resume for a different job from your existing profile"
+  },
+  {
+    "query": "second resume",
+    "route": "/dashboard",
+    "expectedTitle": "How to create a new resume for a different job from your existing profile"
+  },
+  {
+    "_comment": "=== PHASE 3: EDITOR NOT SAVING ===",
+    "query": "my changes are not saving",
+    "route": "/editor",
+    "expectedTitle": "Fix Resume Editor not saving or changes lost"
+  },
+  {
+    "query": "lost my edits",
+    "route": "/resume",
+    "expectedTitle": "Fix Resume Editor not saving or changes lost"
+  },
+  {
+    "query": "editor wont save",
+    "route": "/editor",
+    "expectedTitle": "Fix Resume Editor not saving or changes lost"
+  },
+  {
+    "query": "changes disappeared",
+    "route": "/results",
+    "expectedTitle": "Fix Resume Editor not saving or changes lost"
+  },
+  {
+    "_comment": "=== PHASE 4: UPDATE PROFILE ===",
+    "query": "how do I add a new job to my profile",
+    "route": "/profile",
+    "expectedTitle": "How to update your profile and work history"
+  },
+  {
+    "query": "update my work history",
+    "route": "/account",
+    "expectedTitle": "How to update your profile and work history"
+  },
+  {
+    "query": "add new skills",
+    "route": "/settings",
+    "expectedTitle": "How to update your profile and work history"
+  },
+  {
+    "query": "edit profile",
+    "route": "/dashboard",
+    "expectedTitle": "How to update your profile and work history"
+  },
+  {
+    "_comment": "=== PHASE 4: BEFORE AFTER SCORE ===",
+    "query": "what is before score vs after score",
+    "route": "/results",
+    "expectedTitle": "Understanding your Before Score vs After Score comparison"
+  },
+  {
+    "query": "how much did my score improve",
+    "route": "/results",
+    "expectedTitle": "Understanding your Before Score vs After Score comparison"
+  },
+  {
+    "query": "original vs optimized score",
+    "route": "/ats-analysis",
+    "expectedTitle": "Understanding your Before Score vs After Score comparison"
+  },
+  {
+    "_comment": "=== PHASE 4: RECOMMENDATIONS ===",
+    "query": "what are the recommendations",
+    "route": "/results",
+    "expectedTitle": "Understanding the consultative advice in your SPOR report"
+  },
+  {
+    "query": "alternative roles suggested",
+    "route": "/results",
+    "expectedTitle": "Understanding the consultative advice in your SPOR report"
+  },
+  {
+    "query": "career advice in report",
+    "route": "/ats-analysis",
+    "expectedTitle": "Understanding the consultative advice in your SPOR report"
+  },
+  {
+    "_comment": "=== PHASE 4: DATA SOURCES ===",
+    "query": "where does the job data come from",
+    "route": "/results",
+    "expectedTitle": "Where ResumeCoach gets job data and market intelligence"
+  },
+  {
+    "query": "what is O*NET",
+    "route": "/submit",
+    "expectedTitle": "Where ResumeCoach gets job data and market intelligence"
+  },
+  {
+    "query": "how do you know what keywords",
+    "route": "/dashboard",
+    "expectedTitle": "Where ResumeCoach gets job data and market intelligence"
+  },
+  {
+    "_comment": "=== PHASE 4: BASE VS GENERATED ===",
+    "query": "what is my base resume",
+    "route": "/dashboard",
+    "expectedTitle": "Understanding your base resume vs generated resumes"
+  },
+  {
+    "query": "original resume vs generated",
+    "route": "/profile",
+    "expectedTitle": "Understanding your base resume vs generated resumes"
+  },
+  {
+    "query": "my profile vs resumes",
+    "route": "/dashboard",
+    "expectedTitle": "Understanding your base resume vs generated resumes"
+  },
+  {
+    "_comment": "=== PHASE 4: AI COACH ===",
+    "query": "how do I get help",
+    "route": "/submit",
+    "expectedTitle": "How the AI Coach helps during resume submission"
+  },
+  {
+    "query": "where is the chat help",
+    "route": "/dashboard",
+    "expectedTitle": "How the AI Coach helps during resume submission"
+  },
+  {
+    "query": "ask a question",
+    "route": "/results",
+    "expectedTitle": "How the AI Coach helps during resume submission"
+  },
+  {
+    "_comment": "=== PHASE 4: PASTE TEXT ===",
+    "query": "can I paste my resume instead of upload",
+    "route": "/submit",
+    "expectedTitle": "How to use Paste Text when you cannot upload a file"
+  },
+  {
+    "query": "copy paste resume",
+    "route": "/submit",
+    "expectedTitle": "How to use Paste Text when you cannot upload a file"
+  },
+  {
+    "query": "text input instead of file",
+    "route": "/upload",
+    "expectedTitle": "How to use Paste Text when you cannot upload a file"
+  },
+  {
+    "_comment": "=== PHASE 4: FORMATTING WRONG ===",
+    "query": "downloaded resume looks wrong",
+    "route": "/results",
+    "expectedTitle": "Fix downloaded resume has wrong formatting or looks different"
+  },
+  {
+    "query": "formatting messed up",
+    "route": "/resume",
+    "expectedTitle": "Fix downloaded resume has wrong formatting or looks different"
+  },
+  {
+    "query": "fonts look different",
+    "route": "/results",
+    "expectedTitle": "Fix downloaded resume has wrong formatting or looks different"
+  },
+  {
+    "query": "PDF looks different than preview",
+    "route": "/results",
+    "expectedTitle": "Fix downloaded resume has wrong formatting or looks different"
+  },
+  {
+    "_comment": "=== PHASE 4: JOB SEARCH NO RESULTS ===",
+    "query": "job search not returning results",
+    "route": "/jobs",
+    "expectedTitle": "Fix job search showing no results or wrong results"
+  },
+  {
+    "query": "no jobs found",
+    "route": "/jobs",
+    "expectedTitle": "Fix job search showing no results or wrong results"
+  },
+  {
+    "query": "wrong jobs showing up",
+    "route": "/jobs",
+    "expectedTitle": "Fix job search showing no results or wrong results"
+  },
+  {
+    "query": "search empty",
+    "route": "/dashboard",
+    "expectedTitle": "Fix job search showing no results or wrong results"
+  },
+  {
+    "_comment": "=== PHASE 4: 90 DAY POLICY ===",
+    "query": "will my data be deleted",
+    "route": "/account",
+    "expectedTitle": "What happens to my resume after 90 days of inactivity"
+  },
+  {
+    "query": "90 day inactivity",
+    "route": "/settings",
+    "expectedTitle": "What happens to my resume after 90 days of inactivity"
+  },
+  {
+    "query": "how long do you keep my resume",
+    "route": "/privacy",
+    "expectedTitle": "What happens to my resume after 90 days of inactivity"
+  },
+  {
+    "query": "prevent data deletion",
+    "route": "/account",
+    "expectedTitle": "What happens to my resume after 90 days of inactivity"
+  },
+  {
+    "_comment": "=== FOLLOW-UP TESTS ===",
+    "query": "follow-up: I edited but still dont see changes",
+    "route": "/editor",
+    "expectedTitle": "Fix Resume Editor not saving or changes lost"
+  },
+  {
+    "query": "follow-up: tried different browser and search still empty",
+    "route": "/jobs",
+    "expectedTitle": "Fix job search showing no results or wrong results"
+  },
+  {
+    "query": "follow-up: what info to include when reporting bug",
+    "route": "/results",
+    "expectedTitle": "Fix downloaded resume has wrong formatting or looks different"
+  }
+]

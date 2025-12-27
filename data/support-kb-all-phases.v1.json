@@ -1,0 +1,677 @@
+[
+  {
+    "appSlug": "resume-coach",
+    "title": "Why you need a different resume for every job application",
+    "type": "explainer",
+    "summary": "One generic resume does not work because Applicant Tracking Systems (ATS) scan for job-specific keywords. Each job posting uses different terminology, so each application needs a resume tailored to that exact job description. ResumeCoach stores your work history once and generates a fresh, keyword-optimized resume for each job you apply to.",
+    "bodyText": "ResumeCoach exists because the job market changed. Applicant Tracking Systems now filter resumes before humans see them, scanning for keywords that match the job posting. A generic resume gets auto-rejected because it lacks those specific terms.\n\nThe same work experience can be positioned completely differently depending on the role. A sales manager applying for warehouse operations needs inventory and logistics keywords. That same person applying for retail management needs customer experience and merchandising keywords. Same career history, different presentation.\n\nWe store your complete work history once. For each job you apply to, we generate a fresh resume using the exact terminology that employer wants. You are not editing one document over and over—you are getting purpose-built resumes.\n\nThis is why active job seekers on our Pro plan can generate 10 resumes per month. If you are applying to 25 jobs, you need 25 resumes.",
+    "stepsText": "1. Click Upload Resume on the Dashboard or Submit page to upload your resume once.\n2. We extract your complete work history, skills, education, and achievements.\n3. For each job application, provide a job description or use Job Search to find a listing.\n4. We analyze that specific job's requirements using O*NET government data and Indeed market intelligence.\n5. Click Create Resume or Submit to generate a new resume with the exact keywords that job requires.\n6. Review your SPOR score on the Results page to see how well you match.\n7. Edit if needed, download as PDF or Word, and apply.\n8. Repeat for your next job—each one gets a fresh, targeted resume from your same work history.",
+    "triggersText": "why different resumes, one resume, generic resume, same resume every job, why not one resume, resume for each job, targeted resume, why new resume each time, same resume not working, need new resume, customize resume, tailor resume, specific resume, job specific, why cant i use same resume, do i need new resume every time, one resume for all jobs, universal resume, master resume, same resume different jobs, reuse resume, why make new resume, each application, how many resumes, multiple versions, multiple resumes, ATS filters, auto rejected, keyword matching",
+    "routes": [
+      "/dashboard",
+      "/submit",
+      "/pricing",
+      "/results"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What is ATS and why does my resume get rejected",
+    "type": "explainer",
+    "summary": "ATS (Applicant Tracking System) is software that 93% of Fortune 500 companies use to scan resumes for keywords before a human sees them. If your resume lacks the right terms from the job posting, it gets auto-rejected regardless of your qualifications. ResumeCoach optimizes your resume with the exact keywords each job's ATS expects.",
+    "bodyText": "When you apply for a job online, your resume does not go directly to a recruiter. It goes through ATS software first. This system scans your resume for specific keywords, skills, and qualifications that match the job posting. Resumes are scored and ranked. Only the top-scoring ones (typically top 25%) reach human reviewers.\n\n93% of Fortune 500 companies use ATS. Most mid-size companies do too. If you have applied to dozens of jobs and never heard back, this is likely why—your resume never made it past the robots.\n\nATS systems are not smart. They do not understand that 'managed a team' means the same as 'supervised staff.' They look for exact keyword matches. If the job posting says 'project management' and your resume says 'led projects,' you might not match.\n\nResumeCoach solves this by analyzing the job description, identifying the exact keywords the ATS expects, and ensuring your resume contains them. We do not stuff keywords randomly—we rewrite your real experience using the terminology that matches.",
+    "stepsText": "1. You submit a job application online through a company website or job board.\n2. Your resume enters the company's ATS before any human sees it.\n3. ATS scans your resume text for keywords matching the job description.\n4. The system scores your resume based on keyword matches, skills alignment, and formatting.\n5. Resumes are ranked from highest to lowest match score.\n6. Only top-scoring resumes (usually 25% or fewer) are forwarded to recruiters.\n7. The rest are automatically rejected—no human ever reviews them.\n8. ResumeCoach analyzes job requirements and optimizes your resume to pass these filters.",
+    "triggersText": "ATS, applicant tracking system, what is ats, ats meaning, keywords, filtered out, resume rejected, no response, why no callback, robot reading resume, automated screening, application tracking, never hear back, resume scanner, keyword matching, resume filter, auto reject, screening software, HR software, resume parsing, how ats works, ats score, ats friendly, ats compatible, beat the ats, pass ats, get past ats, resume not seen, no interviews, applied many jobs, why rejected, automatically filtered, keyword stuffing, resume keywords, robots screening, ats optimization, ats rejection",
+    "routes": [
+      "/submit",
+      "/ats-analysis",
+      "/results",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Why the job description is required for resume optimization",
+    "type": "explainer",
+    "summary": "The job description contains the exact keywords employers programmed into their ATS filters. Without it, we guess based on general industry standards. With it, we extract specific requirements and match your experience precisely, often achieving 80%+ match scores instead of 60%.",
+    "bodyText": "The job description is not optional context—it is the source code for your resume. Every requirement, skill, and qualification listed in that posting was deliberately chosen by the employer. Those same terms are what their ATS scans for.\n\nWhen you provide a job description, we extract every requirement and cross-reference it against O*NET occupational standards. We identify which of your experiences match and rewrite them using the exact terminology from the posting. The result is a resume that speaks the employer's language.\n\nWithout a job description, we can only make educated guesses based on general industry standards. That might get you a 60% match. With the actual posting, we can often achieve 80%+ match scores.\n\nIf you do not have the job description, you have options: tell us the job title and we will find a similar one, use our Job Search to find real listings, or describe the role yourself. But a real job posting always produces the best results.",
+    "stepsText": "1. Find the job posting on the company website, Indeed, LinkedIn, or other job board.\n2. Copy the full job description including requirements, qualifications, and responsibilities.\n3. On the Submit page, paste the job description into the Job Description field.\n4. We extract every keyword, skill, certification, and requirement mentioned.\n5. We cross-reference against O*NET government standards for that occupation.\n6. We identify which of your experiences match those requirements.\n7. We rewrite your experience using the exact terminology from the posting.\n8. Your generated resume now contains the keywords that job's ATS expects.",
+    "triggersText": "job description, why need description, where get description, dont have description, JD, job posting, job requirements, whats the point of description, job listing, paste description, copy description, find description, need description, description important, description matters, where to find job description, what to paste, job ad, job posting text, requirements section, qualifications, paste the listing, copy from indeed, copy from linkedin, full description, partial description, how much to paste, job description field, description box, where paste jd",
+    "routes": [
+      "/submit",
+      "/dashboard",
+      "/jobs"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What is SPOR Analysis on the Results page",
+    "type": "explainer",
+    "summary": "SPOR stands for Skills, Position, Optimization, and Recommendations. It is our methodology for measuring how well your resume matches a specific job. We analyze your skills fit, experience level, missing keywords, and provide specific improvement advice. Your overall score (0-100) reflects genuine match quality using O*NET government data.",
+    "bodyText": "SPOR is not a buzzword—it is a structured analysis framework. Each letter represents a dimension we evaluate:\n\nSkills: Do your listed abilities match what the job requires? We compare against both the job posting and O*NET occupational standards for that role.\n\nPosition: Does your experience level fit? We evaluate years of experience, job title progression, and career trajectory against what the role expects.\n\nOptimization: Is your resume formatted for ATS? We check for missing keywords, parsing issues, and formatting problems that could cause rejection.\n\nRecommendations: Based on the above, we provide specific guidance—either resume improvements or honest feedback that you might want to consider alternative roles.\n\nYour overall score (0-100) reflects how well your resume matches that specific job. We do not inflate scores. If you score 45, that is real feedback, not a failure.",
+    "stepsText": "1. After submitting your resume, you are redirected to the Results page.\n2. Your overall SPOR score (0-100) appears at the top.\n3. Skills Analysis shows how your abilities match job requirements and O*NET standards.\n4. Position Analysis evaluates your experience level, titles, and career trajectory.\n5. Optimization Analysis identifies missing keywords and ATS compatibility issues.\n6. Recommendations section provides specific guidance on improvements or alternative roles.\n7. Scroll down to see your optimized resume with keywords highlighted.",
+    "triggersText": "SPOR, spor analysis, what is spor, spor meaning, analysis report, how scoring works, what spor stands for, resume analysis, job match, skills analysis, position analysis, optimization, recommendations, methodology, how you score, what does spor mean, spor score, spor report, spor breakdown, s p o r, skills position optimization recommendations, how is score calculated, scoring methodology, analysis method, results page analysis, what does analysis show",
+    "routes": [
+      "/results",
+      "/resume",
+      "/ats-analysis",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What does my resume score mean on the Results page",
+    "type": "explainer",
+    "summary": "Your SPOR score (0-100) honestly reflects how well your resume matches the target job. Scores 70+ mean genuinely qualified. Scores 50-69 mean partial match with gaps. Scores below 50 indicate significant gaps—we explain exactly what is missing and suggest alternatives. A low score is valuable feedback, not failure.",
+    "bodyText": "We do not inflate scores to make you feel good. A score of 72 means you are a solid match. A score of 38 means you have significant gaps—and we will tell you exactly what they are.\n\nScore ranges and what they mean:\n\n0-25: Major career pivot territory. Your background is fundamentally different from job requirements. We will suggest alternative roles that fit better.\n\n26-45: Underqualified for this specific role. You are missing critical requirements like degrees, certifications, or years of experience. The feedback explains exactly what gaps exist.\n\n46-65: Partially qualified. You have relevant experience but notable gaps. Your optimized resume helps, but know you are competing against stronger candidates.\n\n66-80: Qualified. You meet most requirements with minor gaps. Your optimized resume has a strong chance of passing ATS.\n\n81-90: Highly qualified. Strong match between your background and requirements.\n\n91-100: Exceptional. You exceed requirements. Ideal candidate profile.\n\nA low score is not an insult—it is information. Better to know before you apply than to wonder why you never hear back.",
+    "stepsText": "1. After submission, view your overall score (0-100) on the Results page.\n2. Check the breakdown: Skills, Experience, Education, and Keyword Match scores.\n3. Read the specific feedback explaining what contributed to your score.\n4. For scores below 50: Review the Alternative Roles suggestions we provide.\n5. For scores 50-70: Focus on the Improvement Recommendations section.\n6. For scores above 70: Your optimized resume is ready—click Edit Resume or Download.",
+    "triggersText": "score meaning, what is good score, low score, bad score, high score, 40 score, 50 score, 60 score, 70 score, 80 score, improve score, score breakdown, rating meaning, score range, what score means, not qualified, underqualified, qualified, highly qualified, resume rating, my score is low, why low score, score too low, is 60 good, is 70 good, is 50 bad, what is passing score, minimum score, good score, bad score, average score, score explanation, why did i get this score, how to get higher score, improve my score, raise score, results page score",
+    "routes": [
+      "/results",
+      "/resume",
+      "/ats-analysis"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What to do if you do not have a job description",
+    "type": "howto",
+    "summary": "You have three options: (1) Enter just the job title and we search Indeed for matching descriptions, (2) Use the Job Search page to find real listings and click Create Resume for This Job, or (3) Describe the role yourself. Real job postings produce better keyword matches than generic titles.",
+    "bodyText": "Not having a job description is common. Maybe you are exploring options, or the posting expired, or you just know the general role you want. We have three ways to handle this:\n\nOption A - Job Title Search: Enter the job title (like 'Marketing Manager') and optionally location in the Job Title field on the Submit page. We search Indeed and O*NET for matching job descriptions and use a real one to optimize your resume. This works well for common roles.\n\nOption B - Use Job Search: Click Job Search in the navigation. Browse actual job listings in your area, and click 'Create Resume for This Job' on any listing. We automatically use that job's full description. This is the best option because you get a resume for a real, open position you can actually apply to.\n\nOption C - Describe It Yourself: In the Job Description field on the Submit page, write out the role's responsibilities, required skills, and qualifications. Be specific—the more detail you provide, the better we can optimize. This is the weakest option but works in a pinch.\n\nWhy real descriptions work better: Actual job postings contain the exact keywords employers use in their ATS. Generic titles miss these nuances. When possible, use Option A or B.",
+    "stepsText": "1. Option A: On the Submit page, enter just the job title (e.g., 'Software Engineer') in the Job Title field.\n2. Optionally add location to get more relevant matches from Indeed.\n3. Click Submit—we search our database for matching job descriptions from real postings.\n4. Option B: Click Job Search in the top navigation menu.\n5. Search for positions in your area and click any listing to view details.\n6. Click the Create Resume for This Job button to use that listing's description automatically.\n7. Option C: On the Submit page, write the role's responsibilities and requirements in the Job Description field.\n8. Be as specific as possible—list skills, qualifications, and duties you know the role requires.",
+    "triggersText": "no job description, dont have description, dont know description, no posting, just title, general resume, no specific job, where get description, find description, need description, what if no description, job title only, title without description, how to find description, dont have job posting, lost the posting, posting expired, cant find posting, just know the title, exploring options, general job type, no specific listing, what to enter, no JD, missing description, where is description field, job description optional, skip description, without job posting",
+    "routes": [
+      "/submit",
+      "/dashboard",
+      "/jobs"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to use Job Search to find jobs in ResumeCoach",
+    "type": "howto",
+    "summary": "Click Job Search in the top navigation menu. Enter a job title (like 'Software Engineer' or 'Nurse') and your location, then click Search. Browse results from Google Jobs, click any listing to see full details, and click Create Resume for This Job to generate a targeted resume instantly.",
+    "bodyText": "ResumeCoach includes built-in job search powered by Google Jobs. This is not just a convenience feature—it is the fastest way to create targeted resumes because we automatically extract job requirements from any listing you select.\n\nThe Job Search page shows real, current job postings. You can search by job title and location, then browse results. Each listing shows the company, location, salary range (when available), and posting date.\n\nClick any job to see the full details including the complete job description. From there, you can click 'Create Resume for This Job' to instantly generate a targeted resume for that specific position. No copy-pasting required—we pull the job requirements automatically.\n\nThis workflow is ideal for active job seekers. Find a job you like, create a resume in 60 seconds, download it, and apply. Then find the next job and repeat.",
+    "stepsText": "1. Click Job Search in the top navigation menu (or Jobs link on Dashboard).\n2. Enter a job title in the search field (e.g., 'Account Manager', 'Registered Nurse', 'Software Developer').\n3. Enter your location (city, state, or zip code) to find jobs near you.\n4. Click the Search button to see matching listings from Google Jobs.\n5. Browse results—each shows company name, location, salary range, and posting date.\n6. Click any job card to view full details including the complete job description.\n7. Review the requirements to confirm this is a role you want.\n8. Click the Create Resume for This Job button to generate a targeted resume for this listing.",
+    "triggersText": "find jobs, job search, search jobs, job listings, google jobs, jobs near me, where to find jobs, looking for jobs, browse jobs, job board, search for work, find work, job openings, available jobs, local jobs, where is job search, how to search jobs, job search page, find a job, search feature, jobs tab, jobs button, job search not working, cant find jobs, no jobs showing, job results, browse listings, find openings, search for positions, engineering jobs, california jobs, nursing jobs, remote jobs, job search menu, jobs navigation, how to find jobs here",
+    "routes": [
+      "/jobs",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to create a resume for a job from Job Search results",
+    "type": "howto",
+    "summary": "From the Job Search page, click any job listing to view details. Click the Create Resume for This Job button—we automatically extract all requirements from that posting and generate a targeted resume in 30-60 seconds. Then edit if needed, download as PDF or Word, and click Apply to go to the employer's application page.",
+    "bodyText": "This is the fastest path from job discovery to application. When you find a job in our Job Search that interests you, you do not need to copy the description or fill out forms. One click starts the resume generation process.\n\nClick the job listing to view full details. Review the description to confirm it is a role you want. Then click 'Create Resume for This Job.' We automatically extract the job title, company name, and complete description.\n\nYour resume is generated in about 30-60 seconds. You will see your SPOR score showing how well you match. If the score is lower than expected, the feedback explains why—maybe the role requires skills you do not have listed.\n\nFrom the Results page, you can click Edit Resume to make changes, then Download as PDF or Word. Click the Apply button to open the employer's application page where you can submit your optimized resume.",
+    "stepsText": "1. Use Job Search to find a position you want to apply for.\n2. Click on the job card to view full details and the complete description.\n3. Review the requirements to confirm this is a role you want.\n4. Click the Create Resume for This Job button on the job details page.\n5. Wait 30-60 seconds while we analyze requirements and generate your resume.\n6. View your SPOR score on the Results page to see how well you match this role.\n7. Click Edit Resume to make any changes (optional).\n8. Click Download and choose PDF or Word format.\n9. Click the Apply button to open the employer's application page.\n10. Upload your optimized resume and complete their application.",
+    "triggersText": "create resume for job, resume for listing, generate resume, job card resume, write resume for, apply for job, resume from listing, one click resume, instant resume, resume from search, make resume for job, build resume for, create resume button, apply to job from search, resume for this job, job listing resume, how to apply, apply from job search, generate from listing, create from job, apply button, create resume for this job button, job details, job card, apply now, submit application, apply to this job, resume for google jobs listing",
+    "routes": [
+      "/jobs",
+      "/results",
+      "/resume"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to upload your resume using the Upload Resume button",
+    "type": "howto",
+    "summary": "Click the Upload Resume button on the Dashboard or go to the Submit page. Drag and drop your file or click to browse. We accept PDF, DOC, DOCX, and TXT files up to 5MB. Upload completes in under 10 seconds and we extract your work history automatically.",
+    "bodyText": "Uploading your resume is the first step. We extract your work history, skills, education, and achievements from the file you provide. This becomes your profile that we use to generate targeted resumes for each job.\n\nWe accept PDF, DOC, DOCX, and TXT files. PDF works best because formatting is preserved. Maximum file size is 5MB—most resumes are well under 1MB so this should not be an issue.\n\nAfter upload, we parse your resume in about 5-10 seconds. You will see a confirmation with the extracted information. Review it to make sure we captured everything correctly. If something is missing or wrong, you can edit your profile later.\n\nIf you do not have a resume file, you can also paste your resume text directly using the Paste Text tab on the Submit page.",
+    "stepsText": "1. From the Dashboard, click the Upload Resume button. Or click Submit in the top navigation.\n2. On the Submit page, you will see the upload area with 'Drag and drop or click to browse.'\n3. Either drag your resume file onto the upload area, or click it to open the file browser.\n4. Select your resume file (PDF, DOC, DOCX, or TXT format, max 5MB).\n5. Wait for the upload progress bar to complete (usually under 10 seconds).\n6. Review the extracted information—skills, work history, education.\n7. If anything is missing, click Edit Profile to add it manually.\n8. Proceed to enter a job description or use Job Search to create your first targeted resume.",
+    "triggersText": "upload resume, how to upload, where to upload, upload button, drag drop, file upload, submit resume, add resume, attach resume, upload my resume, cant upload, upload file, resume file, upload area, upload section, supported formats, file types, accepted formats, PDF, DOC, DOCX, TXT, what files, upload not working, how do i upload, where do i upload, first step, getting started, new user, upload resume button, drag and drop, browse files, select file, choose file",
+    "routes": [
+      "/dashboard",
+      "/submit",
+      "/upload"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Supported file formats and size limits for resume upload",
+    "type": "explainer",
+    "summary": "We accept PDF, DOC, DOCX, and TXT files up to 5MB. PDF is recommended for best parsing accuracy. If your file fails to upload, try saving it as a different format—for example, export Word documents as PDF.",
+    "bodyText": "We support four file formats for resume upload:\n\nPDF (.pdf): Recommended. Best formatting preservation and most reliable parsing.\n\nWord Document (.doc, .docx): Works well. Modern DOCX files parse better than older DOC format.\n\nPlain Text (.txt): Works for simple resumes. All formatting is lost but text content is extracted.\n\nMaximum file size is 5MB. Most resume files are 100KB-500KB, so you should not hit this limit unless your resume contains high-resolution images.\n\nIf your file fails to upload or parse correctly, try saving it as a different format. For example, if DOCX fails, try exporting as PDF from Word. If your resume has complex formatting, tables, or graphics, PDF tends to work best.",
+    "stepsText": "1. Check your file format: must be PDF, DOC, DOCX, or TXT.\n2. Check file size: must be under 5MB (check in file properties).\n3. If using PDF, ensure it is not password-protected or encrypted.\n4. If using Word, save as DOCX (not older DOC) for better parsing.\n5. For complex layouts with tables or graphics, export as PDF from Word.\n6. If upload still fails, try the Paste Text option on the Submit page instead.",
+    "triggersText": "file format, supported formats, file types, accepted formats, PDF, DOC, DOCX, TXT, what files can i upload, file size limit, max size, 5MB, file too large, unsupported format, wrong format, invalid format, cant upload PDF, wont upload DOC, convert format, change format, export PDF, best format, recommended format, which format, .pdf, .doc, .docx, .txt, word document, text file, file extension, format not supported, invalid file type",
+    "routes": [
+      "/submit",
+      "/upload",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix upload failed or file rejected error on Submit page",
+    "type": "troubleshooting",
+    "summary": "Upload failures are usually caused by unsupported file types (only PDF/DOC/DOCX/TXT work), files over 5MB, corrupted files, or password-protected PDFs. Try saving as a different format or use the Paste Text option instead.",
+    "bodyText": "If your upload fails, check these common causes:\n\nWrong file type: We only accept PDF, DOC, DOCX, and TXT. Files like JPG, PNG, RTF, or Pages will be rejected with 'Unsupported file type' error.\n\nFile too large: Maximum is 5MB. If your resume has embedded images, they might be inflating the file size. Try removing images or compressing the PDF.\n\nCorrupted file: If the file opens normally on your computer but fails here, it might be corrupted during transfer. Try re-saving it and uploading again.\n\nPassword-protected PDF: We cannot read encrypted or password-protected PDFs. Remove the password protection before uploading.\n\nBrowser issue: Try a different browser (Chrome recommended) or clear your browser cache.\n\nIf none of these fix the issue, use the Paste Text tab on the Submit page—copy your resume content and paste it directly.",
+    "stepsText": "1. Verify your file is PDF, DOC, DOCX, or TXT format (check the file extension).\n2. Right-click the file and check Properties—ensure size is under 5MB.\n3. If PDF, try opening it to confirm it is not password-protected.\n4. Try opening the file in Word/Preview and re-saving it, then upload again.\n5. Try a different browser (Chrome works best) or clear browser cache.\n6. If still failing, click the Paste Text tab on the Submit page and paste your resume content directly.\n7. If the problem persists, submit a support ticket with: the error message shown, your file format, file size, and browser name.",
+    "triggersText": "upload failed, upload error, file rejected, upload not working, cant upload, wont upload, error uploading, invalid file, unsupported file, rejected file, upload stuck, upload problem, upload issue, file too large, file size error, wrong format, format not supported, corrupted file, broken file, cant read file, password protected, encrypted PDF, error message, upload failed please try again, something went wrong upload, unsupported file type error, file rejected error, upload error message",
+    "routes": [
+      "/submit",
+      "/upload",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Where is the Upload Resume button - cannot find upload",
+    "type": "howto",
+    "summary": "On Desktop: The Upload Resume button is on the Dashboard main area, or click Submit in the top navigation. On Mobile: Tap the menu icon (☰) in the top corner, then tap Submit. The upload area appears at the top of the Submit page.",
+    "bodyText": "The upload button location depends on where you are in the app:\n\nDashboard: Look for the Upload Resume button in the main action area. On desktop it is prominently displayed. On mobile, you may need to scroll down.\n\nSubmit page: Click Submit in the top navigation menu. The upload area ('Drag and drop or click to browse') is at the top of the page.\n\nNavigation menu: On mobile, tap the hamburger menu icon (three horizontal lines, ☰) in the top corner to reveal the navigation. Tap Submit.\n\nIf you have already uploaded a resume before, the Dashboard may show your existing resumes instead of a prominent upload button. Look for New Resume, Create New, or the + button to start a new submission.",
+    "stepsText": "1. Desktop: Look for Upload Resume button on the Dashboard main area.\n2. Or click Submit in the top navigation menu bar.\n3. Mobile: Tap the menu icon (☰) in the top left or right corner.\n4. Tap Submit from the navigation menu that appears.\n5. The upload area appears at the top of the Submit page.\n6. If you see existing resumes instead, look for New Resume or + button.\n7. The upload area says 'Drag and drop or click to browse.'",
+    "triggersText": "where is upload button, cant find upload button, upload button missing, no upload button, where to upload, how to upload, where is submit button, find upload, upload location, upload resume button, missing button, cant see upload, where do i upload, looking for upload button, upload not showing, hidden upload button, no upload option, submit button missing, cant find submit, where is new resume, mobile upload, hamburger menu, navigation menu, upload area missing",
+    "routes": [
+      "/dashboard",
+      "/submit",
+      "/"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Where to find your results on the Results page after submission",
+    "type": "howto",
+    "summary": "After submitting, you are automatically redirected to the Results page showing your SPOR score. If you navigated away, click Results or My Resumes in the top navigation, or go to your Dashboard and click on any submission to view its results.",
+    "bodyText": "After you submit a resume for analysis, you should be automatically redirected to the Results page showing your SPOR score and feedback. This usually takes 30-60 seconds to process.\n\nIf you navigated away or closed the browser, your results are saved. Go to Dashboard and look for your recent submissions listed there. Click on any submission to view its full results.\n\nYou can also click Results or My Resumes in the top navigation menu to see all your past analyses.\n\nEach result shows your SPOR score, detailed feedback on skills/experience/keywords, and the optimized resume. From there you can click Edit Resume, Download, or Apply.",
+    "stepsText": "1. After clicking Submit, wait 30-60 seconds for processing to complete.\n2. You should be automatically redirected to the Results page.\n3. Your SPOR score and feedback appear on this page.\n4. If not redirected, click Results or My Resumes in the top navigation.\n5. Or go to Dashboard and find your recent submission listed.\n6. Click on any submission to view its full results and feedback.\n7. From Results, you can click Edit Resume, Download, or Apply.",
+    "triggersText": "where are my results, find results, results page, my resumes, see results, view results, cant find results, where did my resume go, lost results, no results showing, results not showing, where is my analysis, where is my score, find my score, see my resume, results missing, where to see results, after submission, submitted now what, where do i go, my resumes page, results navigation, view my submission, find my resume, where is results page",
+    "routes": [
+      "/results",
+      "/dashboard",
+      "/submit"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What processing means and how long resume analysis takes",
+    "type": "explainer",
+    "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page.",
+    "bodyText": "When you see 'Processing' after submitting your resume, we are running the SPOR analysis. This involves:\n\n1. Parsing your resume to extract skills, experience, and qualifications\n2. Analyzing the job description for requirements and keywords\n3. Cross-referencing against O*NET occupational data\n4. Generating your optimized resume with matched keywords\n5. Calculating your SPOR score\n\nThis process typically takes 30-60 seconds. Complex resumes or job descriptions may take slightly longer.\n\nIf processing seems stuck (spinner showing for more than 2 minutes), try refreshing the page (F5 or Ctrl+R). Your submission is saved—refreshing will show the results if they completed, or let you know if there was an error.\n\nDo not click Submit multiple times while waiting—this creates duplicate entries and uses your monthly quota.",
+    "stepsText": "1. After clicking Submit, you will see a processing indicator (spinner or progress bar).\n2. Normal processing time is 30-60 seconds.\n3. Wait at least 90 seconds before assuming something is wrong.\n4. If stuck over 2 minutes, refresh the page (press F5 or Ctrl+R).\n5. After refresh, check Dashboard or Results for your submission.\n6. Do not click Submit again while waiting—this creates duplicates.",
+    "triggersText": "processing, how long, processing time, stuck processing, processing forever, spinner, loading, taking too long, how long does it take, wait time, analysis time, still processing, not done yet, loading forever, stuck on processing, processing stuck, hung, frozen, waiting too long, when will it finish, processing taking forever, submit processing, how long to wait, normal wait time, expected time",
+    "routes": [
+      "/submit",
+      "/results",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to improve your resume score on the Results page",
+    "type": "howto",
+    "summary": "To improve your score: provide a complete job description (not just title), ensure your profile lists all relevant skills and achievements with specific numbers, and verify the role matches your experience level. Review the Recommendations section on Results for specific improvement guidance.",
+    "bodyText": "Your SPOR score reflects how well your resume matches the specific job. Here is how to improve it:\n\nProvide a better job description: If you used just a job title, find the actual posting and paste the full description. More detail means better keyword matching.\n\nAdd missing skills to your profile: Review the feedback on the Results page to see which required skills you are missing. If you have those skills, click Edit Profile to add them.\n\nExpand your achievements: Generic job duties score lower than specific accomplishments with numbers. 'Managed a team' is weaker than 'Managed 12-person team, reduced turnover by 25%.'\n\nConsider role fit: If your score is below 50, the role may require qualifications you do not have (degree, certification, years of experience). The Recommendations section explains what is missing.\n\nSometimes a low score is accurate feedback that this particular job is not a strong match for your background. That is valuable information before you spend time applying.",
+    "stepsText": "1. On the Results page, scroll to the feedback section to see what lowered your score.\n2. Check if you provided a complete job description—if not, resubmit with the full posting.\n3. Look at the Missing Skills or Gaps section in the feedback.\n4. Click Edit Profile to add any skills you have but did not list originally.\n5. Add specific numbers and achievements to your work history (e.g., 'increased sales 30%').\n6. Click Create New Resume to resubmit with your updated profile.\n7. If score is still low, review the Alternative Roles suggestions.",
+    "triggersText": "improve score, raise score, higher score, better score, low score, why low score, increase score, score too low, how to get higher score, boost score, improve my score, fix low score, bad score, what lowers score, why is my score low, how do i improve, get better score, score improvement, tips to improve, raise my score, increase my score, why score low, score went down, make score higher",
+    "routes": [
+      "/results",
+      "/ats-analysis",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "ResumeCoach pricing plans and subscription options",
+    "type": "billing",
+    "summary": "Free plan: 2 resumes/month. Pro ($14.95/mo): 10 resumes. Career Accelerator ($29/mo): 25 resumes. Agency ($79/mo): 100 resumes. Lifetime ($99 one-time): unlimited forever. All paid plans include full SPOR analysis, all download formats, and Job Search access.",
+    "bodyText": "ResumeCoach offers plans for different job search intensities:\n\nFree: 2 resume generations per month. Good for trying out the service or occasional use.\n\nPro ($14.95/month): 10 resumes per month. Best for active job seekers applying to multiple positions weekly.\n\nCareer Accelerator ($29/month): 25 resumes per month. For intensive job searches or career changers applying broadly.\n\nAgency ($79/month): 100 resumes per month. For recruiters, career coaches, or staffing agencies.\n\nLifetime ($99 one-time): Unlimited resumes forever. No monthly fees. Best value if you will use the service long-term.\n\nAll paid plans include full SPOR analysis, AI-optimized resumes, all download formats (PDF, Word), and Job Search access. Annual billing is available for Pro and Career Accelerator at 20% discount.",
+    "stepsText": "1. Click Pricing in the top navigation to view current plans.\n2. Free Plan: 2 resumes per month, basic SPOR analysis.\n3. Pro Plan: $14.95/month for 10 resumes per month.\n4. Career Accelerator: $29/month for 25 resumes per month.\n5. Agency: $79/month for 100 resumes per month.\n6. Lifetime: $99 one-time payment for unlimited resumes forever.\n7. Click Upgrade or Subscribe on any plan to change your subscription.\n8. Annual billing saves 20% on Pro and Career Accelerator plans.",
+    "triggersText": "pricing, plans, how much, cost, subscription, price, free plan, pro plan, premium plan, upgrade plan, billing, whats included, features comparison, monthly, yearly, annual, lifetime, pricing page, which plan, best plan, how many resumes per month, resume limit, quota, allowance, $14.95, $29, $79, $99, plan options, plan prices, subscription cost, free trial, career accelerator, agency plan",
+    "routes": [
+      "/pricing",
+      "/billing",
+      "/account",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to upgrade your plan from the Billing page",
+    "type": "billing",
+    "summary": "Click Pricing in the navigation or go to Account Settings > Billing. Click Upgrade on your desired plan and enter payment details. The upgrade takes effect immediately—additional resume credits are available right away.",
+    "bodyText": "Upgrading your plan is immediate—you get access to additional resume generations right away.\n\nYou can upgrade from the Pricing page (click Pricing in navigation) or from Account Settings > Billing.\n\nWhen you upgrade mid-cycle, you are charged the prorated difference for the remaining days in your billing period. From the next billing cycle, you pay the full new plan price.\n\nIf you are on the Free plan and hit your 2-resume limit, you will see an upgrade prompt when trying to create a new resume. Click Upgrade to go directly to plan selection.\n\nLifetime plan is a one-time purchase that never renews. You get unlimited resumes forever after the single $99 payment.",
+    "stepsText": "1. Click Pricing in the top navigation menu.\n2. Or go to Account Settings > Billing section.\n3. Review the available plans and their resume limits.\n4. Click Upgrade or Subscribe on the plan you want.\n5. Enter your payment details (credit or debit card).\n6. Click Confirm to complete the purchase.\n7. Your new plan takes effect immediately—additional resumes available now.\n8. For Lifetime plan, you pay once and never see renewal charges.",
+    "triggersText": "upgrade plan, change plan, switch plan, get more resumes, need more resumes, ran out of resumes, limit reached, hit limit, upgrade subscription, better plan, premium upgrade, how to upgrade, upgrade now, buy plan, purchase plan, get pro, get premium, upgrade button, subscribe, more credits, resume credits, out of resumes, no resumes left, used all resumes",
+    "routes": [
+      "/pricing",
+      "/billing",
+      "/account"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to update your credit card on the Billing page",
+    "type": "billing",
+    "summary": "Go to Account Settings (click your profile icon) then Billing. Click Update Payment Method or Change Card. Enter your new card details and click Save. The new card will be charged on your next billing date.",
+    "bodyText": "You can update your payment method anytime from your Account Settings.\n\nClick your profile icon or name in the top right corner, then select Account Settings or Account. Go to the Billing tab and look for Payment Method or Update Card.\n\nEnter your new card details (card number, expiration, CVV) and click Save. The new card will be charged on your next billing date. Your current billing period is not affected.\n\nIf your card was declined and your subscription lapsed, updating your card and saving it should reactivate your subscription. If not, you may need to click Resubscribe.\n\nWe accept major credit and debit cards (Visa, Mastercard, American Express, Discover).",
+    "stepsText": "1. Click your profile icon or name in the top right corner of any page.\n2. Select Account Settings or Account from the dropdown.\n3. Click the Billing tab.\n4. Find Payment Method section and click Update or Change Card.\n5. Enter your new card number, expiration date, and CVV.\n6. Click Save to confirm the new payment method.\n7. Your new card will be charged on your next billing date.\n8. For declined cards, you may need to click Resubscribe after updating.",
+    "triggersText": "update card, change card, new card, update payment method, edit payment, card expired, new credit card, replace card, card declined, payment method, update billing, change payment, card on file, different card, switch card, payment update, billing update, expired card, declined card, payment failed, add new card, remove card, update credit card",
+    "routes": [
+      "/billing",
+      "/account",
+      "/settings"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to cancel your subscription from the Billing page",
+    "type": "billing",
+    "summary": "Go to Account Settings > Billing and click Cancel Subscription. Confirm when prompted. You keep access until your current billing period ends, then revert to the Free plan. No partial refunds for unused time.",
+    "bodyText": "You can cancel your subscription anytime. When you cancel, you keep access to your paid features until the end of your current billing period. After that, your account reverts to the Free plan (2 resumes per month).\n\nTo cancel, go to Account Settings > Billing and click Cancel Subscription or Cancel Plan. Confirm the cancellation when prompted.\n\nWe do not offer partial refunds for unused time in your billing period. If you paid for a month and cancel on day 5, you still have access for the remaining 25 days.\n\nLifetime plan cannot be canceled since it is a one-time purchase, not a subscription. There is no recurring billing to stop.\n\nIf you want to delete your account entirely (not just cancel billing), see the Privacy section in Account Settings or contact support.",
+    "stepsText": "1. Click your profile icon, then Account Settings.\n2. Go to the Billing tab.\n3. Find Cancel Subscription or Cancel Plan button.\n4. Click Cancel and confirm when prompted.\n5. Your access continues until the current billing period ends.\n6. After that, your account reverts to Free plan (2 resumes/month).\n7. Your data and past resumes are preserved on the Free plan.\n8. Lifetime plan has no subscription to cancel—it is a one-time purchase.",
+    "triggersText": "cancel subscription, cancel plan, unsubscribe, stop billing, stop payment, end subscription, cancel account, stop charging, cancel my account, how to cancel, dont want to pay anymore, cancel renewal, turn off auto renew, stop subscription, cancel membership, end my subscription, stop recurring, cancel recurring, unsubscribe button, cancellation",
+    "routes": [
+      "/billing",
+      "/account",
+      "/settings"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to download invoice or receipt from Billing History",
+    "type": "billing",
+    "summary": "Go to Account Settings > Billing and scroll to Billing History. Click the download icon or Invoice link next to any payment to get a PDF receipt with payment amount, date, plan name, and business details for expense reporting.",
+    "bodyText": "All your payment receipts are available in your Account Settings.\n\nClick your profile icon, go to Account Settings, then the Billing tab. Scroll down to Billing History or Payment History. You will see a list of all your payments with dates and amounts.\n\nClick the download icon (↓) or Invoice/Receipt link next to any payment to download a PDF. This includes your payment amount, date, plan name, and our business details for expense reporting or tax purposes.\n\nIf you need a receipt for a payment not showing in your history, or need a custom invoice format, contact support with your account email and the payment date.",
+    "stepsText": "1. Click your profile icon in the top right corner.\n2. Select Account Settings from the dropdown.\n3. Click the Billing tab.\n4. Scroll down to Billing History or Payment History section.\n5. Find the payment you need a receipt for.\n6. Click the download icon (↓) or Invoice link next to it.\n7. PDF receipt downloads to your device.\n8. If you need a custom invoice, contact support with payment details.",
+    "triggersText": "invoice, receipt, download receipt, billing history, payment history, get receipt, download invoice, PDF receipt, tax receipt, expense report, payment proof, need invoice, need receipt, where are receipts, billing statement, payment record, charge history, download payment, receipt PDF, invoice download, expense documentation, tax documentation",
+    "routes": [
+      "/billing",
+      "/account"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to sign in to your ResumeCoach account",
+    "type": "howto",
+    "summary": "Click Sign In in the top right corner of any page. Enter your email and password, then click Sign In. Or click Sign in with Google or Sign in with LinkedIn if you registered using those services.",
+    "bodyText": "To sign in, click the Sign In link in the top right corner of any page.\n\nEnter the email address you used when creating your account, then your password. Click the Sign In button.\n\nIf you signed up using Google or LinkedIn, click the Sign in with Google or Sign in with LinkedIn button instead of entering email and password. You will be redirected to authenticate with that service, then returned to ResumeCoach.\n\nIf you do not remember which method you used to sign up, try your email first. If that fails (wrong password error), try the social login buttons. Note: You cannot use email login if you originally signed up with Google or LinkedIn.\n\nCheck Remember me to stay logged in for 30 days on that device.",
+    "stepsText": "1. Click Sign In in the top right corner of any page.\n2. Enter your email address in the email field.\n3. Enter your password in the password field.\n4. Click the Sign In button.\n5. Or click Sign in with Google if you registered with Google.\n6. Or click Sign in with LinkedIn if you registered with LinkedIn.\n7. Check Remember me to stay signed in for 30 days.",
+    "triggersText": "sign in, login, log in, how to login, cant login, login page, where to login, access account, enter site, authentication, SSO, Google login, LinkedIn login, sign in button, not logged in, session expired, need to login, logging in, signin, log on, logon, login button, sign in link, email login, password login, social login",
+    "routes": [
+      "/login",
+      "/signin",
+      "/"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to reset your password using Forgot Password",
+    "type": "howto",
+    "summary": "Click Sign In, then click Forgot Password link. Enter your account email and click Send Reset Link. Check your email (and spam folder) for the reset link. Click it to set a new password. The link expires in 24 hours.",
+    "bodyText": "If you forgot your password, you can reset it via email.\n\nGo to the Sign In page and click Forgot Password (or Reset Password link below the password field). Enter the email address associated with your account and click Send Reset Link.\n\nWe will send you an email with a password reset link. Click the link in the email to set a new password. The link expires after 24 hours.\n\nIf you do not receive the email within a few minutes, check your spam or junk folder. Also verify you entered the correct email address—the one you used when signing up.\n\nNote: Password reset only works for accounts created with email registration. If you signed up with Google or LinkedIn, there is no password to reset—you must continue using that login method.",
+    "stepsText": "1. Go to the Sign In page.\n2. Click Forgot Password or Reset Password link below the password field.\n3. Enter your account email address.\n4. Click Send Reset Link button.\n5. Check your email inbox for the reset link (check spam folder too).\n6. Click the link in the email (expires in 24 hours).\n7. Enter and confirm your new password.\n8. Click Save or Reset Password to confirm.\n9. Return to Sign In and use your new password.",
+    "triggersText": "forgot password, reset password, change password, cant remember password, lost password, new password, password recovery, reset link, password email, password not working, wrong password, change my password, update password, password reset link, no reset email, forgot my password, password forgot, reset my password, recover password, password link",
+    "routes": [
+      "/login",
+      "/signin",
+      "/forgot-password",
+      "/reset-password"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix account not found or email not recognized error",
+    "type": "troubleshooting",
+    "summary": "You may have signed up with a different email or used Google/LinkedIn instead of email registration. Try your other email addresses, try the social login buttons, or use Forgot Password to verify if an email is registered.",
+    "bodyText": "If you see 'account not found' or 'email not recognized' when signing in, here are the common causes:\n\nDifferent email: You may have used a different email address when signing up. Try your other email addresses (personal, work, old email).\n\nSocial login mismatch: If you signed up with Google or LinkedIn, you cannot use email/password login. Click Sign in with Google or Sign in with LinkedIn instead.\n\nTypo in email: Double-check for typos in your email address.\n\nNo account exists: You may not have completed registration. Try signing up again—if an account exists with that email, you will see an error saying so.\n\nTo check if an email is registered, click Forgot Password and enter the email. If registered, you will get a reset link. If not, you will see an error.",
+    "stepsText": "1. Try signing in with any other email addresses you use (personal, work, old email).\n2. Try clicking Sign in with Google or Sign in with LinkedIn buttons.\n3. Double-check your email for typos.\n4. Click Forgot Password and enter the email to verify if it is registered.\n5. If none of your emails are recognized, you may need to create a new account.\n6. If you are certain you have an account but cannot access it, contact support with: the email you believe you used, approximate signup date, and whether you used social login.",
+    "triggersText": "account not found, email not recognized, wrong email, different email, cant find account, no account, email mismatch, signed up with wrong email, google account email, not found, user not found, invalid email, dont have account, cant login, email error, which email did i use, cant remember email, account doesnt exist, no user, unrecognized email, account not exist",
+    "routes": [
+      "/login",
+      "/signin"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Data privacy and how ResumeCoach handles your resume",
+    "type": "policy",
+    "summary": "Your resume is encrypted in transit (HTTPS) and at rest on our servers. We never share your data with third parties or employers unless you explicitly apply. Resumes auto-delete after 90 days of inactivity. You can request immediate deletion from Account Settings or by contacting support.",
+    "bodyText": "We take your privacy seriously. Here is how we handle your data:\n\nEncryption: All data is transmitted over HTTPS (encrypted in transit) and stored encrypted on our servers (encrypted at rest).\n\nNo third-party sharing: We do not sell, rent, or share your resume data with third parties. We do not give your information to recruiters or employers unless you explicitly click Apply and submit to them.\n\nData retention: Your resumes and profile are retained while your account is active. After 90 days of inactivity (no logins or submissions), data is automatically deleted. Active accounts retain data indefinitely.\n\nDeletion requests: You can request immediate deletion of your data from Account Settings > Privacy, or by contacting support. We process deletion requests within 7 days.\n\nWhat we use data for: Generating your optimized resumes and improving our AI models (anonymized and aggregated only).",
+    "stepsText": "1. All uploads and data transfer use HTTPS encryption.\n2. Stored data is encrypted at rest on secure servers.\n3. We never share your data with third parties or employers without your action.\n4. Data auto-deletes after 90 days of account inactivity.\n5. To request manual deletion: go to Account Settings > Privacy.\n6. Or email support requesting account and data deletion.\n7. Deletion is processed within 7 days of request.",
+    "triggersText": "privacy, data security, what do you store, how long keep data, delete my data, GDPR, data protection, encrypted, secure, personal information, data retention, who sees my data, do you share data, third party, data safe, is my data safe, where is data stored, data policy, privacy policy, delete account, delete my information, remove my data, data deletion, how long stored, sell my data, share my data",
+    "routes": [
+      "/privacy",
+      "/account",
+      "/settings"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix white screen or blank page not loading",
+    "type": "troubleshooting",
+    "summary": "A blank page usually means a browser compatibility issue. Try: hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac), clear browser cache, disable extensions (especially ad blockers), try Incognito mode, or use Chrome browser.",
+    "bodyText": "If you see a white screen or blank page where content should appear, this is usually a browser issue, not a server problem.\n\nFirst, try a hard refresh: Press Ctrl+Shift+R on Windows or Cmd+Shift+R on Mac. This forces the browser to reload everything fresh without cache.\n\nIf that does not work, clear your browser cache and cookies for resumecoach.me, then reload.\n\nBrowser extensions (especially ad blockers, privacy extensions, or VPN extensions) can sometimes break web apps. Try disabling extensions or opening the site in Incognito/Private mode where extensions are disabled by default.\n\nIf the problem persists, try a different browser. Chrome is recommended and most thoroughly tested.\n\nIf you have tried all the above and still see a blank page, it may be a more serious issue requiring support investigation.",
+    "stepsText": "1. Hard refresh: Press Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac).\n2. Clear browser cache and cookies for resumecoach.me.\n3. Disable browser extensions, especially ad blockers and privacy tools.\n4. Try opening the site in Incognito or Private browsing mode.\n5. Try a different browser (Chrome recommended).\n6. If still blank, press F12 to open developer tools, click Console tab, look for red error messages.\n7. If problem persists, submit a support ticket with: your browser name and version, device type (desktop/mobile), screenshot of the blank page, and any red error messages from the Console.",
+    "triggersText": "white screen, blank page, nothing showing, empty page, page wont load, white page, blank screen, no content, nothing appears, page broken, page not loading, just white, empty screen, black screen, content not showing, page blank, stuck on white, page empty, nothing loads, blank white, page doesnt load, screen blank, all white, content missing",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix stuck spinning or loading forever after Submit",
+    "type": "troubleshooting",
+    "summary": "Normal processing takes 30-60 seconds. If stuck loading over 2 minutes: refresh the page (F5), check your internet connection, try a different browser. Do not click Submit again—this creates duplicates. Your submission is saved and will appear on Dashboard.",
+    "bodyText": "If you see a spinner or loading indicator that will not stop, first make sure you have waited long enough. Normal resume processing takes 30-60 seconds. Wait at least 90 seconds before assuming it is stuck.\n\nIf still spinning after 2 minutes:\n\nRefresh the page: Press F5 or Ctrl+R. Your submission is saved—refreshing will show results if they completed, or show the Dashboard if still processing.\n\nCheck your internet connection: Try loading another website to confirm you are online.\n\nTry a different browser: Some older browsers or those with many extensions can cause issues. Chrome is recommended.\n\nDo not click Submit again while waiting. This creates duplicate entries and wastes your monthly resume quota.\n\nIf the problem keeps happening, there may be a temporary server issue.",
+    "stepsText": "1. Wait at least 90 seconds—normal processing takes 30-60 seconds.\n2. If stuck over 2 minutes, refresh the page (press F5 or Ctrl+R).\n3. Check your internet connection by loading another website.\n4. Try a different browser (Chrome recommended).\n5. Do NOT click Submit again—this creates duplicate entries.\n6. After refresh, check Dashboard or Results for your submission.\n7. If problem persists, submit a support ticket with: the page URL, what you were submitting, how long you waited, and your browser/device info.",
+    "triggersText": "stuck spinning, loading forever, spinner wont stop, processing forever, taking too long, infinite loading, loading stuck, frozen, hanging, not responding, never finishes, progress bar stuck, waiting forever, loading wheel, stuck processing, loading not done, still loading, page stuck, loading indefinitely, processing stuck, submit stuck, spinning forever, endless loading, wont finish",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix 500 error or Something went wrong server error",
+    "type": "troubleshooting",
+    "summary": "A 500 error means something went wrong on our servers—not caused by you. Wait 2-3 minutes and try again. If it persists over 10 minutes, submit a support ticket with: the exact URL, what action you attempted, the time it happened, and the full error message.",
+    "bodyText": "A 500 error (or 'Internal Server Error' or 'Something went wrong') means an unexpected problem occurred on our servers. This is not caused by anything you did.\n\nMost 500 errors are temporary glitches. Wait 2-3 minutes and try your action again. The issue often resolves itself.\n\nIf the error persists after 10 minutes, there may be a larger service issue.\n\nDo not repeatedly retry the same action in quick succession—this can make server issues worse.\n\nClearing your browser cache and trying again sometimes helps if the error is caused by stale cached data.",
+    "stepsText": "1. Wait 2-3 minutes, then try the same action again.\n2. If still failing, clear your browser cache and try again.\n3. Try a different browser to rule out browser-specific issues.\n4. Check if other parts of the site work (can you load Dashboard?).\n5. If error persists over 10 minutes, submit a support ticket.\n6. Include in your ticket: the exact URL where the error occurred, what action you were trying to do, the approximate time, and the full error message text or a screenshot.",
+    "triggersText": "500 error, server error, internal server error, something went wrong, oops error, server problem, HTTP 500, error 500, backend error, service unavailable, server down, site broken, application error, crash, technical difficulties, server issue, unexpected error, 500 internal, server failure, system error, site error, website error",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix 404 page not found error",
+    "type": "troubleshooting",
+    "summary": "A 404 error means that specific page does not exist. Check the URL for typos. Navigate fresh from the Dashboard or homepage instead of using old bookmarks. Old links from emails or expired pages may no longer work.",
+    "bodyText": "A 404 error means the URL you requested does not exist on our site. This is usually caused by:\n\nTypo in the URL: Double-check the address bar for mistakes or extra characters.\n\nOutdated bookmark: If you bookmarked a page previously, it may have moved or been renamed. Delete the old bookmark and navigate fresh from the Dashboard.\n\nOld link: Links from old emails or external sites may point to pages that no longer exist or have changed URLs.\n\nDeleted content: If you are trying to access an old resume that was deleted (after 90 days of inactivity), it will 404.\n\nTo fix: Go to the homepage (resumecoach.me) or Dashboard and navigate to where you want to be using the menu.",
+    "stepsText": "1. Check the URL in your browser address bar for typos.\n2. Go to the homepage: resumecoach.me\n3. Navigate to your destination from the Dashboard using the menu.\n4. Delete any outdated bookmarks and create new ones.\n5. If you believe the page should exist, try searching for it from Dashboard.\n6. If you cannot find what you need, submit a support ticket with the URL that gave 404 and what you were trying to access.",
+    "triggersText": "404 error, page not found, not found, cant find page, missing page, broken link, dead link, page doesnt exist, page gone, wrong URL, bad link, 404 not found, page removed, page deleted, invalid URL, link not working, page missing, url not found, this page doesnt exist, nothing here, page unavailable",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix failed to fetch or connection error",
+    "type": "troubleshooting",
+    "summary": "Connection errors usually mean a network issue on your end or temporary server maintenance. Check your internet, disable VPN if using one, try a different network (WiFi vs mobile data), and retry in a few minutes.",
+    "bodyText": "A 'Failed to fetch' or 'connection error' or 'network error' typically means the request could not reach our servers. This is usually a network issue rather than a problem with the site itself.\n\nCheck your internet connection: Can you load other websites like google.com? If not, the issue is your network, not us.\n\nDisable VPN: Some VPNs block or slow connections to certain services. Try disconnecting your VPN and retrying.\n\nTry a different network: Switch from WiFi to mobile data (or vice versa) to rule out local network issues.\n\nWait and retry: If our servers are briefly overloaded or undergoing maintenance, waiting a few minutes usually resolves it.\n\nIf the problem persists across different networks and browsers, there may be an outage on our end.",
+    "stepsText": "1. Check if other websites load—open google.com to confirm your internet works.\n2. Disable VPN if you are using one.\n3. Try a different network—switch from WiFi to mobile data or vice versa.\n4. Wait a few minutes and try again.\n5. Try a different browser.\n6. If still failing across multiple networks and browsers, there may be a service outage.\n7. Submit a support ticket with: your location (country/region), internet provider if known, the action you were trying, and the exact error message.",
+    "triggersText": "failed to fetch, connection error, network error, cannot connect, timeout, connection refused, no internet, offline, cant connect, server unreachable, connection lost, network problem, fetch failed, request failed, connection timeout, connection issue, cant reach server, no response, ERR_CONNECTION, connection reset, network timeout, request timeout, fetch error",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to edit your resume in the Resume Editor",
+    "type": "howto",
+    "summary": "From the Results page, click the Edit Resume button to open the Resume Editor. You can modify any section including contact info, summary, work experience, skills, and education. Changes save automatically. Click Done Editing or Download when finished.",
+    "bodyText": "After we generate your optimized resume, you have full control to make changes. The Resume Editor lets you fine-tune the content before downloading or applying.\n\nYou can edit any section: contact information, professional summary, work experience bullets, skills list, education, and certifications. The editor preserves the ATS-optimized formatting while letting you adjust the wording.\n\nChanges save automatically as you type—you will see a 'Saved' indicator. There is no separate save button to click.\n\nIf you make changes you do not like, you can revert to the original generated version. Look for Reset to Original or Undo Changes option.\n\nWhen finished editing, click Done Editing to return to the Results view, or click Download to get your PDF or Word file immediately.",
+    "stepsText": "1. From the Results page, find your generated resume preview.\n2. Click the Edit Resume button (may appear as Edit or pencil icon).\n3. The Resume Editor opens showing all sections of your resume.\n4. Click on any section to edit: Summary, Experience, Skills, Education.\n5. Make your changes—text saves automatically as you type.\n6. To undo changes, look for Reset to Original or Undo option.\n7. When finished, click Done Editing to return to Results.\n8. Or click Download to immediately save your edited resume.",
+    "triggersText": "edit resume, resume editor, change resume, modify resume, update resume, edit my resume, how to edit, editor page, edit button, make changes, change wording, edit experience, edit skills, edit summary, fix resume, correct resume, adjust resume, edit text, modify text, change text, resume changes, editing, edit generated resume, pencil icon, edit icon, done editing",
+    "routes": [
+      "/resume",
+      "/results",
+      "/editor"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to download your resume as PDF or Word from the Results page",
+    "type": "howto",
+    "summary": "From the Results page, click the Download button and choose PDF or Word (DOCX) format. PDF is best for online applications and email. Word is best if you need to make additional edits in Microsoft Word or Google Docs.",
+    "bodyText": "Once your resume is generated and you have made any edits, you can download it in multiple formats.\n\nPDF format (.pdf): Best for submitting to online application systems, emailing to recruiters, or uploading to job boards. PDF preserves exact formatting and fonts across all devices. Most ATS systems can parse PDF files.\n\nWord format (.docx): Best if you want to make additional edits in Microsoft Word, Google Docs, or other word processors. Also useful if an employer specifically requests a Word document.\n\nThe download starts immediately after you select your format. Check your browser's download folder or the bottom of your browser window for the file.\n\nYou can download the same resume multiple times in different formats if needed.",
+    "stepsText": "1. From the Results page, review your generated resume.\n2. Make any edits using the Edit Resume button if needed.\n3. Click the Download button.\n4. Choose your format: PDF or Word (DOCX).\n5. The file downloads to your computer immediately.\n6. Check your Downloads folder or browser download bar for the file.\n7. You can download again in a different format if needed.",
+    "triggersText": "download resume, download PDF, download Word, download DOCX, save resume, get resume, export resume, download button, save as PDF, save as Word, how to download, where to download, download my resume, get my resume, export PDF, export Word, file download, resume file, download format, save file, download options, PDF download, Word download, docx download",
+    "routes": [
+      "/results",
+      "/resume",
+      "/editor"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "When to use PDF vs Word format for your resume download",
+    "type": "explainer",
+    "summary": "Use PDF for online applications, email submissions, and job boards—it preserves formatting perfectly. Use Word (DOCX) if you need to make additional edits or if an employer specifically requests Word format. Most ATS systems accept both formats.",
+    "bodyText": "Both PDF and Word formats work for job applications, but each has advantages:\n\nChoose PDF when:\n- Submitting through online application portals\n- Emailing directly to recruiters or hiring managers\n- Uploading to job boards like Indeed or LinkedIn\n- You want guaranteed formatting (fonts, spacing, layout stay exactly as designed)\n- You do not need to make further edits\n\nChoose Word (DOCX) when:\n- The employer specifically requests Word format\n- You want to make additional edits in Microsoft Word or Google Docs\n- A recruiter asks for an editable version\n- You plan to customize further before each application\n\nATS compatibility: Modern ATS systems can parse both PDF and Word files. However, some older systems handle Word slightly better. When in doubt, check if the application portal specifies a preferred format.\n\nYou can always download both versions and use whichever fits each application.",
+    "stepsText": "1. For most online applications: Download as PDF.\n2. For email submissions to recruiters: Download as PDF.\n3. If employer requests Word specifically: Download as Word (DOCX).\n4. If you need to edit more in Word or Google Docs: Download as Word.\n5. When unsure: Download both formats and choose per application.\n6. Check application portal for any specified format preference.",
+    "triggersText": "PDF vs Word, which format, best format, PDF or Word, Word or PDF, DOCX vs PDF, format to use, what format, resume format, file format, which to download, PDF better, Word better, ATS format, application format, email format, upload format, preferred format, format for ATS, format for application, editable format, final format",
+    "routes": [
+      "/results",
+      "/resume"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to apply to a job using the Apply button",
+    "type": "howto",
+    "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form.",
+    "bodyText": "The Apply button takes you directly to the employer's job application page. It does not submit your application automatically—you still need to complete the employer's application process.\n\nWhen you click Apply, a new browser tab opens with the company's application form or the job board listing where you can apply. Your resume does not transfer automatically; you need to upload the PDF or Word file you downloaded.\n\nBefore clicking Apply:\n1. Make sure you have downloaded your optimized resume\n2. Review your SPOR score to understand your match quality\n3. Make any final edits if needed\n\nAfter clicking Apply:\n1. The employer's page opens in a new tab\n2. Follow their application instructions\n3. Upload your downloaded resume when prompted\n4. Fill out any additional required fields\n5. Submit through their system\n\nThe Apply button is a convenience link—it saves you from searching for the application page separately.",
+    "stepsText": "1. On the Results page or Job details, find the Apply button.\n2. Make sure you have already downloaded your resume (PDF or Word).\n3. Click the Apply button.\n4. A new browser tab opens with the employer's application page.\n5. Follow the employer's application instructions.\n6. When prompted, upload your downloaded resume file.\n7. Complete any additional fields the employer requires.\n8. Submit your application through their system.",
+    "triggersText": "apply button, how to apply, apply to job, apply now, apply for job, submit application, application button, where is apply, apply link, click apply, apply to this job, apply from here, job application, submit resume, send application, application page, employer application, apply externally, apply on website, apply to employer, apply process, application process",
+    "routes": [
+      "/results",
+      "/resume",
+      "/jobs"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to view and track your job applications on the Dashboard",
+    "type": "howto",
+    "summary": "The Dashboard shows all your resume submissions organized by job. Each card shows the job title, company, your SPOR score, and submission date. Click any card to view the full results, edit the resume, or download again.",
+    "bodyText": "Your Dashboard is the central hub for managing all your job applications. Every resume you generate is saved here and linked to the specific job it was created for.\n\nEach submission appears as a card showing:\n- Job title and company name\n- Your SPOR score for that application\n- Date you created the resume\n- Status if you have applied\n\nClick any card to view the full Results page for that submission. From there you can:\n- Review the detailed SPOR analysis\n- Edit the resume further\n- Download again in PDF or Word\n- Click Apply if you have not submitted yet\n\nThe Dashboard helps you track which jobs you have applied to and compare your match scores across different positions. If you are applying to many jobs, this keeps everything organized.\n\nResumes are retained while your account is active. After 90 days of inactivity, data may be automatically deleted.",
+    "stepsText": "1. Click Dashboard in the top navigation menu.\n2. View your list of resume submissions as cards.\n3. Each card shows: job title, company, SPOR score, date.\n4. Click any card to open the full Results page for that job.\n5. From Results, you can edit, download, or apply.\n6. Use Dashboard to compare scores across different applications.\n7. Track which jobs you have already applied to.",
+    "triggersText": "dashboard, my resumes, view resumes, track applications, job applications, resume history, past resumes, previous resumes, my submissions, all resumes, resume list, application history, find my resume, where are my resumes, resume cards, job cards, application tracker, track jobs, application status, submission history, resume dashboard, my applications",
+    "routes": [
+      "/dashboard",
+      "/results"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to access and reuse a previous resume from the Dashboard",
+    "type": "howto",
+    "summary": "Go to the Dashboard to see all your previous resume submissions. Click any card to open that resume. You can view the results, edit it again, download it in PDF or Word, or use it as reference for a new application.",
+    "bodyText": "All your generated resumes are saved and accessible from the Dashboard. You do not need to regenerate a resume to access it again.\n\nTo find a previous resume:\n1. Go to Dashboard from the navigation menu\n2. Scroll through your submission cards\n3. Cards are sorted by date with most recent first\n4. Click the card for the job you want\n\nOnce you open a previous resume, you have full access:\n- View the original SPOR score and analysis\n- Edit the resume content (changes save to that version)\n- Download again as PDF or Word\n- Click Apply if you haven't submitted yet\n\nNote: Each resume is tied to the specific job description it was created for. If you want to apply to a different job, you should create a new resume for that job to get proper keyword optimization. Reusing an old resume for a different job will likely result in lower ATS match rates.",
+    "stepsText": "1. Click Dashboard in the top navigation.\n2. Scroll to find the resume you want (sorted by date, newest first).\n3. Click the card to open that resume's Results page.\n4. View the SPOR score and analysis from that submission.\n5. Click Edit Resume to make changes to that version.\n6. Click Download to get the PDF or Word file again.\n7. For a new job, create a new resume rather than reusing an old one.",
+    "triggersText": "previous resume, old resume, past resume, find resume, access resume, get old resume, resume from before, earlier resume, reuse resume, use again, download old resume, find old resume, resume I made, resume history, past submissions, earlier submission, retrieve resume, saved resumes, stored resumes, my old resumes, resume archive, previous version",
+    "routes": [
+      "/dashboard",
+      "/results"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to create a new resume for a different job from your existing profile",
+    "type": "howto",
+    "summary": "From the Dashboard, click New Resume or Create New to start a new submission. Your work history is already saved in your profile—just enter a new job description or use Job Search to find a new listing. We generate a fresh resume optimized for that different job.",
+    "bodyText": "Once you have uploaded your resume once, your work history is saved in your profile. You do not need to upload again for each new application. Just provide a new job description and we generate a fresh, optimized resume.\n\nThis is the core workflow for active job seekers:\n1. Your profile contains your base work history, skills, and education\n2. For each job you want to apply to, you provide a different job description\n3. We analyze that specific job's requirements\n4. We generate a new resume tailored to that job's keywords\n5. Each resume is saved separately on your Dashboard\n\nYou can create as many resumes as your plan allows (Free: 2/month, Pro: 10/month, etc.). Each one is uniquely optimized for its target job.\n\nIf your work history has changed (new job, new skills, new certification), update your profile before creating new resumes so the new information is included.",
+    "stepsText": "1. From the Dashboard, click New Resume or Create New button.\n2. You are taken to the Submit page with your profile already loaded.\n3. Enter a new job description for the job you want to apply to.\n4. Or click Job Search to find a listing and use its description.\n5. Click Submit to generate a resume optimized for this new job.\n6. Wait 30-60 seconds for processing.\n7. View your new SPOR score and optimized resume on Results.\n8. Repeat for each job you want to apply to.",
+    "triggersText": "new resume, create new, another resume, different job, new application, new job, apply to new job, create another, make another resume, second resume, next resume, additional resume, new submission, submit again, apply elsewhere, different company, another job, more resumes, create resume again, new job description, another position",
+    "routes": [
+      "/dashboard",
+      "/submit"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix Resume Editor not saving or changes lost",
+    "type": "troubleshooting",
+    "summary": "Changes in the Resume Editor should save automatically as you type. If changes are not saving: check your internet connection, wait a few seconds for the 'Saved' indicator, and avoid navigating away before saving completes. Try refreshing the page and making edits again.",
+    "bodyText": "The Resume Editor auto-saves your changes as you type. You should see a 'Saved' or 'Saving...' indicator when changes are being saved. If your edits are being lost, here are common causes and fixes:\n\nInternet connection dropped: The editor needs an active connection to save. Check if other websites load. If your connection dropped mid-edit, your changes may not have saved.\n\nNavigated away too quickly: If you leave the editor page before saving completes, changes may be lost. Wait for the 'Saved' indicator before clicking away.\n\nBrowser issue: Try refreshing the page and editing again. If the problem persists, try a different browser (Chrome recommended).\n\nSession expired: If you were inactive for a long time, your session may have expired. Sign in again and retry.\n\nIf you continue having problems, you can always download your resume, make edits in Word or Google Docs, and use that edited version for applications.",
+    "stepsText": "1. Check your internet connection—try loading another website.\n2. Look for the 'Saved' or 'Saving...' indicator in the editor.\n3. Wait a few seconds after each edit for saving to complete.\n4. Do not navigate away or close the tab while 'Saving...' is shown.\n5. If changes were lost, refresh the page and try editing again.\n6. Try a different browser (Chrome recommended).\n7. If problem persists, download the resume and edit in Word instead.\n8. If this still does not work, click Report bug or the support chat icon and include: your browser name, what edits you tried to make, and any error messages shown.",
+    "triggersText": "editor not saving, changes not saved, lost my changes, edits disappeared, changes lost, resume not saving, saving failed, save error, cant save, wont save, lost edits, changes gone, edit not working, save not working, saving issue, editor problem, changes not sticking, edits not saving, auto save not working, saved but changes gone",
+    "routes": [
+      "/resume",
+      "/editor",
+      "/results"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to update your profile and work history",
+    "type": "howto",
+    "summary": "Click your profile icon and select Edit Profile, or look for Profile or Account Settings. You can add new jobs, update skills, add certifications, and edit education. Updated information will be used in all future resume generations.",
+    "bodyText": "Your profile stores your base work history that we use to generate targeted resumes. When your career changes—new job, new skills, new certification—you should update your profile so future resumes include that information.\n\nWhat you can update:\n- Work experience: Add new jobs, edit titles, update descriptions, add achievements\n- Skills: Add new skills, remove outdated ones, reorder by importance\n- Education: Add degrees, certifications, training programs\n- Contact info: Update phone, email, location, LinkedIn URL\n\nWhen to update:\n- You started a new job\n- You earned a new certification or degree\n- You learned new skills\n- You want to add achievements you previously forgot\n- Your contact information changed\n\nAfter updating your profile, any new resumes you create will include the updated information. Existing resumes on your Dashboard are not automatically updated—they keep the information from when they were created.",
+    "stepsText": "1. Click your profile icon or name in the top right corner.\n2. Select Edit Profile or Profile Settings from the menu.\n3. Or look for Profile or Account Settings in the navigation.\n4. Find the section you want to update: Experience, Skills, Education, or Contact.\n5. Click Edit or the pencil icon next to the section.\n6. Make your changes and click Save.\n7. New resumes will use your updated information.\n8. Existing resumes on Dashboard keep their original information.",
+    "triggersText": "update profile, edit profile, change profile, add job, new job, add experience, update work history, add skills, new skills, add certification, update education, edit work history, profile settings, my profile, account settings, add achievement, update contact info, change work history, modify profile, update my info, add to resume, update my resume, profile page",
+    "routes": [
+      "/profile",
+      "/account",
+      "/settings",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Understanding your Before Score vs After Score comparison",
+    "type": "explainer",
+    "summary": "The Before Score shows how your original resume matched the job. The After Score shows how your optimized resume matches. The difference demonstrates the improvement from our keyword optimization. A 25-point improvement is typical.",
+    "bodyText": "On the Results page, you may see two scores: Before and After (or Original vs Optimized). This comparison shows the impact of our optimization.\n\nBefore Score: How well your original uploaded resume matched the job requirements. This score reflects your resume as-is, with whatever keywords and phrasing you used.\n\nAfter Score: How well your optimized resume matches the job. This score reflects the resume after we have added missing keywords, rephrased experience to match job terminology, and improved ATS compatibility.\n\nThe difference between these scores shows what our optimization accomplished. Typical improvements:\n- 15-25 point improvement: Good optimization, common for resumes that were already decent\n- 25-40 point improvement: Significant optimization, common for resumes missing key terminology\n- 40+ point improvement: Major transformation, usually when the original resume was generic\n\nIf both scores are low (under 50), the job may simply not be a strong match for your background. No amount of keyword optimization can create experience you do not have.",
+    "stepsText": "1. On the Results page, look for the score comparison section.\n2. Before Score shows your original resume's match.\n3. After Score shows your optimized resume's match.\n4. The difference shows the improvement from optimization.\n5. 15-25 point improvement is typical.\n6. If After Score is still low, the job may not match your experience.\n7. Review the feedback section for specific gap explanations.",
+    "triggersText": "before score, after score, score comparison, original score, optimized score, score difference, score improvement, how much improved, before and after, original vs optimized, score change, improvement amount, before after comparison, score before optimization, score after optimization, what changed, how much better, improvement score",
+    "routes": [
+      "/results",
+      "/ats-analysis"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Understanding the consultative advice in your SPOR report",
+    "type": "explainer",
+    "summary": "The Recommendations section of your SPOR report provides personalized career guidance. This may include alternative roles that fit your background better, skills to develop, or honest feedback about experience gaps. We give practical advice, not just scores.",
+    "bodyText": "Beyond scores, your SPOR report includes consultative advice tailored to your specific situation. This appears in the Recommendations section.\n\nTypes of advice you may see:\n\nAlternative roles: If your score is low for the target job, we suggest related roles where your background is a stronger match. A marketing coordinator applying for CMO might see suggestions for Marketing Manager or Senior Marketing Specialist.\n\nSkill gaps to address: We identify skills the job requires that you do not have listed. Some can be added to your profile if you have them. Others are development opportunities.\n\nExperience positioning: Suggestions for how to better describe your experience to match industry terminology.\n\nHonest assessment: If the role requires qualifications you cannot quickly obtain (specific degree, 10 years of experience when you have 3), we tell you directly. Better to know before investing time in an application.\n\nThis is not generic advice. It is based on comparing your specific background against the specific job requirements using O*NET occupational standards.",
+    "stepsText": "1. On the Results page, scroll to the Recommendations section.\n2. Read alternative role suggestions if your score is low.\n3. Review skill gaps—add to your profile if you have them but did not list.\n4. Note experience positioning tips for future applications.\n5. Take honest assessments seriously—they can save you application time.\n6. Click suggested alternative roles to search for those jobs instead.",
+    "triggersText": "recommendations, advice, suggestions, alternative roles, career advice, job suggestions, skill gaps, what to improve, consultative advice, SPOR recommendations, report advice, personalized advice, career guidance, role suggestions, fit advice, honest feedback, improvement suggestions, what should I do, next steps, career recommendations",
+    "routes": [
+      "/results",
+      "/ats-analysis"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Where ResumeCoach gets job data and market intelligence",
+    "type": "explainer",
+    "summary": "We use three authoritative sources: O*NET (U.S. Department of Labor occupational database), Indeed (real-time job market data), and CareerOneStop (government career resources). This ensures our keyword recommendations reflect actual employer requirements, not guesswork.",
+    "bodyText": "ResumeCoach does not guess what employers want. We use authoritative data sources to understand job requirements:\n\nO*NET (Occupational Information Network): The U.S. Department of Labor's comprehensive database of occupational information. Contains detailed data on skills, knowledge, abilities, and tasks for over 1,000 occupations. This is the gold standard for understanding what each role actually requires.\n\nIndeed Job Market Data: Real-time job posting data showing what employers are actually asking for in current listings. This captures emerging skills and trending terminology that may not yet be in government databases.\n\nCareerOneStop: Another government resource providing career exploration data, salary information, and industry trends. Helps validate that our recommendations align with labor market realities.\n\nWhen you submit a job description, we cross-reference it against these sources to:\n- Validate the stated requirements against industry norms\n- Identify standard keywords for that occupation\n- Ensure we are not missing critical terms\n- Provide accurate alternative role suggestions\n\nThis data-driven approach means your optimized resume reflects what employers actually look for, not what we assume they want.",
+    "stepsText": "1. O*NET provides occupational standards from the U.S. Department of Labor.\n2. Indeed provides real-time job market data and current listings.\n3. CareerOneStop provides government career resources and trends.\n4. We cross-reference your job description against these sources.\n5. This validates requirements against industry norms.\n6. Keywords we add are based on actual employer usage.\n7. Alternative role suggestions come from occupational relationships in O*NET.",
+    "triggersText": "where data comes from, data sources, O*NET, ONET, Indeed, CareerOneStop, job data, market data, how do you know, what keywords, where keywords from, source of information, government data, DOL, Department of Labor, occupational data, job market data, how accurate, data accuracy, keyword source, requirement source, how you know what employers want",
+    "routes": [
+      "/results",
+      "/submit",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Understanding your base resume vs generated resumes",
+    "type": "explainer",
+    "summary": "Your base resume is the original you uploaded—it becomes your profile storing all your facts (jobs, dates, achievements). Generated resumes are the targeted versions we create for each job application, using your base data but optimized with job-specific keywords.",
+    "bodyText": "There is an important distinction between your base resume and generated resumes:\n\nBase Resume / Profile:\n- The original resume you uploaded\n- Contains your factual information: job titles, companies, dates, achievements, skills, education\n- Stored in your profile\n- Used as the source material for all generated resumes\n- You can update it anytime to add new jobs or skills\n\nGenerated Resumes:\n- Created fresh for each job you apply to\n- Uses your base resume facts but rewrites them with job-specific keywords\n- Each one is different, optimized for that particular job description\n- Saved on your Dashboard linked to the job it was created for\n- You can have many generated resumes (one per job application)\n\nThink of your base resume as ingredients, and each generated resume as a dish prepared for a specific occasion. Same core ingredients, different preparation based on what is needed.\n\nWhen you update your profile, you are updating the ingredients. New generated resumes will use the updated ingredients. Old generated resumes stay as they were.",
+    "stepsText": "1. Your base resume is uploaded once and becomes your profile.\n2. It stores all your factual information: jobs, dates, skills, education.\n3. Generated resumes are created for each job application.\n4. Each generated resume uses your profile data but optimizes for that job.\n5. You can have many generated resumes (one per job).\n6. Update your profile to add new information for future resumes.\n7. Existing generated resumes keep their original content.",
+    "triggersText": "base resume, original resume, my resume vs generated, profile vs resume, generated resume, created resume, optimized resume, source resume, uploaded resume, master resume, resume versions, multiple resumes, different versions, which resume, original vs new, my profile, profile resume, stored resume, saved resume, resume copy, resume original",
+    "routes": [
+      "/dashboard",
+      "/profile",
+      "/results"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How the AI Coach helps during resume submission",
+    "type": "explainer",
+    "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help.",
+    "bodyText": "The AI Coach is your assistant throughout the ResumeCoach experience. It appears as a chat interface where you can ask questions and get immediate answers.\n\nWhat the AI Coach can help with:\n- Explaining what to enter in each field\n- Clarifying options when you are unsure\n- Answering questions about features and workflow\n- Providing guidance on job descriptions and what to include\n- Explaining your results and scores\n- Troubleshooting common issues\n\nHow to use it:\n- Look for the chat icon or Help button\n- Type your question in plain language\n- Get an immediate response with guidance\n\nThe AI Coach draws from our knowledge base to give you accurate, relevant answers. If it cannot fully answer your question, it can help you submit a support ticket with the right information.\n\nThe coach is available throughout the app—on the Submit page, Results page, Dashboard, and more. Use it whenever you are unsure about something.",
+    "stepsText": "1. Look for the chat icon or Help button on any page.\n2. Click to open the chat interface.\n3. Type your question in plain language.\n4. Get an immediate response with guidance.\n5. Ask follow-up questions if needed.\n6. The coach can help with features, workflow, and troubleshooting.\n7. If stuck, the coach can help you submit a support ticket.",
+    "triggersText": "AI coach, chat help, help button, ask question, get help, support chat, chat assistant, help assistant, talk to support, help me, need help, how to get help, where is help, assistant, chat support, help chat, ask for help, question button, help icon, support icon, guide me, help with this",
+    "routes": [],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "How to use Paste Text when you cannot upload a file",
+    "type": "howto",
+    "summary": "On the Submit page, click the Paste Text tab instead of Upload. Copy all text from your resume document and paste it into the text area. This works when file upload fails or you only have a text version of your resume.",
+    "bodyText": "If you cannot upload a file—maybe it keeps failing, or you only have your resume as plain text—you can paste the content directly instead.\n\nThe Paste Text option extracts your work history from plain text just like file upload does. You lose formatting (fonts, columns, styling) but all the actual content is preserved.\n\nWhen to use Paste Text:\n- File upload keeps failing\n- Your resume is in a format we do not support (like Pages or RTF)\n- You only have the text content, not the original file\n- You want to quickly test with partial resume content\n\nHow to prepare your text:\n- Open your resume in any application\n- Select All (Ctrl+A or Cmd+A)\n- Copy (Ctrl+C or Cmd+C)\n- Make sure you got everything—job titles, dates, descriptions, skills, education\n\nPaste into our text area and submit. We parse the text the same way we parse uploaded files.",
+    "stepsText": "1. On the Submit page, look for the Paste Text or Text tab (near Upload).\n2. Click to switch to text input mode.\n3. Open your resume in Word, Google Docs, or any text editor.\n4. Select all content: Ctrl+A (Windows) or Cmd+A (Mac).\n5. Copy: Ctrl+C (Windows) or Cmd+C (Mac).\n6. Click in the text area on the Submit page.\n7. Paste: Ctrl+V (Windows) or Cmd+V (Mac).\n8. Review that all content pasted correctly.\n9. Click Submit to process your resume.",
+    "triggersText": "paste text, copy paste, paste resume, text input, no file, cant upload file, upload not working, paste instead, type resume, enter text, text area, copy resume, manual entry, paste option, text tab, paste my resume, paste content, copy and paste, text version, plain text resume, paste text area",
+    "routes": [
+      "/submit",
+      "/upload"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix downloaded resume has wrong formatting or looks different",
+    "type": "troubleshooting",
+    "summary": "Downloaded PDFs should preserve formatting exactly. If formatting looks wrong: try downloading PDF instead of Word, open Word files in Microsoft Word (not Google Docs or Preview), and check that you are viewing at 100% zoom. Some formatting differences in Word are expected.",
+    "bodyText": "If your downloaded resume looks different than expected, here are common causes and fixes:\n\nPDF looks wrong:\n- PDF should preserve exact formatting. If it looks wrong, try refreshing the page and downloading again.\n- Make sure you are opening the PDF in a proper PDF reader (Adobe Acrobat, Preview, browser), not trying to edit it in Word.\n\nWord (DOCX) looks wrong:\n- Some formatting differences in Word are expected. Our templates are optimized for PDF output.\n- Open in Microsoft Word specifically. Google Docs, Apple Pages, or LibreOffice may display differently.\n- Fonts may substitute if you do not have the exact fonts installed. This is normal.\n\nLayout issues:\n- Check that you are viewing at 100% zoom. Weird zoom levels can make formatting look off.\n- If downloaded multiple times, make sure you are opening the most recent file.\n\nIf you need exact formatting, always use PDF. Word is for when you need to make additional edits, with the understanding that some styling may need adjustment.",
+    "stepsText": "1. For exact formatting, download as PDF (not Word).\n2. Open PDFs in a proper reader: Adobe Acrobat, Preview, or browser.\n3. If using Word format, open in Microsoft Word specifically.\n4. Google Docs or other apps may display Word files differently.\n5. Check your view zoom is at 100%.\n6. If fonts look wrong in Word, this is normal font substitution.\n7. Try refreshing the page and downloading a fresh copy.\n8. If this still does not work, click Report bug or the support chat icon and include: which format you downloaded, what looks wrong (screenshot helps), and what application you opened it in.",
+    "triggersText": "formatting wrong, resume looks different, layout broken, formatting issue, looks weird, fonts wrong, formatting messed up, download looks bad, PDF looks different, Word looks different, formatting problem, layout issue, resume looks wrong, styling wrong, format broken, download issue, display wrong, not formatted right, formatting off, looks off",
+    "routes": [
+      "/results",
+      "/resume"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "Fix job search showing no results or wrong results",
+    "type": "troubleshooting",
+    "summary": "If Job Search returns no results: try broader search terms, check your spelling, use common job titles, and try a larger location area. If results seem wrong, the search uses Google Jobs which may include related roles.",
+    "bodyText": "If Job Search is not returning the results you expect, here are common issues and fixes:\n\nNo results found:\n- Try broader search terms. 'Software Engineer' finds more than 'Senior Backend Python Engineer.'\n- Check spelling of job title and location.\n- Use a larger geographic area. Try state instead of city, or increase the radius.\n- Very niche roles may have few current openings.\n\nWrong or irrelevant results:\n- Job Search uses Google Jobs, which may include related roles.\n- A search for 'Manager' might return various types of management roles.\n- Be more specific: 'Restaurant Manager' instead of just 'Manager.'\n\nOutdated listings:\n- Google Jobs aggregates from many sources. Some listings may be slightly outdated.\n- Always verify on the employer's actual website before applying.\n\nThe job search is meant to help you find real job descriptions to use for resume optimization. If you already have a job description from another source, you can paste it directly on the Submit page instead.",
+    "stepsText": "1. Try broader, more common job titles.\n2. Check spelling of job title and location.\n3. Use a larger location: state, region, or remote.\n4. If too many irrelevant results, make your search more specific.\n5. Results come from Google Jobs and may include related roles.\n6. Verify listings on the employer website before applying.\n7. If you have a job description already, paste it on Submit page instead.\n8. If this still does not work, click Report bug or the support chat icon and include: what you searched for, your location, and what happened.",
+    "triggersText": "no jobs found, no results, job search empty, no listings, wrong jobs, irrelevant results, job search not working, cant find jobs, no jobs showing, search not working, wrong results, job search broken, search empty, jobs not loading, search results wrong, no matches, zero results, jobs missing, search issue, search problem",
+    "routes": [
+      "/jobs",
+      "/dashboard"
+    ],
+    "_status": "published"
+  },
+  {
+    "appSlug": "resume-coach",
+    "title": "What happens to my resume after 90 days of inactivity",
+    "type": "policy",
+    "summary": "Resumes and profile data auto-delete after 90 days of account inactivity (no logins or submissions). To prevent deletion, simply log in periodically. Active accounts retain data indefinitely. You can manually request deletion anytime from Account Settings.",
+    "bodyText": "To protect your privacy and manage data responsibly, we automatically delete data from inactive accounts.\n\nThe 90-day inactivity policy:\n- If you do not log in or submit any resumes for 90 consecutive days, your data may be deleted.\n- This includes your profile, all generated resumes, and account preferences.\n- You will receive an email warning before deletion if you provided a valid email.\n\nHow to prevent automatic deletion:\n- Simply log in to your account at least once every 90 days.\n- Any login activity resets the inactivity timer.\n- Submitting a new resume also counts as activity.\n\nActive accounts:\n- If you log in regularly, your data is retained indefinitely.\n- There is no limit to how long we will store your resumes for active accounts.\n\nManual deletion:\n- You can request immediate deletion of all your data anytime.\n- Go to Account Settings > Privacy or contact support.\n- Manual deletion requests are processed within 7 days.\n\nIf you are job searching sporadically, just remember to log in occasionally to keep your data.",
+    "stepsText": "1. Data auto-deletes after 90 days of no logins or submissions.\n2. To prevent deletion, log in at least once every 90 days.\n3. Any activity (login, submission) resets the inactivity timer.\n4. Active accounts keep data indefinitely.\n5. You will get an email warning before auto-deletion.\n6. To delete data immediately: Account Settings > Privacy > Delete Data.\n7. Or contact support to request account deletion.",
+    "triggersText": "90 days, inactivity, data deletion, auto delete, account deleted, resume deleted, data expired, inactive account, account inactivity, lost data, data gone, deleted automatically, how long stored, data retention, keep my data, save my data, prevent deletion, resume expired, old account, inactive deletion",
+    "routes": [
+      "/account",
+      "/settings",
+      "/privacy"
+    ],
+    "_status": "published"
+  }
+]

@@ -12,13 +12,18 @@ import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
 const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'] as const
 type Severity = (typeof VALID_SEVERITIES)[number]
 
-// --- LLM Configuration ---
+// --- LLM Configuration (Provider-Agnostic) ---
+type LLMProvider = 'anthropic' | 'openai'
+
 const LLM_CONFIG = {
   enabled: process.env.SUPPORT_LLM_ENABLED === 'true',
-  baseUrl: process.env.HEROKU_INFERENCE_URL || 'https://us.inference.heroku.com/v1',
-  model: process.env.SUPPORT_LLM_MODEL || 'claude-3-5-haiku',
+  // Primary provider (default: anthropic for Haiku)
+  provider: (process.env.SUPPORT_LLM_PROVIDER || 'anthropic') as LLMProvider,
+  model: process.env.SUPPORT_LLM_MODEL || 'claude-3-5-haiku-20241022',
   maxTokens: parseInt(process.env.SUPPORT_LLM_MAX_TOKENS || '300', 10),
-  apiKey: process.env.HEROKU_INFERENCE_API_KEY || '',
+  // Fallback provider (optional)
+  fallbackProvider: process.env.SUPPORT_LLM_FALLBACK_PROVIDER as LLMProvider | undefined,
+  fallbackModel: process.env.SUPPORT_LLM_FALLBACK_MODEL || 'gpt-4o-mini',
 }
 
 // --- LLM Types ---
@@ -515,60 +520,149 @@ function checkRelevanceGate(
 }
 
 /**
+ * Call LLM provider (Anthropic Haiku or OpenAI) to synthesize an answer
+ * Provider-agnostic: supports Anthropic Messages API and OpenAI Chat Completions
+ */
+async function callLLMProvider(params: {
+  provider: LLMProvider
+  model: string
+  system: string
+  user: string
+  maxTokens: number
+}): Promise<string> {
+  const { provider, model, system, user, maxTokens } = params
+
+  if (provider === 'anthropic') {
+    const key = process.env.ANTHROPIC_API_KEY
+    if (!key) throw new Error('ANTHROPIC_API_KEY missing')
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+    })
+
+    if (!resp.ok) {
+      const errorText = await resp.text()
+      throw new Error(`Anthropic LLM error: ${resp.status} - ${errorText}`)
+    }
+    const data = await resp.json()
+
+    // content is an array; extract text blocks safely
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const text = Array.isArray(data?.content)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ? data.content.map((c: any) => c?.text).filter(Boolean).join('\n').trim()
+      : ''
+
+    return text
+  }
+
+  // provider === 'openai'
+  const key = process.env.OPENAI_API_KEY
+  if (!key) throw new Error('OPENAI_API_KEY missing')
+
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.3,
+    }),
+  })
+
+  if (!resp.ok) {
+    const errorText = await resp.text()
+    throw new Error(`OpenAI LLM error: ${resp.status} - ${errorText}`)
+  }
+  const data = await resp.json()
+
+  // Extract from OpenAI chat completions response
+  const text = data?.choices?.[0]?.message?.content?.trim() || ''
+  return text
+}
+
+/**
  * Call LLM to synthesize an answer from KB content
+ * Tries primary provider first, then fallback if configured
  */
 async function callLLM(
   userMessage: string,
   kbContent: string,
   conversationHistory?: Array<{ role: string; content: string }>
 ): Promise<string | null> {
-  if (!LLM_CONFIG.enabled || !LLM_CONFIG.apiKey) {
+  if (!LLM_CONFIG.enabled) {
     return null
   }
 
-  try {
-    // Build conversation context
-    const contextMessages = (conversationHistory || []).slice(-3).map(m => ({
-      role: m.role === 'assistant' ? 'assistant' : 'user',
-      content: m.content,
-    }))
-
-    const systemPrompt = `You are a helpful support assistant. Answer the user's question using ONLY the KB content provided below. Be concise (2-3 sentences max). If the KB content doesn't fully answer the question, say so and suggest they create a support ticket.
+  // Build system prompt with strict KB-only instructions
+  const systemPrompt = `You are a helpful support assistant. Answer the user's question using ONLY the KB content provided below. Be concise (2-3 sentences max). If the KB content doesn't fully answer the question, say so and suggest they create a support ticket. Do NOT use any knowledge outside of the provided KB content.
 
 KB Content:
 ${kbContent}`
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...contextMessages,
-      { role: 'user', content: userMessage },
-    ]
-
-    const response = await fetch(`${LLM_CONFIG.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${LLM_CONFIG.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: LLM_CONFIG.model,
-        messages,
-        max_tokens: LLM_CONFIG.maxTokens,
-        temperature: 0.3,
-      }),
-    })
-
-    if (!response.ok) {
-      console.error('LLM API error:', response.status, await response.text())
-      return null
+  // Build user message with conversation context
+  const contextParts: string[] = []
+  if (conversationHistory?.length) {
+    const recentUserMsgs = conversationHistory
+      .filter(m => m.role === 'user')
+      .slice(-2)
+      .map(m => m.content)
+    if (recentUserMsgs.length) {
+      contextParts.push(`Previous questions: ${recentUserMsgs.join(' | ')}`)
     }
-
-    const data = await response.json()
-    return data?.choices?.[0]?.message?.content || null
-  } catch (err) {
-    console.error('LLM call failed:', err)
-    return null
   }
+  contextParts.push(`Current question: ${userMessage}`)
+  const fullUserMessage = contextParts.join('\n\n')
+
+  // Try primary provider
+  try {
+    const result = await callLLMProvider({
+      provider: LLM_CONFIG.provider,
+      model: LLM_CONFIG.model,
+      system: systemPrompt,
+      user: fullUserMessage,
+      maxTokens: LLM_CONFIG.maxTokens,
+    })
+    if (result) return result
+  } catch (err) {
+    console.error(`Primary LLM (${LLM_CONFIG.provider}) failed:`, err)
+  }
+
+  // Try fallback provider if configured
+  if (LLM_CONFIG.fallbackProvider && LLM_CONFIG.fallbackModel) {
+    try {
+      const result = await callLLMProvider({
+        provider: LLM_CONFIG.fallbackProvider,
+        model: LLM_CONFIG.fallbackModel,
+        system: systemPrompt,
+        user: fullUserMessage,
+        maxTokens: LLM_CONFIG.maxTokens,
+      })
+      if (result) return result
+    } catch (err) {
+      console.error(`Fallback LLM (${LLM_CONFIG.fallbackProvider}) failed:`, err)
+    }
+  }
+
+  return null
 }
 
 /**

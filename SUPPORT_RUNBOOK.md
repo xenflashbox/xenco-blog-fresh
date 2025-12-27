@@ -477,3 +477,61 @@ Context extraction uses **USER messages only**:
 - Combines short messages with previous context for better matching
 
 **Example:** If user says "I can't find the button" after asking about uploads, the system combines both user messages for context search.
+
+---
+
+## LLM Synthesis (v1.3)
+
+The support system can optionally synthesize natural language answers from KB content using LLM providers.
+
+### Supported Providers
+
+| Provider | Model | Use Case |
+|----------|-------|----------|
+| **Anthropic** (default) | `claude-3-5-haiku-20241022` | Primary provider, fast + accurate |
+| **OpenAI** (fallback) | `gpt-4o-mini` | Optional fallback if Anthropic fails |
+
+### Environment Variables
+
+**Required for LLM synthesis:**
+```bash
+SUPPORT_LLM_ENABLED=true
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+**Optional configuration:**
+```bash
+SUPPORT_LLM_PROVIDER=anthropic          # Default: anthropic
+SUPPORT_LLM_MODEL=claude-3-5-haiku-20241022  # Default model
+SUPPORT_LLM_MAX_TOKENS=300              # Max response tokens
+
+# Optional OpenAI fallback
+OPENAI_API_KEY=sk-...
+SUPPORT_LLM_FALLBACK_PROVIDER=openai
+SUPPORT_LLM_FALLBACK_MODEL=gpt-4o-mini
+```
+
+### How It Works
+
+1. **Retrieval**: MeiliSearch finds relevant KB articles
+2. **Relevance Gate**: Checks lexical overlap (≥0.2) OR ranking score (≥0.4)
+3. **If gate passes**: LLM synthesizes answer from top KB content
+4. **If gate fails**: Returns fallback + "submit ticket" suggestion (no hallucination)
+5. **If LLM fails**: Falls back to best KB summary/steps
+
+### Anti-Hallucination Guarantees
+
+- LLM is ONLY called after retrieval + gate passed
+- System prompt enforces: "answer ONLY using provided KB content"
+- If KB doesn't answer the question, LLM says so + suggests ticket
+- Empty/failed LLM response → fallback to KB content
+
+### Verification
+
+Check `llmEnabled: true` in response when LLM synthesis is active:
+```bash
+curl -X POST "$PAYLOAD_URL/api/support/ticket" \
+  -H "Content-Type: application/json" \
+  -d '{"app_slug":"resume-coach","message":"How do I upload my resume?"}' \
+  | jq '{resolved, llmEnabled, answer}'
+```
