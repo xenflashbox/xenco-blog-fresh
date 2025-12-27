@@ -549,25 +549,26 @@ function extractConversationContext(
 
 /**
  * Build synonym fallback query for no-hits scenarios
- * Appends synonyms to help match KB articles when user phrasing differs
+ * Returns REPLACEMENT query (not append) to help match KB articles
  * Only used when initial queries return zero results
  */
 function buildSynonymFallbackQuery(query: string): string | null {
   const q = query.toLowerCase()
 
-  // Synonym mappings: user phrases → KB terms
-  const synonyms: Array<{ patterns: string[]; append: string }> = [
+  // Synonym mappings: user phrases → replacement KB search terms
+  // These replace the original query entirely for better matching
+  const synonyms: Array<{ patterns: string[]; replacement: string }> = [
     // "callbacks" / "not getting interviews" → ATS article
-    { patterns: ['callbacks', 'not getting interviews', 'no interviews', 'no callbacks'], append: 'ATS resume rejected' },
+    { patterns: ['callbacks', 'not getting interviews', 'no interviews', 'no callbacks'], replacement: 'ATS resume rejected applicant tracking' },
     // "score 45" / "is that bad" → score meaning article
-    { patterns: ['score 45', 'is that bad', 'is my score bad', 'score meaning'], append: 'resume score meaning' },
+    { patterns: ['score 45', 'is that bad', 'is my score bad', 'low score'], replacement: 'resume score meaning results' },
     // "reset link" / "password link" → password reset article
-    { patterns: ['reset link', 'password link', 'link valid', 'link expired'], append: 'reset password forgot' },
+    { patterns: ['reset link', 'password link', 'link valid', 'link expired'], replacement: 'reset password forgot' },
   ]
 
-  for (const { patterns, append } of synonyms) {
+  for (const { patterns, replacement } of synonyms) {
     if (patterns.some(p => q.includes(p))) {
-      return `${query} ${append}`
+      return replacement
     }
   }
 
