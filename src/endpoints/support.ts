@@ -1463,3 +1463,111 @@ export const supportUptimeEndpoint: Endpoint = {
     return Response.json({ ok: true })
   },
 }
+
+/**
+ * Normalize doc ID to numeric form
+ * Handles: "support_kb_articles_29", "support_kb_articles:29", "29"
+ */
+function normalizeDocId(rawId: string): number | null {
+  if (!rawId) return null
+
+  const s = rawId.trim()
+
+  // Direct numeric
+  if (/^\d+$/.test(s)) {
+    return parseInt(s, 10)
+  }
+
+  // support_kb_articles_29 or support_kb_articles:29
+  const match = s.match(/support_kb_articles[_:](\d+)$/i)
+  if (match) {
+    return parseInt(match[1], 10)
+  }
+
+  return null
+}
+
+/**
+ * GET /api/support/doc/:id OR /api/support/doc?id=<id>
+ * Fetch a single KB article by ID for related-article linking
+ *
+ * Supports ID formats:
+ * - support_kb_articles_29
+ * - support_kb_articles:29
+ * - 29
+ *
+ * Returns: { ok: true, doc: { id, title, summary, bodyText, stepsText?, url? } }
+ * Or 404: { ok: false, message: "not_found" }
+ */
+export const supportDocEndpoint: Endpoint = {
+  path: '/support/doc/:id?',
+  method: 'get',
+  handler: async (req) => {
+    try {
+      // Get ID from path param or query string
+      const pathId = req.routeParams?.id
+      const url = new URL(req.url)
+      const queryId = url.searchParams.get('id')
+
+      const rawId = pathId || queryId || ''
+
+      if (!rawId) {
+        return Response.json(
+          { ok: false, message: 'id parameter is required' },
+          { status: 400 }
+        )
+      }
+
+      const numericId = normalizeDocId(rawId)
+
+      if (numericId === null) {
+        return Response.json(
+          { ok: false, message: 'invalid id format' },
+          { status: 400 }
+        )
+      }
+
+      // Fetch from Payload's support_kb_articles collection
+      const doc = await req.payload.findByID({
+        collection: 'support_kb_articles',
+        id: numericId,
+      })
+
+      if (!doc) {
+        return Response.json(
+          { ok: false, message: 'not_found' },
+          { status: 404 }
+        )
+      }
+
+      // Return stable shape
+      return Response.json({
+        ok: true,
+        doc: {
+          id: `support_kb_articles_${doc.id}`,
+          title: doc.title || '',
+          summary: doc.summary || '',
+          bodyText: doc.bodyText || '',
+          ...(doc.stepsText ? { stepsText: doc.stepsText } : {}),
+          ...(doc.url ? { url: doc.url } : {}),
+        },
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+
+      // Payload throws NotFound errors for missing docs
+      if (error.message?.includes('not found') || error.name === 'NotFound') {
+        return Response.json(
+          { ok: false, message: 'not_found' },
+          { status: 404 }
+        )
+      }
+
+      console.error('Support doc fetch error:', error)
+      return Response.json(
+        { ok: false, message: 'internal_error' },
+        { status: 500 }
+      )
+    }
+  },
+}

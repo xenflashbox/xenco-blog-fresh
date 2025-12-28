@@ -36,6 +36,7 @@ import {
   supportAnswerEndpoint,
   supportHealthEndpoint,
   supportUptimeEndpoint,
+  supportDocEndpoint,
 } from './endpoints/support'
 
 const filename = fileURLToPath(import.meta.url)
@@ -88,6 +89,7 @@ export default buildConfig({
     supportAnswerEndpoint,
     supportHealthEndpoint,
     supportUptimeEndpoint,
+    supportDocEndpoint,
   ],
 
   editor: lexicalEditor(),
