@@ -1505,9 +1505,12 @@ export const supportDocEndpoint: Endpoint = {
   handler: async (req) => {
     try {
       // Get ID from path param or query string
-      const pathId = req.routeParams?.id
-      const url = new URL(req.url)
-      const queryId = url.searchParams.get('id')
+      const pathId = typeof req.routeParams?.id === 'string' ? req.routeParams.id : ''
+      let queryId: string | null = null
+      if (req.url) {
+        const url = new URL(req.url)
+        queryId = url.searchParams.get('id')
+      }
 
       const rawId = pathId || queryId || ''
 
@@ -1547,9 +1550,8 @@ export const supportDocEndpoint: Endpoint = {
           id: `support_kb_articles_${doc.id}`,
           title: doc.title || '',
           summary: doc.summary || '',
-          bodyText: doc.bodyText || '',
           ...(doc.stepsText ? { stepsText: doc.stepsText } : {}),
-          ...(doc.url ? { url: doc.url } : {}),
+          ...(doc.triggersText ? { triggersText: doc.triggersText } : {}),
         },
       })
     } catch (err: unknown) {
