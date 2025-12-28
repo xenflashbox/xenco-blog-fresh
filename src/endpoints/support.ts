@@ -1558,7 +1558,12 @@ export const supportDocEndpoint: Endpoint = {
       const error = err as Error
 
       // Payload throws NotFound errors for missing docs
-      if (error.message?.includes('not found') || error.name === 'NotFound') {
+      const errorMsg = error.message?.toLowerCase() || ''
+      if (
+        errorMsg.includes('not found') ||
+        errorMsg.includes('notfound') ||
+        error.name === 'NotFound'
+      ) {
         return Response.json(
           { ok: false, message: 'not_found' },
           { status: 404 }
