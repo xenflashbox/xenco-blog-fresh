@@ -2607,14 +2607,12 @@ export const supportAutofixEndpoint: Endpoint = {
       const periodStart = new Date(periodEnd.getTime() - hoursBack * 60 * 60 * 1000)
 
       // Fetch fixable tickets (system_failure and valid_bug only)
+      // Use -> for JSONB traversal, ->> only for final text extraction
       let ticketQuery = `
         SELECT id, app_slug, message, severity, route, page_url, details, created_at
         FROM support_tickets
         WHERE created_at >= $1 AND created_at <= $2
-          AND (
-            details->>'triage'->>'category' IN ('system_failure', 'valid_bug')
-            OR details->'triage'->>'category' IN ('system_failure', 'valid_bug')
-          )
+          AND details->'triage'->>'category' IN ('system_failure', 'valid_bug')
           AND status = 'open'
       `
       const ticketParams: unknown[] = [periodStart.toISOString(), periodEnd.toISOString()]
