@@ -81,23 +81,25 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE INDEX IF NOT EXISTS "support_triage_reports_report_date_idx" ON "support_triage_reports" USING btree ("report_date");
   `)
 
-  // Add new columns to support_tickets if they don't exist
-  // Using simpler ADD COLUMN IF NOT EXISTS syntax (PostgreSQL 9.6+)
-  try {
-    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;`)
-  } catch { /* Column may already exist */ }
+  // Note: support_tickets was created above with all columns, so ALTER statements
+  // are only needed if the table existed before this migration with fewer columns.
+  // Since CREATE TABLE IF NOT EXISTS won't run if table exists, we use a safe approach:
+  // These are wrapped in individual try blocks in case some columns exist but not others.
+  await db.execute(sql`
+    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;
+  `).catch(() => { /* may not exist yet */ })
 
-  try {
-    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;`)
-  } catch { /* Column may already exist */ }
+  await db.execute(sql`
+    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;
+  `).catch(() => { /* may not exist yet */ })
 
-  try {
-    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;`)
-  } catch { /* Column may already exist */ }
+  await db.execute(sql`
+    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;
+  `).catch(() => { /* may not exist yet */ })
 
-  try {
-    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';`)
-  } catch { /* Column may already exist */ }
+  await db.execute(sql`
+    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';
+  `).catch(() => { /* may not exist yet */ })
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
