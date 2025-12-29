@@ -5,7 +5,8 @@
 // - POST /api/support/telemetry - Track widget events
 // - POST /api/support/triage - Run scheduled triage job
 //
-// v1.2: Added telemetry, IP/UA tracking, rate limiting stubs, contact_required enforcement
+// v1.2.1: Added telemetry, IP/UA tracking, rate limiting stubs, contact_required enforcement
+// Build trigger: 2025-12-29
 
 import type { Endpoint } from 'payload'
 import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
