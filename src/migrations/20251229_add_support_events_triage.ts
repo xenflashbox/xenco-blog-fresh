@@ -81,25 +81,14 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE INDEX IF NOT EXISTS "support_triage_reports_report_date_idx" ON "support_triage_reports" USING btree ("report_date");
   `)
 
-  // Note: support_tickets was created above with all columns, so ALTER statements
-  // are only needed if the table existed before this migration with fewer columns.
-  // Since CREATE TABLE IF NOT EXISTS won't run if table exists, we use a safe approach:
-  // These are wrapped in individual try blocks in case some columns exist but not others.
-  await db.execute(sql`
-    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;
-  `).catch(() => { /* may not exist yet */ })
-
-  await db.execute(sql`
-    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;
-  `).catch(() => { /* may not exist yet */ })
-
-  await db.execute(sql`
-    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;
-  `).catch(() => { /* may not exist yet */ })
-
-  await db.execute(sql`
-    ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';
-  `).catch(() => { /* may not exist yet */ })
+  // The support_tickets table should now exist from the CREATE TABLE IF NOT EXISTS above.
+  // The ALTER statements below add columns that may not exist if the table was created
+  // by a previous version. These use ADD COLUMN IF NOT EXISTS which is safe.
+  // No error handling needed - IF NOT EXISTS handles both cases.
+  await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;`)
+  await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;`)
+  await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;`)
+  await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';`)
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
