@@ -82,30 +82,22 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   `)
 
   // Add new columns to support_tickets if they don't exist
-  await db.execute(sql`
-    DO $$ BEGIN
-      ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;
-    EXCEPTION WHEN duplicate_column THEN null;
-    END $$;
-  `)
-  await db.execute(sql`
-    DO $$ BEGIN
-      ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;
-    EXCEPTION WHEN duplicate_column THEN null;
-    END $$;
-  `)
-  await db.execute(sql`
-    DO $$ BEGIN
-      ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;
-    EXCEPTION WHEN duplicate_column THEN null;
-    END $$;
-  `)
-  await db.execute(sql`
-    DO $$ BEGIN
-      ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';
-    EXCEPTION WHEN duplicate_column THEN null;
-    END $$;
-  `)
+  // Using simpler ADD COLUMN IF NOT EXISTS syntax (PostgreSQL 9.6+)
+  try {
+    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "route" varchar;`)
+  } catch { /* Column may already exist */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "client_ip" varchar;`)
+  } catch { /* Column may already exist */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "user_email" varchar;`)
+  } catch { /* Column may already exist */ }
+
+  try {
+    await db.execute(sql`ALTER TABLE "support_tickets" ADD COLUMN IF NOT EXISTS "status" varchar DEFAULT 'open';`)
+  } catch { /* Column may already exist */ }
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
