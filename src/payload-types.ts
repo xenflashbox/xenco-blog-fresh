@@ -329,7 +329,15 @@ export interface SupportKbArticle {
         id?: string | null;
       }[]
     | null;
-  body: {
+  /**
+   * Numbered steps (e.g., "1. Click Upload 2. Select file...")
+   */
+  stepsText?: string | null;
+  /**
+   * Keyword soup: synonyms, common phrasing, error messages
+   */
+  triggersText?: string | null;
+  body?: {
     root: {
       type: string;
       children: {
@@ -343,7 +351,7 @@ export interface SupportKbArticle {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -696,6 +704,8 @@ export interface SupportKbArticlesSelect<T extends boolean = true> {
         route?: T;
         id?: T;
       };
+  stepsText?: T;
+  triggersText?: T;
   body?: T;
   updatedAt?: T;
   createdAt?: T;

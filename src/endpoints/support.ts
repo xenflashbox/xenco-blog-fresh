@@ -2,11 +2,125 @@
 // Support API endpoints for widget integration
 // - POST /api/support/ticket - Create support ticket
 // - POST /api/support/answer - Query support docs and generate AI answer
+// - POST /api/support/telemetry - Track widget events
+// - POST /api/support/triage - Run scheduled triage job
 //
-// v1.1: LLM-Synthesized answers with conversation-aware retrieval
+// v1.2: Added telemetry, IP/UA tracking, rate limiting stubs, contact_required enforcement
 
 import type { Endpoint } from 'payload'
 import { getSupportMeiliClient, getSupportIndexName } from '../lib/meiliSupport'
+
+// --- Rate Limiting Configuration ---
+// Stub implementation - can be replaced with Redis-based rate limiting
+const RATE_LIMIT_CONFIG = {
+  enabled: process.env.SUPPORT_RATE_LIMIT_ENABLED === 'true',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: parseInt(process.env.SUPPORT_RATE_LIMIT_MAX || '30', 10),
+}
+
+// In-memory rate limit store (stub - replace with Redis in production)
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
+
+/**
+ * Extract client IP from request headers
+ * Priority: X-Forwarded-For > X-Real-IP > CF-Connecting-IP > socket
+ */
+function extractClientIP(req: { headers: Headers }): string | null {
+  // X-Forwarded-For can have multiple IPs, take the first (client)
+  const xff = req.headers.get('x-forwarded-for')
+  if (xff) {
+    const firstIP = xff.split(',')[0]?.trim()
+    if (firstIP) return firstIP
+  }
+
+  // Cloudflare
+  const cfIP = req.headers.get('cf-connecting-ip')
+  if (cfIP) return cfIP
+
+  // Nginx/standard
+  const realIP = req.headers.get('x-real-ip')
+  if (realIP) return realIP
+
+  return null
+}
+
+/**
+ * Extract User-Agent from request headers
+ */
+function extractUserAgent(req: { headers: Headers }): string | null {
+  return req.headers.get('user-agent') || null
+}
+
+/**
+ * Check rate limit for a given key (stub implementation)
+ * Returns { allowed: boolean, remaining: number, resetAt: number }
+ */
+function checkRateLimit(key: string): { allowed: boolean; remaining: number; resetAt: number } {
+  if (!RATE_LIMIT_CONFIG.enabled) {
+    return { allowed: true, remaining: RATE_LIMIT_CONFIG.maxRequests, resetAt: 0 }
+  }
+
+  const now = Date.now()
+  const existing = rateLimitStore.get(key)
+
+  // Clean up expired entries
+  if (existing && existing.resetAt <= now) {
+    rateLimitStore.delete(key)
+  }
+
+  const entry = rateLimitStore.get(key)
+  if (!entry) {
+    // First request in window
+    const resetAt = now + RATE_LIMIT_CONFIG.windowMs
+    rateLimitStore.set(key, { count: 1, resetAt })
+    return { allowed: true, remaining: RATE_LIMIT_CONFIG.maxRequests - 1, resetAt }
+  }
+
+  if (entry.count >= RATE_LIMIT_CONFIG.maxRequests) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt }
+  }
+
+  entry.count++
+  return { allowed: true, remaining: RATE_LIMIT_CONFIG.maxRequests - entry.count, resetAt: entry.resetAt }
+}
+
+/**
+ * Generate dedupe key for request (stub implementation)
+ * Used to prevent duplicate ticket submissions
+ */
+function generateDedupeKey(appSlug: string, message: string, clientIP: string | null): string {
+  // Simple hash-like key: first 100 chars of message + app + IP
+  const msgPart = message.slice(0, 100).toLowerCase().replace(/\s+/g, '')
+  return `dedupe:${appSlug}:${clientIP || 'anon'}:${msgPart}`
+}
+
+/**
+ * Check if request is a duplicate (stub implementation)
+ * In production, use Redis with TTL
+ */
+const dedupeStore = new Map<string, number>()
+const DEDUPE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+function checkDedupe(key: string): boolean {
+  const now = Date.now()
+  const timestamp = dedupeStore.get(key)
+
+  if (timestamp && timestamp > now - DEDUPE_TTL_MS) {
+    return true // Is duplicate
+  }
+
+  dedupeStore.set(key, now)
+
+  // Cleanup old entries periodically
+  if (dedupeStore.size > 1000) {
+    const cutoff = now - DEDUPE_TTL_MS
+    for (const [k, t] of dedupeStore.entries()) {
+      if (t < cutoff) dedupeStore.delete(k)
+    }
+  }
+
+  return false
+}
 
 // Severity levels for tickets
 const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'] as const
@@ -1024,14 +1138,36 @@ function getDbPool(payload: any): any {
  *   user_agent?: string
  *   sentry_event_id?: string
  *   user_id?: string
+ *   user_email?: string
+ *   force_ticket?: boolean
  *   details?: object
  * }
+ *
+ * v1.2 additions:
+ * - Enforces contact_required when force_ticket=true and anonymous (no user_id/email)
+ * - Extracts IP from headers and stores it
+ * - Rate limiting with 429 response
+ * - Duplicate detection
  */
 export const supportTicketEndpoint: Endpoint = {
   path: '/support/ticket',
   method: 'post',
   handler: async (req) => {
     try {
+      // Extract IP and UA from headers first
+      const clientIP = extractClientIP(req)
+      const headerUA = extractUserAgent(req)
+
+      // Rate limit check (by IP or app_slug if no IP)
+      const rateLimitKey = `ticket:${clientIP || 'global'}`
+      const rateCheck = checkRateLimit(rateLimitKey)
+      if (!rateCheck.allowed) {
+        return Response.json(
+          { ok: false, message: 'rate_limited', retry_after: Math.ceil((rateCheck.resetAt - Date.now()) / 1000) },
+          { status: 429 }
+        )
+      }
+
       // Parse request body
       let body: Record<string, unknown> = {}
       try {
@@ -1061,14 +1197,39 @@ export const supportTicketEndpoint: Endpoint = {
         : 'medium'
 
       const pageUrl = typeof body.page_url === 'string' ? body.page_url : null
-      const userAgent = typeof body.user_agent === 'string' ? body.user_agent : null
+      // Prefer header UA, fallback to body UA
+      const userAgent = headerUA || (typeof body.user_agent === 'string' ? body.user_agent : null)
       const sentryEventId = typeof body.sentry_event_id === 'string' ? body.sentry_event_id : null
       const userId = typeof body.user_id === 'string' ? body.user_id : null
+      const userEmail = typeof body.user_email === 'string' ? body.user_email : null
       const details = typeof body.details === 'object' && body.details !== null ? body.details : {}
 
-      // Smart Ticket: triage and answer-first logic
+      // Support force_ticket from both top-level and details
       const detailsObj =
         typeof details === 'object' && details !== null ? (details as Record<string, unknown>) : {}
+      const forceTicket =
+        body.force_ticket === true ||
+        (typeof detailsObj.force_ticket === 'boolean' && detailsObj.force_ticket === true)
+
+      // PROMPT B: Enforce contact_required when force_ticket=true and anonymous
+      const isAnonymous = !userId && !userEmail
+      if (forceTicket && isAnonymous) {
+        return Response.json({
+          ok: false,
+          needs_contact: true,
+          message: 'Please provide your email address so we can follow up on your ticket.'
+        }, { status: 400 })
+      }
+
+      // Dedupe check
+      const dedupeKey = generateDedupeKey(appSlug, message, clientIP)
+      if (checkDedupe(dedupeKey)) {
+        return Response.json({
+          ok: false,
+          error: 'duplicate',
+          message: 'This ticket appears to be a duplicate. Please wait before submitting again.'
+        }, { status: 409 })
+      }
 
       // Resolve route with fallback: explicit route > page_url > Referer header
       const routeRaw =
@@ -1079,11 +1240,6 @@ export const supportTicketEndpoint: Endpoint = {
             : null
       const referer = req.headers.get('referer') || null
       const route = resolveRoute({ route: routeRaw, pageUrl: pageUrl, referer })
-
-      // Support force_ticket from both top-level and details
-      const forceTicket =
-        body.force_ticket === true ||
-        (typeof detailsObj.force_ticket === 'boolean' && detailsObj.force_ticket === true)
 
       // Parse conversation_history for LLM context
       const conversationHistory = Array.isArray(body.conversation_history)
@@ -1185,13 +1341,13 @@ export const supportTicketEndpoint: Endpoint = {
         )
       }
 
-      // Insert ticket into database
+      // Insert ticket into database with route, client_ip, user_email (v1.2)
       const result = await pool.query(
         `INSERT INTO support_tickets
-         (app_slug, message, severity, page_url, user_agent, sentry_event_id, user_id, details)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+         (app_slug, message, severity, page_url, route, user_agent, client_ip, sentry_event_id, user_id, user_email, details)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb)
          RETURNING id, created_at`,
-        [appSlug, message, severity, pageUrl, userAgent, sentryEventId, userId, JSON.stringify(detailsFinal)],
+        [appSlug, message, severity, pageUrl, route, userAgent, clientIP, sentryEventId, userId, userEmail, JSON.stringify(detailsFinal)],
       )
 
       const ticket = result.rows[0]
@@ -1573,6 +1729,353 @@ export const supportDocEndpoint: Endpoint = {
       console.error('Support doc fetch error:', error)
       return Response.json(
         { ok: false, message: 'internal_error' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * POST /api/support/telemetry
+ * Persist widget telemetry events in the database
+ *
+ * Body: {
+ *   app_slug: string (required)
+ *   event_type: string (required) - e.g., 'widget_open', 'message_sent', 'doc_viewed'
+ *   event_data?: object - Additional event payload
+ *   page_url?: string
+ *   route?: string
+ *   user_id?: string
+ *   session_id?: string
+ * }
+ */
+export const supportTelemetryEndpoint: Endpoint = {
+  path: '/support/telemetry',
+  method: 'post',
+  handler: async (req) => {
+    try {
+      // Extract IP and UA from headers
+      const clientIP = extractClientIP(req)
+      const userAgent = extractUserAgent(req)
+
+      // Rate limit check
+      const rateLimitKey = `telemetry:${clientIP || 'global'}`
+      const rateCheck = checkRateLimit(rateLimitKey)
+      if (!rateCheck.allowed) {
+        return Response.json(
+          { ok: false, message: 'rate_limited' },
+          { status: 429 }
+        )
+      }
+
+      // Parse request body
+      let body: Record<string, unknown> = {}
+      try {
+        body = await req.json?.() || {}
+      } catch {
+        return Response.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 })
+      }
+
+      // Validate required fields
+      const appSlug = typeof body.app_slug === 'string' ? body.app_slug.trim() : ''
+      const eventType = typeof body.event_type === 'string' ? body.event_type.trim() : ''
+
+      if (!appSlug) {
+        return Response.json({ ok: false, error: 'app_slug is required' }, { status: 400 })
+      }
+      if (!isSafeAppSlug(appSlug)) {
+        return Response.json({ ok: false, error: 'Invalid app_slug format' }, { status: 400 })
+      }
+      if (!eventType) {
+        return Response.json({ ok: false, error: 'event_type is required' }, { status: 400 })
+      }
+
+      // Optional fields
+      const eventData = typeof body.event_data === 'object' && body.event_data !== null ? body.event_data : {}
+      const pageUrl = typeof body.page_url === 'string' ? body.page_url : null
+      const route = typeof body.route === 'string' ? body.route : null
+      const userId = typeof body.user_id === 'string' ? body.user_id : null
+      const sessionId = typeof body.session_id === 'string' ? body.session_id : null
+
+      // Get database pool
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      // Insert event into database
+      const result = await pool.query(
+        `INSERT INTO support_events
+         (app_slug, event_type, event_data, page_url, route, user_agent, client_ip, user_id, session_id)
+         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9)
+         RETURNING id, created_at`,
+        [appSlug, eventType, JSON.stringify(eventData), pageUrl, route, userAgent, clientIP, userId, sessionId]
+      )
+
+      return Response.json({
+        ok: true,
+        event_id: result.rows[0].id,
+        created_at: result.rows[0].created_at,
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Support telemetry error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to record event' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * POST /api/support/triage
+ * Scheduled triage job - analyzes tickets from the past period, clusters them,
+ * generates AI-powered insights, and posts a Slack digest.
+ *
+ * Protected by SUPPORT_TRIAGE_TOKEN env var.
+ *
+ * Query params:
+ *   hours?: number - Look back period (default: 24)
+ *   app_slug?: string - Filter by app (optional)
+ */
+export const supportTriageEndpoint: Endpoint = {
+  path: '/support/triage',
+  method: 'post',
+  handler: async (req) => {
+    try {
+      // Auth check
+      const token = process.env.SUPPORT_TRIAGE_TOKEN?.trim()
+      if (token) {
+        const authHeader = req.headers.get('authorization') || ''
+        if (authHeader !== `Bearer ${token}`) {
+          return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+        }
+      }
+
+      // Parse query params
+      const url = req.url ? new URL(req.url) : null
+      const hoursBack = parseInt(url?.searchParams.get('hours') || '24', 10)
+      const appSlugFilter = url?.searchParams.get('app_slug') || null
+
+      // Get database pool
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      // Calculate time window
+      const periodEnd = new Date()
+      const periodStart = new Date(periodEnd.getTime() - hoursBack * 60 * 60 * 1000)
+
+      // Fetch tickets in the period
+      let ticketQuery = `
+        SELECT id, app_slug, message, severity, route, page_url, details, created_at
+        FROM support_tickets
+        WHERE created_at >= $1 AND created_at <= $2
+      `
+      const ticketParams: unknown[] = [periodStart.toISOString(), periodEnd.toISOString()]
+
+      if (appSlugFilter) {
+        ticketQuery += ` AND app_slug = $3`
+        ticketParams.push(appSlugFilter)
+      }
+      ticketQuery += ` ORDER BY created_at DESC LIMIT 500`
+
+      const ticketResult = await pool.query(ticketQuery, ticketParams)
+      const tickets = ticketResult.rows
+
+      // Fetch events in the period
+      let eventQuery = `
+        SELECT COUNT(*) as count, event_type, app_slug
+        FROM support_events
+        WHERE created_at >= $1 AND created_at <= $2
+      `
+      const eventParams: unknown[] = [periodStart.toISOString(), periodEnd.toISOString()]
+
+      if (appSlugFilter) {
+        eventQuery += ` AND app_slug = $3`
+        eventParams.push(appSlugFilter)
+      }
+      eventQuery += ` GROUP BY event_type, app_slug`
+
+      const eventResult = await pool.query(eventQuery, eventParams)
+      const eventSummary = eventResult.rows
+
+      // Simple clustering by category from triage data
+      const clusters: Record<string, { count: number; examples: string[]; severity_breakdown: Record<string, number> }> = {}
+
+      for (const ticket of tickets) {
+        const category = ticket.details?.triage?.category || 'unknown'
+        if (!clusters[category]) {
+          clusters[category] = { count: 0, examples: [], severity_breakdown: {} }
+        }
+        clusters[category].count++
+        if (clusters[category].examples.length < 3) {
+          clusters[category].examples.push(ticket.message.slice(0, 100))
+        }
+        const sev = ticket.severity || 'medium'
+        clusters[category].severity_breakdown[sev] = (clusters[category].severity_breakdown[sev] || 0) + 1
+      }
+
+      // Generate suggested actions based on clusters
+      const suggestedActions: string[] = []
+      if (clusters['system_failure']?.count > 5) {
+        suggestedActions.push(`High volume of system failures (${clusters['system_failure'].count}) - investigate infrastructure`)
+      }
+      if (clusters['valid_bug']?.count > 10) {
+        suggestedActions.push(`Multiple bug reports (${clusters['valid_bug'].count}) - prioritize bug triage`)
+      }
+      if (clusters['feature_request']?.count > 5) {
+        suggestedActions.push(`Feature requests trending (${clusters['feature_request'].count}) - review product roadmap`)
+      }
+      if (tickets.length === 0) {
+        suggestedActions.push('No tickets in period - systems running smoothly')
+      }
+
+      // AI summary (if enabled)
+      let aiSummary: string | null = null
+      if (LLM_CONFIG.enabled && tickets.length > 0) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const ticketSummaries = tickets.slice(0, 20).map((t: any) =>
+            `[${t.severity}] ${t.details?.triage?.category || 'unknown'}: ${t.message.slice(0, 80)}`
+          ).join('\n')
+
+          aiSummary = await callAIGateway({
+            model: LLM_CONFIG.model,
+            system: 'You are a support triage assistant. Summarize the ticket patterns and suggest priorities. Be concise (3-5 sentences).',
+            user: `Summarize these ${tickets.length} support tickets from the last ${hoursBack} hours:\n\n${ticketSummaries}`,
+            maxTokens: 200,
+          })
+        } catch (err) {
+          console.error('AI triage summary failed (non-fatal):', err)
+        }
+      }
+
+      // Store triage report
+      const reportDate = periodEnd.toISOString().split('T')[0]
+      const reportResult = await pool.query(
+        `INSERT INTO support_triage_reports
+         (app_slug, report_date, period_start, period_end, ticket_count, event_count, clusters, suggested_actions, ai_summary)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb, $9)
+         RETURNING id`,
+        [
+          appSlugFilter,
+          reportDate,
+          periodStart.toISOString(),
+          periodEnd.toISOString(),
+          tickets.length,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          eventSummary.reduce((sum: number, e: any) => sum + parseInt(e.count, 10), 0),
+          JSON.stringify(clusters),
+          JSON.stringify(suggestedActions),
+          aiSummary,
+        ]
+      )
+
+      const reportId = reportResult.rows[0].id
+
+      // Post Slack digest
+      let slackPosted = false
+      const slackWebhook = process.env.SUPPORT_SLACK_WEBHOOK_URL
+      if (slackWebhook && tickets.length > 0) {
+        try {
+          const clusterSummary = Object.entries(clusters)
+            .sort((a, b) => b[1].count - a[1].count)
+            .slice(0, 5)
+            .map(([cat, data]) => `• ${cat}: ${data.count} tickets`)
+            .join('\n')
+
+          const slackPayload = {
+            blocks: [
+              {
+                type: 'header',
+                text: {
+                  type: 'plain_text',
+                  text: `📊 Support Triage Report #${reportId}`,
+                  emoji: true,
+                },
+              },
+              {
+                type: 'section',
+                fields: [
+                  { type: 'mrkdwn', text: `*Period:*\n${hoursBack}h ending ${periodEnd.toISOString().slice(0, 16)}` },
+                  { type: 'mrkdwn', text: `*Total Tickets:*\n${tickets.length}` },
+                ],
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*Top Clusters:*\n${clusterSummary || 'None'}`,
+                },
+              },
+              ...(suggestedActions.length > 0 ? [{
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*Suggested Actions:*\n${suggestedActions.map(a => `• ${a}`).join('\n')}`,
+                },
+              }] : []),
+              ...(aiSummary ? [{
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*AI Summary:*\n${aiSummary}`,
+                },
+              }] : []),
+            ],
+          }
+
+          const slackResp = await fetch(slackWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(slackPayload),
+          })
+
+          if (slackResp.ok) {
+            slackPosted = true
+            // Update report with slack_posted flag
+            await pool.query(
+              `UPDATE support_triage_reports SET slack_posted = true WHERE id = $1`,
+              [reportId]
+            )
+          }
+        } catch (err) {
+          console.error('Slack triage digest failed (non-fatal):', err)
+        }
+      }
+
+      return Response.json({
+        ok: true,
+        report_id: reportId,
+        period: {
+          start: periodStart.toISOString(),
+          end: periodEnd.toISOString(),
+          hours: hoursBack,
+        },
+        summary: {
+          ticket_count: tickets.length,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          event_count: eventSummary.reduce((sum: number, e: any) => sum + parseInt(e.count, 10), 0),
+          clusters,
+          suggested_actions: suggestedActions,
+          ai_summary: aiSummary,
+        },
+        slack_posted: slackPosted,
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Support triage error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Triage failed' },
         { status: 500 }
       )
     }

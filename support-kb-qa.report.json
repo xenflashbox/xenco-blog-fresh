@@ -1,0 +1,890 @@
+{
+  "timestamp": "2025-12-27T21:20:02.373Z",
+  "suiteFile": "/home/xen/docker/apps/xenco-blog-fresh/data/kb_qa_suite.all_phases.json",
+  "total": 169,
+  "passed": 144,
+  "failed": 25,
+  "failures": [
+    {
+      "testName": "PHASE 1: ATS EXPLAINED: why am i not getting callbacks",
+      "query": "why am i not getting callbacks",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "What is ATS and why does my resume get rejected",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 1: SCORE MEANING: i got a 45 is that bad",
+      "query": "i got a 45 is that bad",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "What does my resume score mean on the Results page",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: UPLOAD ERRORS: upload failed",
+      "query": "upload failed",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix upload failed or file rejected error on Submit page",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: UPLOAD ERRORS: unsupported file type error",
+      "query": "unsupported file type error",
+      "route": "/upload",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix upload failed or file rejected error on Submit page",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: WHITE SCREEN: white screen wont load",
+      "query": "white screen wont load",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix white screen or blank page not loading",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_19",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page",
+            "summary": "A blank or white page usually means a browser compatibility issue or JavaScript error. Try refreshing, clearing cache, or using a different browser."
+          },
+          {
+            "id": "support_kb_articles_28",
+            "type": "support_kb_articles",
+            "title": "What to do if you do not have a job description",
+            "summary": "You have three options: (1) Enter just the job title and we search Indeed for matching descriptions, (2) Use the Job Search page to find real listings and click Create Resume for This Job, or (3) Describe the role yourself. Real job postings produce better keyword matches than generic titles."
+          },
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_47",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page not loading",
+            "summary": "A blank page usually means a browser compatibility issue. Try: hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac), clear browser cache, disable extensions (especially ad blockers), try Incognito mode, or use Chrome browser."
+          },
+          {
+            "id": "support_kb_articles_30",
+            "type": "support_kb_articles",
+            "title": "How to create a resume for a job from Job Search results",
+            "summary": "From the Job Search page, click any job listing to view details. Click the Create Resume for This Job button—we automatically extract all requirements from that posting and generate a targeted resume in 30-60 seconds. Then edit if needed, download as PDF or Word, and click Apply to go to the employer's application page."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9825992348158775
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix white screen or blank page not loading\" not found in top 3 sources. Got: Fix white screen or blank page, What to do if you do not have a job description, What processing means and how long resume analysis takes"
+    },
+    {
+      "testName": "PHASE 2: WHITE SCREEN: page is empty",
+      "query": "page is empty",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix white screen or blank page not loading",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_19",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page",
+            "summary": "A blank or white page usually means a browser compatibility issue or JavaScript error. Try refreshing, clearing cache, or using a different browser."
+          },
+          {
+            "id": "support_kb_articles_53",
+            "type": "support_kb_articles",
+            "title": "How to download your resume as PDF or Word from the Results page",
+            "summary": "From the Results page, click the Download button and choose PDF or Word (DOCX) format. PDF is best for online applications and email. Word is best if you need to make additional edits in Microsoft Word or Google Docs."
+          },
+          {
+            "id": "support_kb_articles_26",
+            "type": "support_kb_articles",
+            "title": "What is SPOR Analysis on the Results page",
+            "summary": "SPOR stands for Skills, Position, Optimization, and Recommendations. It is our methodology for measuring how well your resume matches a specific job. We analyze your skills fit, experience level, missing keywords, and provide specific improvement advice. Your overall score (0-100) reflects genuine match quality using O*NET government data."
+          },
+          {
+            "id": "support_kb_articles_27",
+            "type": "support_kb_articles",
+            "title": "What does my resume score mean on the Results page",
+            "summary": "Your SPOR score (0-100) honestly reflects how well your resume matches the target job. Scores 70+ mean genuinely qualified. Scores 50-69 mean partial match with gaps. Scores below 50 indicate significant gaps—we explain exactly what is missing and suggest alternatives. A low score is valuable feedback, not failure."
+          },
+          {
+            "id": "support_kb_articles_47",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page not loading",
+            "summary": "A blank page usually means a browser compatibility issue. Try: hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac), clear browser cache, disable extensions (especially ad blockers), try Incognito mode, or use Chrome browser."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9218106995884774
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix white screen or blank page not loading\" not found in top 3 sources. Got: Fix white screen or blank page, How to download your resume as PDF or Word from the Results page, What is SPOR Analysis on the Results page"
+    },
+    {
+      "testName": "PHASE 2: STUCK SPINNING: stuck spinning forever",
+      "query": "stuck spinning forever",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix stuck spinning or loading forever after Submit",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_18",
+            "type": "support_kb_articles",
+            "title": "Fix stuck spinning or processing forever",
+            "summary": "If your resume is stuck processing for more than 2 minutes, try refreshing the page. Normal processing takes 30-60 seconds. Extended delays may indicate a temporary server issue."
+          },
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_7",
+            "type": "support_kb_articles",
+            "title": "Fix upload errors",
+            "summary": "Common upload errors include unsupported file types, files too large, or corrupted files. Here is how to troubleshoot upload issues."
+          },
+          {
+            "id": "support_kb_articles_33",
+            "type": "support_kb_articles",
+            "title": "Fix upload failed or file rejected error on Submit page",
+            "summary": "Upload failures are usually caused by unsupported file types (only PDF/DOC/DOCX/TXT work), files over 5MB, corrupted files, or password-protected PDFs. Try saving as a different format or use the Paste Text option instead."
+          },
+          {
+            "id": "support_kb_articles_48",
+            "type": "support_kb_articles",
+            "title": "Fix stuck spinning or loading forever after Submit",
+            "summary": "Normal processing takes 30-60 seconds. If stuck loading over 2 minutes: refresh the page (F5), check your internet connection, try a different browser. Do not click Submit again—this creates duplicates. Your submission is saved and will appear on Dashboard."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9880460041750364
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix stuck spinning or loading forever after Submit\" not found in top 3 sources. Got: Fix stuck spinning or processing forever, What processing means and how long resume analysis takes, Fix upload errors"
+    },
+    {
+      "testName": "PHASE 2: STUCK SPINNING: loading never finishes",
+      "query": "loading never finishes",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix stuck spinning or loading forever after Submit",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_18",
+            "type": "support_kb_articles",
+            "title": "Fix stuck spinning or processing forever",
+            "summary": "If your resume is stuck processing for more than 2 minutes, try refreshing the page. Normal processing takes 30-60 seconds. Extended delays may indicate a temporary server issue."
+          },
+          {
+            "id": "support_kb_articles_21",
+            "type": "support_kb_articles",
+            "title": "Fix connection errors or failed to fetch",
+            "summary": "Connection errors usually indicate network issues on your end or temporary server maintenance. Check your internet connection and try again."
+          },
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_48",
+            "type": "support_kb_articles",
+            "title": "Fix stuck spinning or loading forever after Submit",
+            "summary": "Normal processing takes 30-60 seconds. If stuck loading over 2 minutes: refresh the page (F5), check your internet connection, try a different browser. Do not click Submit again—this creates duplicates. Your submission is saved and will appear on Dashboard."
+          },
+          {
+            "id": "support_kb_articles_47",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page not loading",
+            "summary": "A blank page usually means a browser compatibility issue. Try: hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac), clear browser cache, disable extensions (especially ad blockers), try Incognito mode, or use Chrome browser."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9529816062074127
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix stuck spinning or loading forever after Submit\" not found in top 3 sources. Got: Fix stuck spinning or processing forever, Fix connection errors or failed to fetch, What processing means and how long resume analysis takes"
+    },
+    {
+      "testName": "PHASE 2: STUCK SPINNING: processing stuck",
+      "query": "processing stuck",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix stuck spinning or loading forever after Submit",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_18",
+            "type": "support_kb_articles",
+            "title": "Fix stuck spinning or processing forever",
+            "summary": "If your resume is stuck processing for more than 2 minutes, try refreshing the page. Normal processing takes 30-60 seconds. Extended delays may indicate a temporary server issue."
+          },
+          {
+            "id": "support_kb_articles_35",
+            "type": "support_kb_articles",
+            "title": "Where to find your results on the Results page after submission",
+            "summary": "After submitting, you are automatically redirected to the Results page showing your SPOR score. If you navigated away, click Results or My Resumes in the top navigation, or go to your Dashboard and click on any submission to view its results."
+          },
+          {
+            "id": "support_kb_articles_5",
+            "type": "support_kb_articles",
+            "title": "Upload a resume",
+            "summary": "Learn how to upload your resume to ResumeCoach for analysis. We support PDF, DOC, DOCX, and TXT files up to 5MB. Most resumes are processed within 30 seconds."
+          },
+          {
+            "id": "support_kb_articles_58",
+            "type": "support_kb_articles",
+            "title": "How to create a new resume for a different job from your existing profile",
+            "summary": "From the Dashboard, click New Resume or Create New to start a new submission. Your work history is already saved in your profile—just enter a new job description or use Job Search to find a new listing. We generate a fresh resume optimized for that different job."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9952601410934744
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix stuck spinning or loading forever after Submit\" not found in top 3 sources. Got: What processing means and how long resume analysis takes, Fix stuck spinning or processing forever, Where to find your results on the Results page after submission"
+    },
+    {
+      "testName": "PHASE 2: 500 ERROR: 500 error",
+      "query": "500 error",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 500 error or Something went wrong server error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: 500 ERROR: something went wrong",
+      "query": "something went wrong",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 500 error or Something went wrong server error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_20",
+            "type": "support_kb_articles",
+            "title": "Fix 500 or 404 errors",
+            "summary": "A 500 error means a server-side issue - please try again in a few minutes. A 404 error means the page does not exist - check the URL or navigate from the homepage."
+          },
+          {
+            "id": "support_kb_articles_33",
+            "type": "support_kb_articles",
+            "title": "Fix upload failed or file rejected error on Submit page",
+            "summary": "Upload failures are usually caused by unsupported file types (only PDF/DOC/DOCX/TXT work), files over 5MB, corrupted files, or password-protected PDFs. Try saving as a different format or use the Paste Text option instead."
+          },
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_49",
+            "type": "support_kb_articles",
+            "title": "Fix 500 error or Something went wrong server error",
+            "summary": "A 500 error means something went wrong on our servers—not caused by you. Wait 2-3 minutes and try again. If it persists over 10 minutes, submit a support ticket with: the exact URL, what action you attempted, the time it happened, and the full error message."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9908385521288747
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix 500 error or Something went wrong server error\" not found in top 3 sources. Got: Fix 500 or 404 errors, Fix upload failed or file rejected error on Submit page, What processing means and how long resume analysis takes"
+    },
+    {
+      "testName": "PHASE 2: 500 ERROR: internal server error",
+      "query": "internal server error",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 500 error or Something went wrong server error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: 404 ERROR: page not found",
+      "query": "page not found",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 404 page not found error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_20",
+            "type": "support_kb_articles",
+            "title": "Fix 500 or 404 errors",
+            "summary": "A 500 error means a server-side issue - please try again in a few minutes. A 404 error means the page does not exist - check the URL or navigate from the homepage."
+          },
+          {
+            "id": "support_kb_articles_68",
+            "type": "support_kb_articles",
+            "title": "Fix job search showing no results or wrong results",
+            "summary": "If Job Search returns no results: try broader search terms, check your spelling, use common job titles, and try a larger location area. If results seem wrong, the search uses Google Jobs which may include related roles."
+          },
+          {
+            "id": "support_kb_articles_28",
+            "type": "support_kb_articles",
+            "title": "What to do if you do not have a job description",
+            "summary": "You have three options: (1) Enter just the job title and we search Indeed for matching descriptions, (2) Use the Job Search page to find real listings and click Create Resume for This Job, or (3) Describe the role yourself. Real job postings produce better keyword matches than generic titles."
+          },
+          {
+            "id": "support_kb_articles_37",
+            "type": "support_kb_articles",
+            "title": "How to improve your resume score on the Results page",
+            "summary": "To improve your score: provide a complete job description (not just title), ensure your profile lists all relevant skills and achievements with specific numbers, and verify the role matches your experience level. Review the Recommendations section on Results for specific improvement guidance."
+          },
+          {
+            "id": "support_kb_articles_50",
+            "type": "support_kb_articles",
+            "title": "Fix 404 page not found error",
+            "summary": "A 404 error means that specific page does not exist. Check the URL for typos. Navigate fresh from the Dashboard or homepage instead of using old bookmarks. Old links from emails or expired pages may no longer work."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9942199377683248
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix 404 page not found error\" not found in top 3 sources. Got: Fix 500 or 404 errors, Fix job search showing no results or wrong results, What to do if you do not have a job description"
+    },
+    {
+      "testName": "PHASE 2: 404 ERROR: 404 error",
+      "query": "404 error",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 404 page not found error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: 404 ERROR: this page doesnt exist",
+      "query": "this page doesnt exist",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix 404 page not found error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_19",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page",
+            "summary": "A blank or white page usually means a browser compatibility issue or JavaScript error. Try refreshing, clearing cache, or using a different browser."
+          },
+          {
+            "id": "support_kb_articles_26",
+            "type": "support_kb_articles",
+            "title": "What is SPOR Analysis on the Results page",
+            "summary": "SPOR stands for Skills, Position, Optimization, and Recommendations. It is our methodology for measuring how well your resume matches a specific job. We analyze your skills fit, experience level, missing keywords, and provide specific improvement advice. Your overall score (0-100) reflects genuine match quality using O*NET government data."
+          },
+          {
+            "id": "support_kb_articles_35",
+            "type": "support_kb_articles",
+            "title": "Where to find your results on the Results page after submission",
+            "summary": "After submitting, you are automatically redirected to the Results page showing your SPOR score. If you navigated away, click Results or My Resumes in the top navigation, or go to your Dashboard and click on any submission to view its results."
+          },
+          {
+            "id": "support_kb_articles_50",
+            "type": "support_kb_articles",
+            "title": "Fix 404 page not found error",
+            "summary": "A 404 error means that specific page does not exist. Check the URL for typos. Navigate fresh from the Dashboard or homepage instead of using old bookmarks. Old links from emails or expired pages may no longer work."
+          },
+          {
+            "id": "support_kb_articles_47",
+            "type": "support_kb_articles",
+            "title": "Fix white screen or blank page not loading",
+            "summary": "A blank page usually means a browser compatibility issue. Try: hard refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac), clear browser cache, disable extensions (especially ad blockers), try Incognito mode, or use Chrome browser."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.5,
+          "rankingScore": 0.32525252525252524
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix 404 page not found error\" not found in top 3 sources. Got: Fix white screen or blank page, What is SPOR Analysis on the Results page, Where to find your results on the Results page after submission"
+    },
+    {
+      "testName": "PHASE 2: CONNECTION ERROR: failed to fetch",
+      "query": "failed to fetch",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix failed to fetch or connection error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: CONNECTION ERROR: connection error",
+      "query": "connection error",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix failed to fetch or connection error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "PHASE 2: CONNECTION ERROR: network error",
+      "query": "network error",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix failed to fetch or connection error",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: what if my score is still low...",
+      "query": "follow-up: what if my score is still low after updating",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "How to improve your resume score on the Results page",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_55",
+            "type": "support_kb_articles",
+            "title": "How to apply to a job using the Apply button",
+            "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form."
+          },
+          {
+            "id": "support_kb_articles_65",
+            "type": "support_kb_articles",
+            "title": "How the AI Coach helps during resume submission",
+            "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.45454545454545453,
+          "rankingScore": 0.08874458874458875
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"How to improve your resume score on the Results page\" not found in top 3 sources. Got: How to apply to a job using the Apply button, How the AI Coach helps during resume submission"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: how long is the reset link va...",
+      "query": "follow-up: how long is the reset link valid",
+      "route": "/forgot-password",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "How to reset your password using Forgot Password",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_65",
+            "type": "support_kb_articles",
+            "title": "How the AI Coach helps during resume submission",
+            "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help."
+          },
+          {
+            "id": "support_kb_articles_55",
+            "type": "support_kb_articles",
+            "title": "How to apply to a job using the Apply button",
+            "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.5555555555555556,
+          "rankingScore": 0.3228493043307858
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"How to reset your password using Forgot Password\" not found in top 3 sources. Got: How the AI Coach helps during resume submission, How to apply to a job using the Apply button"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: what info should I include in...",
+      "query": "follow-up: what info should I include in a ticket",
+      "route": "/submit",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix stuck spinning or loading forever after Submit",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_65",
+            "type": "support_kb_articles",
+            "title": "How the AI Coach helps during resume submission",
+            "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help."
+          },
+          {
+            "id": "support_kb_articles_55",
+            "type": "support_kb_articles",
+            "title": "How to apply to a job using the Apply button",
+            "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.625,
+          "rankingScore": 0.38741916519694297
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix stuck spinning or loading forever after Submit\" not found in top 3 sources. Got: How the AI Coach helps during resume submission, How to apply to a job using the Apply button"
+    },
+    {
+      "testName": "PHASE 3: DASHBOARD TRACKING: how do I see all my resumes",
+      "query": "how do I see all my resumes",
+      "route": "/dashboard",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "How to view and track your job applications on the Dashboard",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_57",
+            "type": "support_kb_articles",
+            "title": "How to access and reuse a previous resume from the Dashboard",
+            "summary": "Go to the Dashboard to see all your previous resume submissions. Click any card to open that resume. You can view the results, edit it again, download it in PDF or Word, or use it as reference for a new application."
+          },
+          {
+            "id": "support_kb_articles_23",
+            "type": "support_kb_articles",
+            "title": "Why you need a different resume for every job application",
+            "summary": "One generic resume does not work because Applicant Tracking Systems (ATS) scan for job-specific keywords. Each job posting uses different terminology, so each application needs a resume tailored to that exact job description. ResumeCoach stores your work history once and generates a fresh, keyword-optimized resume for each job you apply to."
+          },
+          {
+            "id": "support_kb_articles_37",
+            "type": "support_kb_articles",
+            "title": "How to improve your resume score on the Results page",
+            "summary": "To improve your score: provide a complete job description (not just title), ensure your profile lists all relevant skills and achievements with specific numbers, and verify the role matches your experience level. Review the Recommendations section on Results for specific improvement guidance."
+          },
+          {
+            "id": "support_kb_articles_36",
+            "type": "support_kb_articles",
+            "title": "What processing means and how long resume analysis takes",
+            "summary": "When you see 'Processing' after submitting, we are running SPOR analysis—parsing your resume, analyzing the job description, cross-referencing O*NET data, and generating your optimized resume. This typically takes 30-60 seconds. If stuck over 2 minutes, refresh the page."
+          },
+          {
+            "id": "support_kb_articles_39",
+            "type": "support_kb_articles",
+            "title": "How to upgrade your plan from the Billing page",
+            "summary": "Click Pricing in the navigation or go to Account Settings > Billing. Click Upgrade on your desired plan and enter payment details. The upgrade takes effect immediately—additional resume credits are available right away."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 1,
+          "rankingScore": 0.9897298042459333
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"How to view and track your job applications on the Dashboard\" not found in top 3 sources. Got: How to access and reuse a previous resume from the Dashboard, Why you need a different resume for every job application, How to improve your resume score on the Results page"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: I edited but still dont see c...",
+      "query": "follow-up: I edited but still dont see changes",
+      "route": "/editor",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix Resume Editor not saving or changes lost",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_65",
+            "type": "support_kb_articles",
+            "title": "How the AI Coach helps during resume submission",
+            "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help."
+          },
+          {
+            "id": "support_kb_articles_55",
+            "type": "support_kb_articles",
+            "title": "How to apply to a job using the Apply button",
+            "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.375,
+          "rankingScore": 0.27672797514067354
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix Resume Editor not saving or changes lost\" not found in top 3 sources. Got: How the AI Coach helps during resume submission, How to apply to a job using the Apply button"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: tried different browser and s...",
+      "query": "follow-up: tried different browser and search still empty",
+      "route": "/jobs",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix job search showing no results or wrong results",
+        "topN": 3
+      },
+      "got": {
+        "resolved": true,
+        "sources": [
+          {
+            "id": "support_kb_articles_55",
+            "type": "support_kb_articles",
+            "title": "How to apply to a job using the Apply button",
+            "summary": "After downloading your optimized resume, click the Apply button on the Results page or Job details page. This opens the employer's application page in a new tab. Upload your downloaded resume and complete their application form."
+          },
+          {
+            "id": "support_kb_articles_65",
+            "type": "support_kb_articles",
+            "title": "How the AI Coach helps during resume submission",
+            "summary": "The AI Coach is the chat interface that guides you through the submission process. It can answer questions about what to enter, help you understand options, and explain features. Type your questions in the chat to get immediate help."
+          }
+        ],
+        "gate": {
+          "passed": true,
+          "reason": "passed",
+          "lexicalScore": 0.4444444444444444,
+          "rankingScore": 0.07765151515151515
+        },
+        "triage": {
+          "category": "user_error",
+          "action": "answer_now",
+          "reason": "kb_hit",
+          "forced": false
+        }
+      },
+      "reason": "Expected title \"Fix job search showing no results or wrong results\" not found in top 3 sources. Got: How to apply to a job using the Apply button, How the AI Coach helps during resume submission"
+    },
+    {
+      "testName": "FOLLOW-UP TESTS: follow-up: what info to include when rep...",
+      "query": "follow-up: what info to include when reporting bug",
+      "route": "/results",
+      "expected": {
+        "resolved": true,
+        "expectedTitle": "Fix downloaded resume has wrong formatting or looks different",
+        "topN": 3
+      },
+      "got": {
+        "resolved": false,
+        "sources": []
+      },
+      "reason": "Expected resolved=true, got resolved=false"
+    }
+  ]
+}
