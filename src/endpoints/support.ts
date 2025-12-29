@@ -19,8 +19,31 @@ const RATE_LIMIT_CONFIG = {
   maxRequests: parseInt(process.env.SUPPORT_RATE_LIMIT_MAX || '30', 10),
 }
 
+// --- Telemetry Abuse Protection Configuration ---
+const TELEMETRY_CONFIG = {
+  // Max body size in bytes (default 10KB)
+  maxBodySize: parseInt(process.env.SUPPORT_TELEMETRY_MAX_BODY_SIZE || '10240', 10),
+  // Allowlist of event types (comma-separated, empty = allow all)
+  allowlist: (process.env.SUPPORT_TELEMETRY_ALLOWLIST || '').split(',').map(s => s.trim()).filter(Boolean),
+  // Whether to drop abusive requests entirely (vs storing with is_abuse flag)
+  dropAbuse: process.env.SUPPORT_TELEMETRY_DROP_ABUSE === 'true',
+  // Rate limit per IP+session (stricter than general rate limit)
+  rateLimit: {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: parseInt(process.env.SUPPORT_TELEMETRY_RATE_LIMIT || '60', 10),
+  },
+  // Dedupe window for identical events
+  dedupeWindowMs: parseInt(process.env.SUPPORT_TELEMETRY_DEDUPE_WINDOW || '5000', 10), // 5 seconds
+}
+
 // In-memory rate limit store (stub - replace with Redis in production)
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
+
+// Telemetry-specific rate limit store (per IP+session)
+const telemetryRateLimitStore = new Map<string, { count: number; resetAt: number }>()
+
+// Telemetry dedupe store (hash -> timestamp)
+const telemetryDedupeStore = new Map<string, number>()
 
 /**
  * Extract client IP from request headers
@@ -121,6 +144,142 @@ function checkDedupe(key: string): boolean {
   }
 
   return false
+}
+
+/**
+ * Check telemetry-specific rate limit (by IP + session_id)
+ * Stricter than general rate limit, designed for high-volume telemetry
+ */
+function checkTelemetryRateLimit(clientIP: string | null, sessionId: string | null): {
+  allowed: boolean
+  remaining: number
+  resetAt: number
+  isAbuse: boolean
+} {
+  const key = `telemetry:${clientIP || 'anon'}:${sessionId || 'no-session'}`
+  const now = Date.now()
+  const existing = telemetryRateLimitStore.get(key)
+
+  // Clean up expired entries
+  if (existing && existing.resetAt <= now) {
+    telemetryRateLimitStore.delete(key)
+  }
+
+  const entry = telemetryRateLimitStore.get(key)
+  if (!entry) {
+    const resetAt = now + TELEMETRY_CONFIG.rateLimit.windowMs
+    telemetryRateLimitStore.set(key, { count: 1, resetAt })
+    return { allowed: true, remaining: TELEMETRY_CONFIG.rateLimit.maxRequests - 1, resetAt, isAbuse: false }
+  }
+
+  if (entry.count >= TELEMETRY_CONFIG.rateLimit.maxRequests) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt, isAbuse: true }
+  }
+
+  entry.count++
+  return {
+    allowed: true,
+    remaining: TELEMETRY_CONFIG.rateLimit.maxRequests - entry.count,
+    resetAt: entry.resetAt,
+    isAbuse: false,
+  }
+}
+
+/**
+ * Generate hash for telemetry event deduplication
+ * Uses: app_slug + event_type + stringified event_data + clientIP + sessionId
+ */
+function generateTelemetryHash(
+  appSlug: string,
+  eventType: string,
+  eventData: unknown,
+  clientIP: string | null,
+  sessionId: string | null
+): string {
+  // Simple string-based hash (not cryptographic, just for dedupe)
+  const payload = `${appSlug}:${eventType}:${JSON.stringify(eventData)}:${clientIP || ''}:${sessionId || ''}`
+  // Simple hash: sum of char codes mod large prime
+  let hash = 0
+  for (let i = 0; i < payload.length; i++) {
+    hash = ((hash << 5) - hash + payload.charCodeAt(i)) | 0
+  }
+  return `telem:${hash.toString(36)}`
+}
+
+/**
+ * Check if telemetry event is a duplicate (within dedupe window)
+ */
+function checkTelemetryDedupe(hash: string): boolean {
+  const now = Date.now()
+  const timestamp = telemetryDedupeStore.get(hash)
+
+  if (timestamp && timestamp > now - TELEMETRY_CONFIG.dedupeWindowMs) {
+    return true // Is duplicate
+  }
+
+  telemetryDedupeStore.set(hash, now)
+
+  // Cleanup old entries periodically
+  if (telemetryDedupeStore.size > 5000) {
+    const cutoff = now - TELEMETRY_CONFIG.dedupeWindowMs
+    for (const [k, t] of telemetryDedupeStore.entries()) {
+      if (t < cutoff) telemetryDedupeStore.delete(k)
+    }
+  }
+
+  return false
+}
+
+/**
+ * Validate event type against allowlist
+ * Returns true if allowed, false if blocked
+ */
+function isEventTypeAllowed(eventType: string): boolean {
+  // If no allowlist configured, allow all
+  if (!TELEMETRY_CONFIG.allowlist.length) return true
+  return TELEMETRY_CONFIG.allowlist.includes(eventType)
+}
+
+/**
+ * Detect abuse patterns in telemetry event
+ * Returns: { isAbuse: boolean, reason: string | null }
+ */
+function detectTelemetryAbuse(
+  eventType: string,
+  eventData: unknown,
+  bodySize: number,
+  isRateLimited: boolean,
+  isDuplicate: boolean,
+  isAllowed: boolean
+): { isAbuse: boolean; reason: string | null } {
+  // Priority order of abuse checks
+  if (!isAllowed) {
+    return { isAbuse: true, reason: 'event_type_not_allowed' }
+  }
+  if (bodySize > TELEMETRY_CONFIG.maxBodySize) {
+    return { isAbuse: true, reason: 'body_too_large' }
+  }
+  if (isRateLimited) {
+    return { isAbuse: true, reason: 'rate_limited' }
+  }
+  if (isDuplicate) {
+    return { isAbuse: true, reason: 'duplicate' }
+  }
+
+  // Check for suspicious patterns in event_data
+  if (eventData && typeof eventData === 'object') {
+    const dataStr = JSON.stringify(eventData)
+    // Check for extremely large nested data
+    if (dataStr.length > 5000) {
+      return { isAbuse: true, reason: 'event_data_too_large' }
+    }
+    // Check for script injection attempts
+    if (/<script|javascript:|on\w+=/i.test(dataStr)) {
+      return { isAbuse: true, reason: 'suspicious_content' }
+    }
+  }
+
+  return { isAbuse: false, reason: null }
 }
 
 // Severity levels for tickets
@@ -1139,7 +1298,8 @@ function getDbPool(payload: any): any {
  *   user_agent?: string
  *   sentry_event_id?: string
  *   user_id?: string
- *   user_email?: string
+ *   user_email?: string (preferred)
+ *   email?: string (fallback for user_email)
  *   force_ticket?: boolean
  *   details?: object
  * }
@@ -1149,6 +1309,9 @@ function getDbPool(payload: any): any {
  * - Extracts IP from headers and stores it
  * - Rate limiting with 429 response
  * - Duplicate detection
+ *
+ * v1.3 additions:
+ * - Accepts body.email as fallback for user_email (anonymous ticket contact correctness)
  */
 export const supportTicketEndpoint: Endpoint = {
   path: '/support/ticket',
@@ -1202,7 +1365,14 @@ export const supportTicketEndpoint: Endpoint = {
       const userAgent = headerUA || (typeof body.user_agent === 'string' ? body.user_agent : null)
       const sentryEventId = typeof body.sentry_event_id === 'string' ? body.sentry_event_id : null
       const userId = typeof body.user_id === 'string' ? body.user_id : null
-      const userEmail = typeof body.user_email === 'string' ? body.user_email : null
+      // PROMPT 2: Accept both user_email and email for anonymous ticket contact correctness
+      // Priority: user_email > email (for backward compatibility)
+      const userEmail =
+        typeof body.user_email === 'string' && body.user_email.trim()
+          ? body.user_email.trim()
+          : typeof body.email === 'string' && body.email.trim()
+            ? body.email.trim()
+            : null
       const details = typeof body.details === 'object' && body.details !== null ? body.details : {}
 
       // Support force_ticket from both top-level and details
@@ -1740,6 +1910,13 @@ export const supportDocEndpoint: Endpoint = {
  * POST /api/support/telemetry
  * Persist widget telemetry events in the database
  *
+ * v1.3: Added abuse protection:
+ * - Max body size validation
+ * - Event type allowlist (SUPPORT_TELEMETRY_ALLOWLIST)
+ * - Per-IP+session rate limiting
+ * - Dedupe identical events within window
+ * - Abuse flagging with reason tracking
+ *
  * Body: {
  *   app_slug: string (required)
  *   event_type: string (required) - e.g., 'widget_open', 'message_sent', 'doc_viewed'
@@ -1759,20 +1936,13 @@ export const supportTelemetryEndpoint: Endpoint = {
       const clientIP = extractClientIP(req)
       const userAgent = extractUserAgent(req)
 
-      // Rate limit check
-      const rateLimitKey = `telemetry:${clientIP || 'global'}`
-      const rateCheck = checkRateLimit(rateLimitKey)
-      if (!rateCheck.allowed) {
-        return Response.json(
-          { ok: false, message: 'rate_limited' },
-          { status: 429 }
-        )
-      }
-
-      // Parse request body
+      // Parse request body (with size tracking)
       let body: Record<string, unknown> = {}
+      let bodySize = 0
       try {
-        body = await req.json?.() || {}
+        const rawBody = await req.text?.()
+        bodySize = rawBody?.length || 0
+        body = rawBody ? JSON.parse(rawBody) : {}
       } catch {
         return Response.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 })
       }
@@ -1798,6 +1968,50 @@ export const supportTelemetryEndpoint: Endpoint = {
       const userId = typeof body.user_id === 'string' ? body.user_id : null
       const sessionId = typeof body.session_id === 'string' ? body.session_id : null
 
+      // --- Abuse Detection ---
+
+      // 1. Check event type allowlist
+      const isAllowed = isEventTypeAllowed(eventType)
+
+      // 2. Check telemetry-specific rate limit (per IP+session)
+      const telemetryRateCheck = checkTelemetryRateLimit(clientIP, sessionId)
+
+      // 3. Generate hash and check for duplicates
+      const eventHash = generateTelemetryHash(appSlug, eventType, eventData, clientIP, sessionId)
+      const isDuplicate = checkTelemetryDedupe(eventHash)
+
+      // 4. Comprehensive abuse detection
+      const abuseResult = detectTelemetryAbuse(
+        eventType,
+        eventData,
+        bodySize,
+        !telemetryRateCheck.allowed,
+        isDuplicate,
+        isAllowed
+      )
+
+      // If DROP_ABUSE is enabled and this is abuse, reject immediately
+      if (abuseResult.isAbuse && TELEMETRY_CONFIG.dropAbuse) {
+        // Different status codes based on abuse type
+        if (abuseResult.reason === 'rate_limited') {
+          return Response.json(
+            { ok: false, message: 'rate_limited', dropped: true },
+            { status: 429 }
+          )
+        }
+        if (abuseResult.reason === 'duplicate') {
+          return Response.json(
+            { ok: false, message: 'duplicate', dropped: true },
+            { status: 409 }
+          )
+        }
+        // All other abuse types
+        return Response.json(
+          { ok: false, message: abuseResult.reason || 'abuse_detected', dropped: true },
+          { status: 400 }
+        )
+      }
+
       // Get database pool
       const pool = getDbPool(req.payload)
       if (!pool) {
@@ -1807,19 +2021,32 @@ export const supportTelemetryEndpoint: Endpoint = {
         )
       }
 
-      // Insert event into database
+      // Insert event into database (with abuse flags if applicable)
       const result = await pool.query(
         `INSERT INTO support_events
-         (app_slug, event_type, event_data, page_url, route, user_agent, client_ip, user_id, session_id)
-         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9)
+         (app_slug, event_type, event_data, page_url, route, user_agent, client_ip, user_id, session_id, is_abuse, abuse_reason)
+         VALUES ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9, $10, $11)
          RETURNING id, created_at`,
-        [appSlug, eventType, JSON.stringify(eventData), pageUrl, route, userAgent, clientIP, userId, sessionId]
+        [
+          appSlug,
+          eventType,
+          JSON.stringify(eventData),
+          pageUrl,
+          route,
+          userAgent,
+          clientIP,
+          userId,
+          sessionId,
+          abuseResult.isAbuse,
+          abuseResult.reason,
+        ]
       )
 
       return Response.json({
         ok: true,
         event_id: result.rows[0].id,
         created_at: result.rows[0].created_at,
+        ...(abuseResult.isAbuse ? { flagged: true, abuse_reason: abuseResult.reason } : {}),
       })
     } catch (err: unknown) {
       const error = err as Error
@@ -1832,10 +2059,63 @@ export const supportTelemetryEndpoint: Endpoint = {
   },
 }
 
+// --- Autofix Types ---
+interface AutofixSuggestion {
+  ticket_id: number
+  category: string
+  severity: string
+  message: string
+  ai_analysis: string
+  suggested_fix: string | null
+  confidence: 'high' | 'medium' | 'low'
+  can_autofix: boolean
+  reason: string
+}
+
+interface AutofixResult {
+  ok: boolean
+  mode: 'dry_run' | 'pr_only'
+  analyzed_count: number
+  fixable_count: number
+  suggestions: AutofixSuggestion[]
+  pr_created: boolean
+  pr_url: string | null
+  pr_branch: string | null
+  error?: string
+}
+
+// --- Triage Report Types ---
+interface TriageSuggestedAction {
+  id: string
+  priority: 'critical' | 'high' | 'medium' | 'low'
+  type: 'investigate' | 'fix' | 'review' | 'monitor' | 'kb_update'
+  title: string
+  description: string
+  category: string
+  ticket_count: number
+  assignee_hint?: string
+}
+
+interface EnhancedCluster {
+  count: number
+  examples: string[]
+  severity_breakdown: Record<string, number>
+  top_routes: Array<{ route: string; count: number }>
+  recent_spike: boolean
+  first_seen: string | null
+  last_seen: string | null
+}
+
 /**
  * POST /api/support/triage
  * Scheduled triage job - analyzes tickets from the past period, clusters them,
  * generates AI-powered insights, and posts a Slack digest.
+ *
+ * v1.3 improvements:
+ * - Structured JSON output for suggested actions
+ * - Enhanced clustering with route analysis
+ * - Time-based spike detection
+ * - Better AI summary with structured format
  *
  * Protected by SUPPORT_TRIAGE_TOKEN env var.
  *
@@ -1909,51 +2189,210 @@ export const supportTriageEndpoint: Endpoint = {
       const eventResult = await pool.query(eventQuery, eventParams)
       const eventSummary = eventResult.rows
 
-      // Simple clustering by category from triage data
-      const clusters: Record<string, { count: number; examples: string[]; severity_breakdown: Record<string, number> }> = {}
+      // Enhanced clustering by category with route analysis and time patterns
+      const clusters: Record<string, EnhancedCluster> = {}
+      const routeCounts: Record<string, number> = {}
+      const halfwayPoint = new Date(periodStart.getTime() + (periodEnd.getTime() - periodStart.getTime()) / 2)
 
       for (const ticket of tickets) {
         const category = ticket.details?.triage?.category || 'unknown'
         if (!clusters[category]) {
-          clusters[category] = { count: 0, examples: [], severity_breakdown: {} }
+          clusters[category] = {
+            count: 0,
+            examples: [],
+            severity_breakdown: {},
+            top_routes: [],
+            recent_spike: false,
+            first_seen: null,
+            last_seen: null,
+          }
         }
-        clusters[category].count++
-        if (clusters[category].examples.length < 3) {
-          clusters[category].examples.push(ticket.message.slice(0, 100))
+        const cluster = clusters[category]
+        cluster.count++
+
+        // Track examples
+        if (cluster.examples.length < 3) {
+          cluster.examples.push(ticket.message.slice(0, 100))
         }
+
+        // Severity breakdown
         const sev = ticket.severity || 'medium'
-        clusters[category].severity_breakdown[sev] = (clusters[category].severity_breakdown[sev] || 0) + 1
+        cluster.severity_breakdown[sev] = (cluster.severity_breakdown[sev] || 0) + 1
+
+        // Route tracking for this category
+        if (ticket.route) {
+          const routeKey = `${category}:${ticket.route}`
+          routeCounts[routeKey] = (routeCounts[routeKey] || 0) + 1
+        }
+
+        // Time tracking
+        const ticketTime = new Date(ticket.created_at).toISOString()
+        if (!cluster.first_seen || ticketTime < cluster.first_seen) {
+          cluster.first_seen = ticketTime
+        }
+        if (!cluster.last_seen || ticketTime > cluster.last_seen) {
+          cluster.last_seen = ticketTime
+        }
       }
 
-      // Generate suggested actions based on clusters
-      const suggestedActions: string[] = []
-      if (clusters['system_failure']?.count > 5) {
-        suggestedActions.push(`High volume of system failures (${clusters['system_failure'].count}) - investigate infrastructure`)
+      // Build top_routes for each category and detect spikes
+      for (const [category, cluster] of Object.entries(clusters)) {
+        // Get routes for this category
+        const categoryRoutes: Array<{ route: string; count: number }> = []
+        for (const [key, count] of Object.entries(routeCounts)) {
+          if (key.startsWith(`${category}:`)) {
+            const route = key.substring(category.length + 1)
+            categoryRoutes.push({ route, count })
+          }
+        }
+        cluster.top_routes = categoryRoutes
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3)
+
+        // Detect spike: if more than 60% of tickets are in the recent half of the period
+        if (cluster.count >= 3 && cluster.last_seen) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const recentTickets = tickets.filter((t: any) => {
+            const tc = t.details?.triage?.category || 'unknown'
+            return tc === category && new Date(t.created_at) >= halfwayPoint
+          }).length
+          cluster.recent_spike = recentTickets > cluster.count * 0.6
+        }
       }
-      if (clusters['valid_bug']?.count > 10) {
-        suggestedActions.push(`Multiple bug reports (${clusters['valid_bug'].count}) - prioritize bug triage`)
+
+      // Generate structured suggested actions
+      const suggestedActions: TriageSuggestedAction[] = []
+      let actionId = 1
+
+      // System failures - highest priority
+      if (clusters['system_failure']?.count > 0) {
+        const sf = clusters['system_failure']
+        const hasCritical = (sf.severity_breakdown['critical'] || 0) > 0
+        const hasHigh = (sf.severity_breakdown['high'] || 0) > 0
+        suggestedActions.push({
+          id: `action-${actionId++}`,
+          priority: hasCritical ? 'critical' : hasHigh ? 'high' : 'medium',
+          type: 'investigate',
+          title: `Investigate system failures (${sf.count})`,
+          description: sf.recent_spike
+            ? `SPIKE DETECTED: ${sf.count} system failures, increasing in recent hours. Top routes: ${sf.top_routes.map(r => r.route).join(', ') || 'N/A'}`
+            : `${sf.count} system failures detected. Check infrastructure and error logs.`,
+          category: 'system_failure',
+          ticket_count: sf.count,
+          assignee_hint: 'infrastructure',
+        })
       }
-      if (clusters['feature_request']?.count > 5) {
-        suggestedActions.push(`Feature requests trending (${clusters['feature_request'].count}) - review product roadmap`)
+
+      // Valid bugs
+      if (clusters['valid_bug']?.count > 0) {
+        const vb = clusters['valid_bug']
+        const hasCritical = (vb.severity_breakdown['critical'] || 0) > 0
+        suggestedActions.push({
+          id: `action-${actionId++}`,
+          priority: hasCritical ? 'high' : vb.count > 5 ? 'high' : 'medium',
+          type: 'fix',
+          title: `Triage bug reports (${vb.count})`,
+          description: `${vb.count} bug reports need review. ${vb.recent_spike ? 'SPIKE DETECTED. ' : ''}Top affected routes: ${vb.top_routes.map(r => r.route).join(', ') || 'various'}`,
+          category: 'valid_bug',
+          ticket_count: vb.count,
+          assignee_hint: 'engineering',
+        })
       }
+
+      // Feature requests
+      if (clusters['feature_request']?.count > 0) {
+        const fr = clusters['feature_request']
+        suggestedActions.push({
+          id: `action-${actionId++}`,
+          priority: fr.count > 10 ? 'medium' : 'low',
+          type: 'review',
+          title: `Review feature requests (${fr.count})`,
+          description: `${fr.count} feature requests. Consider adding to product roadmap.`,
+          category: 'feature_request',
+          ticket_count: fr.count,
+          assignee_hint: 'product',
+        })
+      }
+
+      // User errors with no KB match - potential KB gap
+      if (clusters['user_error']?.count > 5) {
+        const ue = clusters['user_error']
+        suggestedActions.push({
+          id: `action-${actionId++}`,
+          priority: 'low',
+          type: 'kb_update',
+          title: `Update KB for common questions (${ue.count})`,
+          description: `${ue.count} user questions not answered by KB. Review for documentation gaps. Common examples: ${ue.examples.slice(0, 2).join('; ')}`,
+          category: 'user_error',
+          ticket_count: ue.count,
+          assignee_hint: 'docs',
+        })
+      }
+
+      // No tickets = healthy
       if (tickets.length === 0) {
-        suggestedActions.push('No tickets in period - systems running smoothly')
+        suggestedActions.push({
+          id: `action-${actionId++}`,
+          priority: 'low',
+          type: 'monitor',
+          title: 'Systems healthy',
+          description: 'No tickets in period. Continue monitoring.',
+          category: 'none',
+          ticket_count: 0,
+        })
       }
 
-      // AI summary (if enabled)
+      // Sort by priority
+      const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
+      suggestedActions.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+
+      // AI summary (if enabled) - enhanced with structured context
       let aiSummary: string | null = null
       if (LLM_CONFIG.enabled && tickets.length > 0) {
         try {
+          // Build structured context for AI
+          const clusterSummaryText = Object.entries(clusters)
+            .sort((a, b) => b[1].count - a[1].count)
+            .map(([cat, data]) => {
+              const spikeText = data.recent_spike ? ' [SPIKE]' : ''
+              const routeText = data.top_routes.length > 0
+                ? ` (routes: ${data.top_routes.map(r => r.route).join(', ')})`
+                : ''
+              return `- ${cat}: ${data.count} tickets${spikeText}${routeText}`
+            })
+            .join('\n')
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const ticketSummaries = tickets.slice(0, 20).map((t: any) =>
-            `[${t.severity}] ${t.details?.triage?.category || 'unknown'}: ${t.message.slice(0, 80)}`
+          const ticketSummaries = tickets.slice(0, 15).map((t: any) =>
+            `[${t.severity}] ${t.details?.triage?.category || 'unknown'}: ${t.message.slice(0, 60)}`
           ).join('\n')
+
+          const actionsSummary = suggestedActions
+            .slice(0, 3)
+            .map(a => `- [${a.priority.toUpperCase()}] ${a.title}`)
+            .join('\n')
 
           aiSummary = await callAIGateway({
             model: LLM_CONFIG.model,
-            system: 'You are a support triage assistant. Summarize the ticket patterns and suggest priorities. Be concise (3-5 sentences).',
-            user: `Summarize these ${tickets.length} support tickets from the last ${hoursBack} hours:\n\n${ticketSummaries}`,
-            maxTokens: 200,
+            system: `You are a support triage assistant. Analyze the ticket data and provide:
+1. A 1-sentence executive summary of the situation
+2. The most critical issue that needs immediate attention (if any)
+3. One recommendation for preventing similar issues
+
+Be direct and actionable. No fluff. Max 4 sentences total.`,
+            user: `Support triage for last ${hoursBack} hours:
+
+CLUSTER BREAKDOWN:
+${clusterSummaryText || 'No clusters'}
+
+SUGGESTED ACTIONS:
+${actionsSummary || 'No actions needed'}
+
+SAMPLE TICKETS:
+${ticketSummaries || 'None'}
+
+Total: ${tickets.length} tickets`,
+            maxTokens: 250,
           })
         } catch (err) {
           console.error('AI triage summary failed (non-fatal):', err)
@@ -1983,15 +2422,31 @@ export const supportTriageEndpoint: Endpoint = {
 
       const reportId = reportResult.rows[0].id
 
-      // Post Slack digest
+      // Post Slack digest - enhanced with structured actions
       let slackPosted = false
       const slackWebhook = process.env.SUPPORT_SLACK_WEBHOOK_URL
       if (slackWebhook && tickets.length > 0) {
         try {
+          // Build cluster summary with spike indicators
           const clusterSummary = Object.entries(clusters)
             .sort((a, b) => b[1].count - a[1].count)
             .slice(0, 5)
-            .map(([cat, data]) => `• ${cat}: ${data.count} tickets`)
+            .map(([cat, data]) => {
+              const spikeEmoji = data.recent_spike ? ' 📈' : ''
+              return `• ${cat}: ${data.count} tickets${spikeEmoji}`
+            })
+            .join('\n')
+
+          // Build structured actions list with priority emoji
+          const priorityEmoji: Record<string, string> = {
+            critical: '🔴',
+            high: '🟠',
+            medium: '🟡',
+            low: '🟢',
+          }
+          const actionsText = suggestedActions
+            .slice(0, 4)
+            .map(a => `${priorityEmoji[a.priority] || '⚪'} *${a.title}*\n   ${a.description.slice(0, 100)}${a.description.length > 100 ? '...' : ''}`)
             .join('\n')
 
           const slackPayload = {
@@ -2015,21 +2470,21 @@ export const supportTriageEndpoint: Endpoint = {
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `*Top Clusters:*\n${clusterSummary || 'None'}`,
+                  text: `*Clusters:*\n${clusterSummary || 'None'}`,
                 },
               },
               ...(suggestedActions.length > 0 ? [{
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `*Suggested Actions:*\n${suggestedActions.map(a => `• ${a}`).join('\n')}`,
+                  text: `*Actions:*\n${actionsText}`,
                 },
               }] : []),
               ...(aiSummary ? [{
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `*AI Summary:*\n${aiSummary}`,
+                  text: `*AI Analysis:*\n${aiSummary}`,
                 },
               }] : []),
             ],
@@ -2077,6 +2532,216 @@ export const supportTriageEndpoint: Endpoint = {
       console.error('Support triage error:', error)
       return Response.json(
         { ok: false, error: error.message || 'Triage failed' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * POST /api/support/autofix
+ * AI-powered autofix worker for bug tickets
+ *
+ * SAFETY CONSTRAINTS (NEVER BYPASS):
+ * 1. PR-ONLY: Never deploys directly, only creates PRs
+ * 2. DRY-RUN DEFAULT: Default mode is dry_run (analysis only)
+ * 3. TOKEN-PROTECTED: Requires SUPPORT_AUTOFIX_TOKEN
+ * 4. MANUAL APPROVAL: PRs require human review before merge
+ * 5. CATEGORY FILTER: Only analyzes system_failure and valid_bug tickets
+ *
+ * Query params:
+ *   mode: 'dry_run' | 'pr_only' (default: dry_run)
+ *   hours?: number - Look back period (default: 24)
+ *   app_slug?: string - Filter by app
+ *   limit?: number - Max tickets to analyze (default: 10)
+ *
+ * Returns analysis and suggestions. If mode=pr_only and fixable issues found,
+ * creates a PR with suggested fixes (requires GitHub integration).
+ */
+export const supportAutofixEndpoint: Endpoint = {
+  path: '/support/autofix',
+  method: 'post',
+  handler: async (req) => {
+    try {
+      // Auth check - REQUIRED, no fallback
+      const token = process.env.SUPPORT_AUTOFIX_TOKEN?.trim()
+      if (!token) {
+        return Response.json(
+          { ok: false, error: 'SUPPORT_AUTOFIX_TOKEN not configured - autofix disabled' },
+          { status: 503 }
+        )
+      }
+
+      const authHeader = req.headers.get('authorization') || ''
+      if (authHeader !== `Bearer ${token}`) {
+        return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+      }
+
+      // Parse query params
+      const url = req.url ? new URL(req.url) : null
+      const modeParam = url?.searchParams.get('mode') || 'dry_run'
+      const mode: 'dry_run' | 'pr_only' = modeParam === 'pr_only' ? 'pr_only' : 'dry_run'
+      const hoursBack = parseInt(url?.searchParams.get('hours') || '24', 10)
+      const appSlugFilter = url?.searchParams.get('app_slug') || null
+      const limit = Math.min(parseInt(url?.searchParams.get('limit') || '10', 10), 50) // Max 50
+
+      // Check if AI is enabled
+      if (!LLM_CONFIG.enabled) {
+        return Response.json(
+          { ok: false, error: 'AI not enabled - set SUPPORT_LLM_ENABLED=true' },
+          { status: 503 }
+        )
+      }
+
+      // Get database pool
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      // Calculate time window
+      const periodEnd = new Date()
+      const periodStart = new Date(periodEnd.getTime() - hoursBack * 60 * 60 * 1000)
+
+      // Fetch fixable tickets (system_failure and valid_bug only)
+      let ticketQuery = `
+        SELECT id, app_slug, message, severity, route, page_url, details, created_at
+        FROM support_tickets
+        WHERE created_at >= $1 AND created_at <= $2
+          AND (
+            details->>'triage'->>'category' IN ('system_failure', 'valid_bug')
+            OR details->'triage'->>'category' IN ('system_failure', 'valid_bug')
+          )
+          AND status = 'open'
+      `
+      const ticketParams: unknown[] = [periodStart.toISOString(), periodEnd.toISOString()]
+
+      if (appSlugFilter) {
+        ticketQuery += ` AND app_slug = $3`
+        ticketParams.push(appSlugFilter)
+      }
+      ticketQuery += ` ORDER BY severity DESC, created_at DESC LIMIT ${limit}`
+
+      const ticketResult = await pool.query(ticketQuery, ticketParams)
+      const tickets = ticketResult.rows
+
+      // Analyze each ticket
+      const suggestions: AutofixSuggestion[] = []
+
+      for (const ticket of tickets) {
+        const category = ticket.details?.triage?.category || 'unknown'
+        const severity = ticket.severity || 'medium'
+
+        try {
+          // AI analysis of the ticket
+          const analysisPrompt = `Analyze this support ticket and determine if it can be auto-fixed:
+
+TICKET #${ticket.id}:
+- Category: ${category}
+- Severity: ${severity}
+- Message: ${ticket.message}
+- Route: ${ticket.route || 'N/A'}
+- Page URL: ${ticket.page_url || 'N/A'}
+
+Respond with:
+1. ROOT_CAUSE: Brief description of the likely root cause
+2. CAN_AUTOFIX: yes/no - Can this be fixed programmatically?
+3. CONFIDENCE: high/medium/low
+4. FIX_SUGGESTION: If CAN_AUTOFIX=yes, describe the fix. If no, explain why manual intervention is needed.
+
+Be conservative - only mark CAN_AUTOFIX=yes for clear, well-understood issues.`
+
+          const aiResponse = await callAIGateway({
+            model: LLM_CONFIG.model,
+            system: 'You are a technical support analyst. Analyze tickets and determine if they can be auto-fixed. Be conservative - only suggest autofix for clear, well-understood issues with straightforward solutions.',
+            user: analysisPrompt,
+            maxTokens: 300,
+          })
+
+          // Parse AI response
+          const canAutofix = /CAN_AUTOFIX:\s*yes/i.test(aiResponse)
+          const confidenceMatch = aiResponse.match(/CONFIDENCE:\s*(high|medium|low)/i)
+          const confidence = (confidenceMatch?.[1]?.toLowerCase() as 'high' | 'medium' | 'low') || 'low'
+          const rootCauseMatch = aiResponse.match(/ROOT_CAUSE:\s*([^\n]+)/i)
+          const fixMatch = aiResponse.match(/FIX_SUGGESTION:\s*(.+?)(?=\n\d\.|$)/is)
+
+          suggestions.push({
+            ticket_id: ticket.id,
+            category,
+            severity,
+            message: ticket.message.slice(0, 200),
+            ai_analysis: rootCauseMatch?.[1]?.trim() || 'Analysis unavailable',
+            suggested_fix: canAutofix ? (fixMatch?.[1]?.trim() || null) : null,
+            confidence,
+            can_autofix: canAutofix && confidence !== 'low',
+            reason: canAutofix
+              ? `AI suggests fix with ${confidence} confidence`
+              : 'Requires manual investigation',
+          })
+        } catch (err) {
+          console.error(`Autofix analysis failed for ticket ${ticket.id}:`, err)
+          suggestions.push({
+            ticket_id: ticket.id,
+            category,
+            severity,
+            message: ticket.message.slice(0, 200),
+            ai_analysis: 'Analysis failed',
+            suggested_fix: null,
+            confidence: 'low',
+            can_autofix: false,
+            reason: 'AI analysis failed',
+          })
+        }
+      }
+
+      const fixableCount = suggestions.filter(s => s.can_autofix).length
+
+      // Result object
+      const result: AutofixResult = {
+        ok: true,
+        mode,
+        analyzed_count: suggestions.length,
+        fixable_count: fixableCount,
+        suggestions,
+        pr_created: false,
+        pr_url: null,
+        pr_branch: null,
+      }
+
+      // If pr_only mode and we have fixable issues, create a PR
+      // NOTE: This is a placeholder - actual PR creation requires GitHub integration
+      if (mode === 'pr_only' && fixableCount > 0) {
+        // Check for GitHub token
+        const githubToken = process.env.GITHUB_TOKEN?.trim()
+        if (!githubToken) {
+          result.pr_created = false
+          result.error = 'GITHUB_TOKEN not configured - PR creation disabled'
+        } else {
+          // TODO: Implement actual GitHub PR creation
+          // For now, return a placeholder indicating what would be done
+          const fixableSuggestions = suggestions.filter(s => s.can_autofix)
+          const branchName = `autofix/${new Date().toISOString().slice(0, 10)}-${Date.now()}`
+
+          result.pr_branch = branchName
+          result.error = `PR creation not yet implemented. Would create branch "${branchName}" with ${fixableCount} fixes: ${fixableSuggestions.map(s => `#${s.ticket_id}`).join(', ')}`
+
+          // Log for audit trail
+          console.log(`[AUTOFIX] Would create PR on branch ${branchName}:`, fixableSuggestions.map(s => ({
+            ticket: s.ticket_id,
+            fix: s.suggested_fix,
+          })))
+        }
+      }
+
+      return Response.json(result)
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Support autofix error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Autofix failed' },
         { status: 500 }
       )
     }

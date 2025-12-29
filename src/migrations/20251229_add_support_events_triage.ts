@@ -35,9 +35,15 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
       "client_ip" varchar,
       "user_id" varchar,
       "session_id" varchar,
+      "is_abuse" boolean DEFAULT false,
+      "abuse_reason" varchar,
       "created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
     );
   `)
+
+  // Add abuse columns to support_events if table already exists
+  await db.execute(sql`ALTER TABLE "support_events" ADD COLUMN IF NOT EXISTS "is_abuse" boolean DEFAULT false;`)
+  await db.execute(sql`ALTER TABLE "support_events" ADD COLUMN IF NOT EXISTS "abuse_reason" varchar;`)
 
   // Create triage_reports table for scheduled AI triage
   await db.execute(sql`
@@ -76,6 +82,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   `)
   await db.execute(sql`
     CREATE INDEX IF NOT EXISTS "support_events_created_at_idx" ON "support_events" USING btree ("created_at");
+  `)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "support_events_is_abuse_idx" ON "support_events" USING btree ("is_abuse");
   `)
   await db.execute(sql`
     CREATE INDEX IF NOT EXISTS "support_triage_reports_report_date_idx" ON "support_triage_reports" USING btree ("report_date");
