@@ -9,7 +9,9 @@ import * as migration_20251215_185759_fix_unique_indexes_categories_tags from '.
 import * as migration_20251223_add_support_collections from './20251223_add_support_collections';
 import * as migration_20251223_fix_announcements_columns from './20251223_fix_announcements_columns';
 import * as migration_20251226_add_kb_steps_triggers from './20251226_add_kb_steps_triggers';
-import * as migration_20251229_add_support_events_triage from './20251229_add_support_events_triage';
+// Migration 20251229 causes Vercel startup issues - run SQL manually instead.
+// See: src/migrations/20251229_add_support_events_triage.ts for the SQL.
+// import * as migration_20251229_add_support_events_triage from './20251229_add_support_events_triage';
 
 export const migrations = [
   {
@@ -67,9 +69,10 @@ export const migrations = [
     down: migration_20251226_add_kb_steps_triggers.down,
     name: '20251226_add_kb_steps_triggers'
   },
-  {
-    up: migration_20251229_add_support_events_triage.up,
-    down: migration_20251229_add_support_events_triage.down,
-    name: '20251229_add_support_events_triage'
-  },
+  // Disabled - run SQL manually. See comment at top of file.
+  // {
+  //   up: migration_20251229_add_support_events_triage.up,
+  //   down: migration_20251229_add_support_events_triage.down,
+  //   name: '20251229_add_support_events_triage'
+  // },
 ];
