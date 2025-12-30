@@ -90,6 +90,21 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE INDEX IF NOT EXISTS "support_triage_reports_report_date_idx" ON "support_triage_reports" USING btree ("report_date");
   `)
 
+  // Additional indexes for admin dashboard performance
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "support_tickets_route_idx" ON "support_tickets" USING btree ("route");
+  `)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "support_events_session_id_idx" ON "support_events" USING btree ("session_id");
+  `)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "support_triage_reports_app_slug_idx" ON "support_triage_reports" USING btree ("app_slug");
+  `)
+  // GIN index for JSONB filtering on details (category, etc.)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS "support_tickets_details_gin_idx" ON "support_tickets" USING gin ("details");
+  `)
+
   // The support_tickets table should now exist from the CREATE TABLE IF NOT EXISTS above.
   // The ALTER statements below add columns that may not exist if the table was created
   // by a previous version. These use ADD COLUMN IF NOT EXISTS which is safe.

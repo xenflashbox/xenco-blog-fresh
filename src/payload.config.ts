@@ -40,6 +40,11 @@ import {
   supportTelemetryEndpoint,
   supportTriageEndpoint,
   supportAutofixEndpoint,
+  supportAdminTicketsListEndpoint,
+  supportAdminTicketDetailEndpoint,
+  supportAdminTicketUpdateEndpoint,
+  supportAdminTriageReportsEndpoint,
+  supportAdminEventsListEndpoint,
 } from './endpoints/support'
 
 const filename = fileURLToPath(import.meta.url)
@@ -96,6 +101,12 @@ export default buildConfig({
     supportTelemetryEndpoint,
     supportTriageEndpoint,
     supportAutofixEndpoint,
+    // Admin endpoints (protected by SUPPORT_ADMIN_TOKEN)
+    supportAdminTicketsListEndpoint,
+    supportAdminTicketDetailEndpoint,
+    supportAdminTicketUpdateEndpoint,
+    supportAdminTriageReportsEndpoint,
+    supportAdminEventsListEndpoint,
   ],
 
   editor: lexicalEditor(),

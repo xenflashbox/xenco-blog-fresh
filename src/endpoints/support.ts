@@ -2745,3 +2745,619 @@ Be conservative - only mark CAN_AUTOFIX=yes for clear, well-understood issues.`
     }
   },
 }
+
+// =============================================================================
+// ADMIN ENDPOINTS - Protected by SUPPORT_ADMIN_TOKEN
+// =============================================================================
+
+/**
+ * Validate admin auth token
+ * Returns true if valid, Response if invalid (caller should return it)
+ */
+function validateAdminAuth(req: { headers: Headers }): true | Response {
+  const token = process.env.SUPPORT_ADMIN_TOKEN?.trim()
+  if (!token) {
+    return Response.json(
+      { ok: false, error: 'SUPPORT_ADMIN_TOKEN not configured' },
+      { status: 503 }
+    )
+  }
+
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader !== `Bearer ${token}`) {
+    return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return true
+}
+
+// --- Admin Types ---
+interface TicketListItem {
+  id: number
+  created_at: string
+  app_slug: string
+  status: string
+  severity: string
+  route: string | null
+  page_url: string | null
+  category: string | null
+  user_email: string | null
+  user_id: string | null
+  slack_alerted: boolean
+  message_preview: string
+}
+
+interface TicketDetail {
+  id: number
+  created_at: string
+  updated_at: string
+  app_slug: string
+  status: string
+  severity: string
+  route: string | null
+  page_url: string | null
+  user_agent: string | null
+  client_ip: string | null
+  sentry_event_id: string | null
+  user_email: string | null
+  user_id: string | null
+  message: string
+  details: Record<string, unknown>
+  internal_notes: string | null
+  assigned_to: string | null
+}
+
+/**
+ * GET /api/support/admin/tickets
+ * List tickets with pagination and filters
+ *
+ * Query params:
+ *   limit: number (default 50, max 200)
+ *   offset: number (default 0)
+ *   app_slug: string - filter by app
+ *   status: string - filter by status (open, closed, in_progress, etc.)
+ *   severity: string - filter by severity (low, medium, high, critical)
+ *   category: string - filter by triage category
+ *   route: string - filter by route
+ *   q: string - search in message
+ *   from: ISO date string - created_at >= from
+ *   to: ISO date string - created_at <= to
+ */
+export const supportAdminTicketsListEndpoint: Endpoint = {
+  path: '/support/admin/tickets',
+  method: 'get',
+  handler: async (req) => {
+    const authResult = validateAdminAuth(req)
+    if (authResult !== true) return authResult
+
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      const url = req.url ? new URL(req.url) : null
+      const limit = Math.min(parseInt(url?.searchParams.get('limit') || '50', 10), 200)
+      const offset = parseInt(url?.searchParams.get('offset') || '0', 10)
+      const appSlug = url?.searchParams.get('app_slug') || null
+      const status = url?.searchParams.get('status') || null
+      const severity = url?.searchParams.get('severity') || null
+      const category = url?.searchParams.get('category') || null
+      const route = url?.searchParams.get('route') || null
+      const q = url?.searchParams.get('q') || null
+      const from = url?.searchParams.get('from') || null
+      const to = url?.searchParams.get('to') || null
+
+      // Build query with parameterized filters
+      const conditions: string[] = []
+      const params: unknown[] = []
+      let paramIndex = 1
+
+      if (appSlug) {
+        conditions.push(`app_slug = $${paramIndex++}`)
+        params.push(appSlug)
+      }
+      if (status) {
+        conditions.push(`status = $${paramIndex++}`)
+        params.push(status)
+      }
+      if (severity) {
+        conditions.push(`severity = $${paramIndex++}`)
+        params.push(severity)
+      }
+      if (category) {
+        conditions.push(`details->'triage'->>'category' = $${paramIndex++}`)
+        params.push(category)
+      }
+      if (route) {
+        conditions.push(`route = $${paramIndex++}`)
+        params.push(route)
+      }
+      if (q) {
+        conditions.push(`message ILIKE $${paramIndex++}`)
+        params.push(`%${q}%`)
+      }
+      if (from) {
+        conditions.push(`created_at >= $${paramIndex++}`)
+        params.push(from)
+      }
+      if (to) {
+        conditions.push(`created_at <= $${paramIndex++}`)
+        params.push(to)
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+      // Get total count
+      const countResult = await pool.query(
+        `SELECT COUNT(*) as total FROM support_tickets ${whereClause}`,
+        params
+      )
+      const total = parseInt(countResult.rows[0].total, 10)
+
+      // Get tickets
+      params.push(limit)
+      params.push(offset)
+      const ticketsResult = await pool.query(
+        `SELECT
+          id, created_at, app_slug, status, severity, route, page_url,
+          details->'triage'->>'category' as category,
+          user_email, user_id,
+          COALESCE((details->>'slack_alerted')::boolean, false) as slack_alerted,
+          LEFT(message, 100) as message_preview
+        FROM support_tickets
+        ${whereClause}
+        ORDER BY created_at DESC
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+        params
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const tickets: TicketListItem[] = ticketsResult.rows.map((row: any) => ({
+        id: row.id,
+        created_at: row.created_at,
+        app_slug: row.app_slug,
+        status: row.status || 'open',
+        severity: row.severity || 'medium',
+        route: row.route,
+        page_url: row.page_url,
+        category: row.category,
+        user_email: row.user_email,
+        user_id: row.user_id,
+        slack_alerted: row.slack_alerted || false,
+        message_preview: row.message_preview,
+      }))
+
+      return Response.json({
+        ok: true,
+        tickets,
+        pagination: {
+          total,
+          limit,
+          offset,
+          has_more: offset + tickets.length < total,
+        },
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Admin tickets list error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to list tickets' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * GET /api/support/admin/tickets/:id
+ * Get ticket detail by ID
+ */
+export const supportAdminTicketDetailEndpoint: Endpoint = {
+  path: '/support/admin/tickets/:id',
+  method: 'get',
+  handler: async (req) => {
+    const authResult = validateAdminAuth(req)
+    if (authResult !== true) return authResult
+
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      // Extract ID from route params
+      const ticketId = typeof req.routeParams?.id === 'string'
+        ? parseInt(req.routeParams.id, 10)
+        : typeof req.routeParams?.id === 'number'
+          ? req.routeParams.id
+          : null
+
+      if (!ticketId || isNaN(ticketId)) {
+        return Response.json({ ok: false, error: 'Invalid ticket ID' }, { status: 400 })
+      }
+
+      const result = await pool.query(
+        `SELECT
+          id, created_at, updated_at, app_slug, status, severity, route, page_url,
+          user_agent, client_ip, sentry_event_id, user_email, user_id,
+          message, details,
+          details->>'internal_notes' as internal_notes,
+          details->>'assigned_to' as assigned_to
+        FROM support_tickets
+        WHERE id = $1`,
+        [ticketId]
+      )
+
+      if (result.rows.length === 0) {
+        return Response.json({ ok: false, error: 'Ticket not found' }, { status: 404 })
+      }
+
+      const row = result.rows[0]
+      const ticket: TicketDetail = {
+        id: row.id,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        app_slug: row.app_slug,
+        status: row.status || 'open',
+        severity: row.severity || 'medium',
+        route: row.route,
+        page_url: row.page_url,
+        user_agent: row.user_agent,
+        client_ip: row.client_ip,
+        sentry_event_id: row.sentry_event_id,
+        user_email: row.user_email,
+        user_id: row.user_id,
+        message: row.message,
+        details: row.details || {},
+        internal_notes: row.internal_notes,
+        assigned_to: row.assigned_to,
+      }
+
+      return Response.json({ ok: true, ticket })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Admin ticket detail error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to get ticket' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * PATCH /api/support/admin/tickets/:id
+ * Update ticket: status, internal_notes, assigned_to
+ *
+ * Body: {
+ *   status?: string
+ *   internal_notes?: string
+ *   assigned_to?: string
+ * }
+ */
+export const supportAdminTicketUpdateEndpoint: Endpoint = {
+  path: '/support/admin/tickets/:id',
+  method: 'patch',
+  handler: async (req) => {
+    const authResult = validateAdminAuth(req)
+    if (authResult !== true) return authResult
+
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      // Extract ID from route params
+      const ticketId = typeof req.routeParams?.id === 'string'
+        ? parseInt(req.routeParams.id, 10)
+        : typeof req.routeParams?.id === 'number'
+          ? req.routeParams.id
+          : null
+
+      if (!ticketId || isNaN(ticketId)) {
+        return Response.json({ ok: false, error: 'Invalid ticket ID' }, { status: 400 })
+      }
+
+      // Parse request body
+      let body: Record<string, unknown> = {}
+      try {
+        body = await req.json?.() || {}
+      } catch {
+        return Response.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 })
+      }
+
+      const status = typeof body.status === 'string' ? body.status : null
+      const internalNotes = typeof body.internal_notes === 'string' ? body.internal_notes : null
+      const assignedTo = typeof body.assigned_to === 'string' ? body.assigned_to : null
+
+      // Build update query
+      const updates: string[] = []
+      const params: unknown[] = []
+      let paramIndex = 1
+
+      if (status !== null) {
+        updates.push(`status = $${paramIndex++}`)
+        params.push(status)
+      }
+
+      // Store internal_notes and assigned_to in details JSONB
+      if (internalNotes !== null || assignedTo !== null) {
+        // Merge with existing details
+        const detailsUpdate: Record<string, unknown> = {}
+        if (internalNotes !== null) detailsUpdate.internal_notes = internalNotes
+        if (assignedTo !== null) detailsUpdate.assigned_to = assignedTo
+
+        updates.push(`details = COALESCE(details, '{}'::jsonb) || $${paramIndex++}::jsonb`)
+        params.push(JSON.stringify(detailsUpdate))
+      }
+
+      if (updates.length === 0) {
+        return Response.json({ ok: false, error: 'No updates provided' }, { status: 400 })
+      }
+
+      // Always update updated_at
+      updates.push(`updated_at = NOW()`)
+
+      params.push(ticketId)
+      const result = await pool.query(
+        `UPDATE support_tickets
+         SET ${updates.join(', ')}
+         WHERE id = $${paramIndex}
+         RETURNING id, status, updated_at, details->>'internal_notes' as internal_notes, details->>'assigned_to' as assigned_to`,
+        params
+      )
+
+      if (result.rows.length === 0) {
+        return Response.json({ ok: false, error: 'Ticket not found' }, { status: 404 })
+      }
+
+      return Response.json({
+        ok: true,
+        ticket: {
+          id: result.rows[0].id,
+          status: result.rows[0].status,
+          updated_at: result.rows[0].updated_at,
+          internal_notes: result.rows[0].internal_notes,
+          assigned_to: result.rows[0].assigned_to,
+        },
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Admin ticket update error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to update ticket' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * GET /api/support/admin/triage-reports
+ * List triage reports with pagination
+ *
+ * Query params:
+ *   limit: number (default 50, max 200)
+ *   offset: number (default 0)
+ *   app_slug: string - filter by app
+ *   from: ISO date string - report_date >= from
+ *   to: ISO date string - report_date <= to
+ */
+export const supportAdminTriageReportsEndpoint: Endpoint = {
+  path: '/support/admin/triage-reports',
+  method: 'get',
+  handler: async (req) => {
+    const authResult = validateAdminAuth(req)
+    if (authResult !== true) return authResult
+
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      const url = req.url ? new URL(req.url) : null
+      const limit = Math.min(parseInt(url?.searchParams.get('limit') || '50', 10), 200)
+      const offset = parseInt(url?.searchParams.get('offset') || '0', 10)
+      const appSlug = url?.searchParams.get('app_slug') || null
+      const from = url?.searchParams.get('from') || null
+      const to = url?.searchParams.get('to') || null
+
+      // Build query with parameterized filters
+      const conditions: string[] = []
+      const params: unknown[] = []
+      let paramIndex = 1
+
+      if (appSlug) {
+        conditions.push(`app_slug = $${paramIndex++}`)
+        params.push(appSlug)
+      }
+      if (from) {
+        conditions.push(`report_date >= $${paramIndex++}`)
+        params.push(from)
+      }
+      if (to) {
+        conditions.push(`report_date <= $${paramIndex++}`)
+        params.push(to)
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+      // Get total count
+      const countResult = await pool.query(
+        `SELECT COUNT(*) as total FROM support_triage_reports ${whereClause}`,
+        params
+      )
+      const total = parseInt(countResult.rows[0].total, 10)
+
+      // Get reports
+      params.push(limit)
+      params.push(offset)
+      const reportsResult = await pool.query(
+        `SELECT
+          id, app_slug, report_date, period_start, period_end,
+          ticket_count, event_count, clusters, suggested_actions,
+          ai_summary, slack_posted, slack_ts, created_at
+        FROM support_triage_reports
+        ${whereClause}
+        ORDER BY report_date DESC, created_at DESC
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+        params
+      )
+
+      return Response.json({
+        ok: true,
+        reports: reportsResult.rows,
+        pagination: {
+          total,
+          limit,
+          offset,
+          has_more: offset + reportsResult.rows.length < total,
+        },
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Admin triage reports list error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to list triage reports' },
+        { status: 500 }
+      )
+    }
+  },
+}
+
+/**
+ * GET /api/support/admin/events
+ * List telemetry events with filters
+ *
+ * Query params:
+ *   limit: number (default 50, max 200)
+ *   offset: number (default 0)
+ *   app_slug: string - filter by app
+ *   event_type: string - filter by event type
+ *   route: string - filter by route
+ *   session_id: string - filter by session
+ *   from: ISO date string - created_at >= from
+ *   to: ISO date string - created_at <= to
+ *   is_abuse: boolean - filter by abuse flag
+ */
+export const supportAdminEventsListEndpoint: Endpoint = {
+  path: '/support/admin/events',
+  method: 'get',
+  handler: async (req) => {
+    const authResult = validateAdminAuth(req)
+    if (authResult !== true) return authResult
+
+    try {
+      const pool = getDbPool(req.payload)
+      if (!pool) {
+        return Response.json(
+          { ok: false, error: 'Database connection not available' },
+          { status: 500 }
+        )
+      }
+
+      const url = req.url ? new URL(req.url) : null
+      const limit = Math.min(parseInt(url?.searchParams.get('limit') || '50', 10), 200)
+      const offset = parseInt(url?.searchParams.get('offset') || '0', 10)
+      const appSlug = url?.searchParams.get('app_slug') || null
+      const eventType = url?.searchParams.get('event_type') || null
+      const route = url?.searchParams.get('route') || null
+      const sessionId = url?.searchParams.get('session_id') || null
+      const from = url?.searchParams.get('from') || null
+      const to = url?.searchParams.get('to') || null
+      const isAbuseParam = url?.searchParams.get('is_abuse')
+      const isAbuse = isAbuseParam === 'true' ? true : isAbuseParam === 'false' ? false : null
+
+      // Build query with parameterized filters
+      const conditions: string[] = []
+      const params: unknown[] = []
+      let paramIndex = 1
+
+      if (appSlug) {
+        conditions.push(`app_slug = $${paramIndex++}`)
+        params.push(appSlug)
+      }
+      if (eventType) {
+        conditions.push(`event_type = $${paramIndex++}`)
+        params.push(eventType)
+      }
+      if (route) {
+        conditions.push(`route = $${paramIndex++}`)
+        params.push(route)
+      }
+      if (sessionId) {
+        conditions.push(`session_id = $${paramIndex++}`)
+        params.push(sessionId)
+      }
+      if (from) {
+        conditions.push(`created_at >= $${paramIndex++}`)
+        params.push(from)
+      }
+      if (to) {
+        conditions.push(`created_at <= $${paramIndex++}`)
+        params.push(to)
+      }
+      if (isAbuse !== null) {
+        conditions.push(`is_abuse = $${paramIndex++}`)
+        params.push(isAbuse)
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+      // Get total count
+      const countResult = await pool.query(
+        `SELECT COUNT(*) as total FROM support_events ${whereClause}`,
+        params
+      )
+      const total = parseInt(countResult.rows[0].total, 10)
+
+      // Get events
+      params.push(limit)
+      params.push(offset)
+      const eventsResult = await pool.query(
+        `SELECT
+          id, app_slug, event_type, event_data, page_url, route,
+          user_agent, client_ip, user_id, session_id,
+          is_abuse, abuse_reason, created_at
+        FROM support_events
+        ${whereClause}
+        ORDER BY created_at DESC
+        LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+        params
+      )
+
+      return Response.json({
+        ok: true,
+        events: eventsResult.rows,
+        pagination: {
+          total,
+          limit,
+          offset,
+          has_more: offset + eventsResult.rows.length < total,
+        },
+      })
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Admin events list error:', error)
+      return Response.json(
+        { ok: false, error: error.message || 'Failed to list events' },
+        { status: 500 }
+      )
+    }
+  },
+}
