@@ -120,6 +120,10 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: dbURI,
+      min: 0,                        // Don't keep idle connections (critical for scale-to-zero)
+      max: 10,                       // Cap concurrent connections
+      idleTimeoutMillis: 10000,      // Close idle connections after 10 seconds
+      allowExitOnIdle: true,         // Let serverless functions exit cleanly
     },
     prodMigrations: migrations,
   }),

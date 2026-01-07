@@ -45,6 +45,11 @@ const telemetryRateLimitStore = new Map<string, { count: number; resetAt: number
 // Telemetry dedupe store (hash -> timestamp)
 const telemetryDedupeStore = new Map<string, number>()
 
+// Health check cache to prevent repeated DB/Meili hits
+// Even if something polls /api/support/health, we only hit DB once per TTL
+const HEALTH_CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes
+let healthCache: { result: object; timestamp: number } | null = null
+
 /**
  * Extract client IP from request headers
  * Priority: X-Forwarded-For > X-Real-IP > CF-Connecting-IP > socket
@@ -1713,6 +1718,12 @@ export const supportAnswerEndpoint: Endpoint = {
  * GET /api/support/health
  * Health check endpoint for monitoring DB and MeiliSearch status
  * Optional auth via SUPPORT_HEALTH_TOKEN env var (Bearer token)
+ *
+ * IMPORTANT: This endpoint hits the database! Use /api/support/uptime for frequent
+ * uptime monitoring to allow Neon database to scale to zero.
+ *
+ * Results are cached for 10 minutes to prevent accidental polling from
+ * keeping the database awake.
  */
 export const supportHealthEndpoint: Endpoint = {
   path: '/support/health',
@@ -1727,6 +1738,17 @@ export const supportHealthEndpoint: Endpoint = {
       if (authHeader !== `Bearer ${token}`) {
         return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
       }
+    }
+
+    // Return cached result if fresh (prevents repeated DB hits)
+    if (healthCache && (Date.now() - healthCache.timestamp) < HEALTH_CACHE_TTL_MS) {
+      const cacheAgeSeconds = Math.floor((Date.now() - healthCache.timestamp) / 1000)
+      return Response.json({
+        ...healthCache.result,
+        cached: true,
+        cache_age_seconds: cacheAgeSeconds,
+        cache_ttl_seconds: Math.floor((HEALTH_CACHE_TTL_MS - (Date.now() - healthCache.timestamp)) / 1000),
+      })
     }
 
     // --- DB health ---
@@ -1762,16 +1784,24 @@ export const supportHealthEndpoint: Endpoint = {
     const overallOk = dbOk && meiliOk
     const durationMs = Date.now() - startedAt
 
+    const result = {
+      ok: overallOk,
+      status: overallOk ? 'ok' : 'degraded',
+      checks: {
+        db: { ok: dbOk, error: dbError },
+        meili: { ok: meiliOk, error: meiliError, index: indexName },
+      },
+      duration_ms: durationMs,
+      ts: new Date().toISOString(),
+    }
+
+    // Cache the result to prevent repeated DB/Meili hits
+    healthCache = { result, timestamp: Date.now() }
+
     return Response.json(
       {
-        ok: overallOk,
-        status: overallOk ? 'ok' : 'degraded',
-        checks: {
-          db: { ok: dbOk, error: dbError },
-          meili: { ok: meiliOk, error: meiliError, index: indexName },
-        },
-        duration_ms: durationMs,
-        ts: new Date().toISOString(),
+        ...result,
+        cached: false,
       },
       { status: overallOk ? 200 : 503 },
     )
