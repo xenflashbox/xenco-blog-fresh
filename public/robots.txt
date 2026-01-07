@@ -1,26 +1,26 @@
-# Robots.txt for Payload CMS
-# This site is in development/testing - restrict crawler access
-# to prevent unnecessary database wake-ups on Neon serverless
+# Robots.txt for Payload CMS Blog
+# Google Search crawlers ARE ALLOWED - only blocking admin/API paths
 
 User-agent: *
-# Allow the homepage (static, no DB query)
-Allow: /$
+# Allow all public content pages
+Allow: /
 
-# Block all other paths to prevent DB queries from crawlers
+# Block admin and API paths (these shouldn't be indexed anyway)
 Disallow: /admin
 Disallow: /api/
 Disallow: /my-route
 
-# Block common bot paths
+# Block common attack vectors
 Disallow: /wp-admin
 Disallow: /wp-login
 Disallow: /.env
 Disallow: /xmlrpc.php
 
-# Crawl delay to reduce frequency
-Crawl-delay: 60
+# Sitemap (when you add one)
+# Sitemap: https://your-domain.com/sitemap.xml
 
-# Specific bot restrictions
+# Block AI training bots (NOT search crawlers)
+# These bots scrape content for AI training, not search indexing
 User-agent: GPTBot
 Disallow: /
 
@@ -33,8 +33,14 @@ Disallow: /
 User-agent: anthropic-ai
 Disallow: /
 
+User-agent: Claude-Web
+Disallow: /
+
 User-agent: Google-Extended
 Disallow: /
 
-# Note: When ready for production with real traffic,
-# update this file to allow crawling of public content.
+User-agent: FacebookBot
+Disallow: /
+
+# Note: Googlebot, Bingbot, and other search crawlers ARE ALLOWED
+# Only AI training bots and admin paths are blocked
