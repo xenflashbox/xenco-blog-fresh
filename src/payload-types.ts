@@ -199,6 +199,14 @@ export interface Site {
       }[]
     | null;
   isDefault?: boolean | null;
+  /**
+   * Full URL for on-demand revalidation (e.g., https://resumecoach.me/api/revalidate). Leave empty to skip.
+   */
+  revalidateUrl?: string | null;
+  /**
+   * Secret token for the revalidation endpoint (passed as ?secret=...)
+   */
+  revalidateSecret?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -617,6 +625,8 @@ export interface SitesSelect<T extends boolean = true> {
         id?: T;
       };
   isDefault?: T;
+  revalidateUrl?: T;
+  revalidateSecret?: T;
   updatedAt?: T;
   createdAt?: T;
 }

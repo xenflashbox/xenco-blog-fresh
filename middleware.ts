@@ -2,19 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export const config = {
-  // Match admin routes AND Payload's API routes (but not our custom /api/support/* endpoints)
+  // Match admin routes and sensitive API routes only
+  // Content collection APIs are now PUBLIC for GET (ISR caching handles cost control)
   matcher: [
     '/admin/:path*',
     '/api/users/:path*',
-    '/api/articles/:path*',
-    '/api/media/:path*',
-    '/api/sites/:path*',
-    '/api/authors/:path*',
-    '/api/categories/:path*',
-    '/api/tags/:path*',
-    '/api/support-kb-articles/:path*',
-    '/api/support-playbooks/:path*',
-    '/api/support-announcements/:path*',
     '/api/graphql',
     '/api/graphql-playground',
   ],
@@ -23,34 +15,21 @@ export const config = {
 export function middleware(req: NextRequest) {
   const url = req.nextUrl
   const pathname = url.pathname
+  const method = req.method.toUpperCase()
+  const isReadOnly = method === 'GET' || method === 'HEAD' || method === 'OPTIONS'
 
-  // Block Payload's REST API and GraphQL endpoints from public access
-  // These were waking the database on every bot/crawler hit
-  // Our custom /api/support/* endpoints are NOT matched here (they have their own auth)
+  // Protect sensitive endpoints: /api/users and GraphQL
+  // These always require authentication regardless of method
   if (
     pathname.startsWith('/api/users') ||
-    pathname.startsWith('/api/articles') ||
-    pathname.startsWith('/api/media') ||
-    pathname.startsWith('/api/sites') ||
-    pathname.startsWith('/api/authors') ||
-    pathname.startsWith('/api/categories') ||
-    pathname.startsWith('/api/tags') ||
-    pathname.startsWith('/api/support-kb-articles') ||
-    pathname.startsWith('/api/support-playbooks') ||
-    pathname.startsWith('/api/support-announcements') ||
     pathname === '/api/graphql' ||
     pathname === '/api/graphql-playground'
   ) {
-    // Check for Payload auth cookie or API key
     const hasPayloadToken = req.cookies.has('payload-token')
     const authHeader = req.headers.get('authorization') || ''
-    // Accept multiple auth formats:
-    // - Bearer ${token} (standard JWT/API key)
-    // - users API-Key ${key} (Payload's API key format)
     const hasApiKey = authHeader.startsWith('Bearer ') || authHeader.includes('API-Key')
 
     if (!hasPayloadToken && !hasApiKey) {
-      // Return 401 immediately without initializing Payload (no DB wake!)
       return new NextResponse(
         JSON.stringify({ error: 'Authentication required' }),
         {

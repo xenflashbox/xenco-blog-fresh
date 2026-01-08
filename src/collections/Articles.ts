@@ -14,6 +14,7 @@ import {
 
 import { upsertArticleToMeili, deleteArticleFromMeili } from '../lib/meili'
 import { resolveSiteForRequest } from '../lib/site'
+import { triggerRevalidation } from '../lib/revalidate'
 
 let cachedDefaultSiteId: string | null = null
 let cachedDefaultSiteAt = 0
@@ -172,6 +173,7 @@ const afterChange: CollectionAfterChangeHook = async ({ doc, previousDoc, req })
   const isPublishedNow = (doc as { status?: unknown })?.status === 'published'
   const wasPublished = (previousDoc as { status?: unknown } | undefined)?.status === 'published'
 
+  // MeiliSearch indexing
   try {
     if (isPublishedNow) {
       await upsertArticleToMeili(doc)
@@ -184,6 +186,12 @@ const afterChange: CollectionAfterChangeHook = async ({ doc, previousDoc, req })
       { err },
       'MeiliSearch indexing failed (non-fatal). Article save succeeded.',
     )
+  }
+
+  // ISR Revalidation: trigger front-end cache refresh when article is published or updated
+  // This is fire-and-forget (non-blocking) - we don't wait for the front-end to respond
+  if (isPublishedNow) {
+    triggerRevalidation(req.payload, doc as { id: string | number; slug?: string; site?: unknown })
   }
 
   return doc

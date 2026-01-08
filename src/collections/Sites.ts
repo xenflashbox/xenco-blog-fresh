@@ -192,5 +192,22 @@ export const Sites: CollectionConfig = {
     },
 
     { name: 'isDefault', type: 'checkbox', defaultValue: false },
+
+    // ISR Revalidation settings for front-end cache invalidation
+    {
+      name: 'revalidateUrl',
+      type: 'text',
+      admin: {
+        description:
+          'Full URL for on-demand revalidation (e.g., https://resumecoach.me/api/revalidate). Leave empty to skip.',
+      },
+    },
+    {
+      name: 'revalidateSecret',
+      type: 'text',
+      admin: {
+        description: 'Secret token for the revalidation endpoint (passed as ?secret=...)',
+      },
+    },
   ],
 }
