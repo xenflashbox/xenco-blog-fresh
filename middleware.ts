@@ -43,7 +43,11 @@ export function middleware(req: NextRequest) {
   ) {
     // Check for Payload auth cookie or API key
     const hasPayloadToken = req.cookies.has('payload-token')
-    const hasApiKey = req.headers.get('authorization')?.startsWith('Bearer ')
+    const authHeader = req.headers.get('authorization') || ''
+    // Accept multiple auth formats:
+    // - Bearer ${token} (standard JWT/API key)
+    // - users API-Key ${key} (Payload's API key format)
+    const hasApiKey = authHeader.startsWith('Bearer ') || authHeader.includes('API-Key')
 
     if (!hasPayloadToken && !hasApiKey) {
       // Return 401 immediately without initializing Payload (no DB wake!)
