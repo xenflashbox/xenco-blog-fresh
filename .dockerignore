@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Development
+.git
+.gitignore
+*.md
+.env*
+.env.local
+.env.development
+.env.production
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+coverage
+playwright-report
+test-results
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Screenshots and reports
+*.png
+*.report.json
