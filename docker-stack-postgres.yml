@@ -5,7 +5,15 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg17
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "max_wal_senders=10"
     environment:
       POSTGRES_USER: payload
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
