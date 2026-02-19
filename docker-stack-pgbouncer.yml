@@ -1,0 +1,56 @@
+version: '3.8'
+
+# PgBouncer - PostgreSQL Connection Pooler with SSL
+# Supports: payload, devmaestro, mcpforge, launchcraft, litellm databases
+# External URL: db.xencolabs.com:5433
+# SSL enabled for secure external connections
+# Redundancy: 2 replicas across xenco3 + xenco5 (nodes with config files)
+# Placement controlled via node label: pgbouncer-config=true
+
+services:
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    command: ["/usr/bin/pgbouncer", "/etc/pgbouncer/pgbouncer.ini"]
+    volumes:
+      - /home/xen/docker/apps/payload-swarm/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - /home/xen/docker/apps/payload-swarm/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+      - /home/xen/docker/apps/payload-swarm/pgbouncer/server.crt:/etc/pgbouncer/server.crt:ro
+      - /home/xen/docker/apps/payload-swarm/pgbouncer/server.key:/etc/pgbouncer/server.key:ro
+    networks:
+      - payload-internal
+    ports:
+      - "5433:5432"
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.pgbouncer-config == true
+        max_replicas_per_node: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+        failure_action: pause
+        order: stop-first
+
+networks:
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
