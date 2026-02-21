@@ -18,6 +18,8 @@ import { upsertArticleToMeili, deleteArticleFromMeili } from '../lib/meili'
 import { resolveSiteForRequest } from '../lib/site'
 import { triggerRevalidation } from '../lib/revalidate'
 
+
+
 let cachedDefaultSiteId: string | null = null
 let cachedDefaultSiteAt = 0
 
@@ -88,27 +90,64 @@ async function ensureUniqueSlugForSite(args: {
 }
 
 /**
- * Validates relationship filter values on read operations.
- * Payload uses integer primary keys (PostgreSQL serial). Passing a UUID or non-integer
- * string as a relationship filter (e.g. where[site][equals]=<uuid>) causes Postgres to
- * receive NaN and throw "invalid input syntax for type integer" → unhandled 500.
- * This hook intercepts early and returns a descriptive 400 instead.
+ * Domain-based site scoping for read operations.
+ *
+ * The CMS is multi-tenant: cms.resumecoach.me, cms.blogcraft.app, etc. each map to a
+ * specific Site record. This logic was already applied on writes (beforeChange). This hook
+ * extends it to reads so that external callers (Make.com, frontends, APIs) hitting a
+ * domain-specific CMS URL automatically see only that site's articles — no need to
+ * manually pass where[site][equals] at all.
+ *
+ * Safety: internal Payload calls (relationship population, admin lookups, hooks) all pass
+ * overrideAccess:true. We skip scoping for those so internal data fetching is not broken.
+ *
+ * Validation: if a caller does pass where[site][equals] with a non-integer value (e.g. a
+ * UUID), we return a descriptive 400 instead of letting PostgreSQL crash with a 500.
  */
 const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation }) => {
   if (operation !== 'read') return args
 
-  const where = (args as any)?.where
-  if (!where) return args
+  // Skip internal/system reads — Payload's own calls (relationship population, hooks,
+  // admin operations) use overrideAccess:true. We must not scope those.
+  if ((args as any).overrideAccess === true) return args
 
+  const where = (args as any)?.where
   const siteValue = where?.site?.equals
-  if (siteValue != null && typeof siteValue === 'string' && isNaN(Number(siteValue))) {
-    throw new APIError(
-      `Invalid site ID "${siteValue}". The where[site][equals] filter must be a numeric integer ID, not a UUID or slug. ` +
-        `Use GET /api/sites to list your sites and find the correct integer ID (e.g. where[site][equals]=1).`,
-      400,
-      undefined,
-      true,
-    )
+
+  // If caller explicitly passed a site filter, validate it's a usable integer ID.
+  // UUID strings cause Number() → NaN → Postgres "invalid input syntax for type integer" → 500.
+  if (siteValue != null) {
+    if (typeof siteValue === 'string' && isNaN(Number(siteValue))) {
+      throw new APIError(
+        `Invalid site ID "${siteValue}". The where[site][equals] filter must be a numeric ` +
+          `integer ID — not a UUID or slug. You can omit this filter entirely: the CMS ` +
+          `auto-scopes to the correct site based on the domain you're hitting ` +
+          `(e.g. cms.resumecoach.me → site 1). Use GET /api/sites to list all sites.`,
+        400,
+        undefined,
+        true,
+      )
+    }
+    // Valid integer provided — let it pass through as-is.
+    return args
+  }
+
+  // No site filter provided — auto-inject from the request domain.
+  // cms.resumecoach.me → Resume Coach (id: 1), cms.blogcraft.app → BlogCraft (id: 6), etc.
+  const req = (args as any).req
+  if (req?.payload && req?.headers) {
+    try {
+      const site = await resolveSiteForRequest(req.payload, req.headers)
+      if (site?.id) {
+        ;(args as any).where = {
+          ...((args as any).where ?? {}),
+          site: { equals: Number(site.id) },
+        }
+      }
+    } catch (err) {
+      // Non-fatal: if site resolution fails, let the query through unscoped
+      req.payload?.logger?.warn({ err }, 'Articles beforeOperation: site resolution failed, returning unscoped results')
+    }
   }
 
   return args
