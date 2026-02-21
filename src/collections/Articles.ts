@@ -4,7 +4,9 @@ import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
   CollectionBeforeChangeHook,
+  CollectionBeforeOperationHook,
 } from 'payload'
+import { APIError } from 'payload'
 import {
   lexicalEditor,
   UploadFeature,
@@ -83,6 +85,33 @@ async function ensureUniqueSlugForSite(args: {
     candidate = `${base}-${i++}`
     if (i > 50) throw new Error('Unable to generate unique slug for this site.')
   }
+}
+
+/**
+ * Validates relationship filter values on read operations.
+ * Payload uses integer primary keys (PostgreSQL serial). Passing a UUID or non-integer
+ * string as a relationship filter (e.g. where[site][equals]=<uuid>) causes Postgres to
+ * receive NaN and throw "invalid input syntax for type integer" → unhandled 500.
+ * This hook intercepts early and returns a descriptive 400 instead.
+ */
+const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation }) => {
+  if (operation !== 'read') return args
+
+  const where = (args as any)?.where
+  if (!where) return args
+
+  const siteValue = where?.site?.equals
+  if (siteValue != null && typeof siteValue === 'string' && isNaN(Number(siteValue))) {
+    throw new APIError(
+      `Invalid site ID "${siteValue}". The where[site][equals] filter must be a numeric integer ID, not a UUID or slug. ` +
+        `Use GET /api/sites to list your sites and find the correct integer ID (e.g. where[site][equals]=1).`,
+      400,
+      undefined,
+      true,
+    )
+  }
+
+  return args
 }
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
@@ -220,6 +249,7 @@ export const Articles: CollectionConfig = {
   },
 
   hooks: {
+    beforeOperation: [beforeOperation],
     beforeChange: [beforeChange],
     afterChange: [afterChange],
     afterDelete: [afterDelete],
@@ -377,7 +407,55 @@ export const Articles: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
 
-    // SEO fields (read-only, populated by external SEO scoring)
+    // ── SEO fields ──
+    {
+      name: 'metaTitle',
+      type: 'text',
+      admin: {
+        description: 'Custom page <title> for search engines (50-60 chars). Falls back to title + site name.',
+      },
+      maxLength: 70,
+    },
+    {
+      name: 'metaDescription',
+      type: 'textarea',
+      admin: {
+        description: 'Custom meta description for search results (150-160 chars). Falls back to excerpt.',
+      },
+      maxLength: 170,
+    },
+    {
+      name: 'focusKeyword',
+      type: 'text',
+      admin: {
+        description: 'Primary keyword this article targets. Used by SEO scoring and frontend optimization.',
+      },
+    },
+    {
+      name: 'canonicalUrl',
+      type: 'text',
+      admin: {
+        description: 'Custom canonical URL if this article is syndicated or republished from another source.',
+      },
+    },
+    {
+      name: 'noIndex',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Prevent search engines from indexing this article.',
+      },
+    },
+    {
+      name: 'structuredData',
+      type: 'json',
+      admin: {
+        description: 'Optional custom JSON-LD override. Leave empty to auto-generate Article schema.',
+      },
+    },
+
+    // SEO scoring (read-only, populated by external SEO analysis)
     {
       name: 'seoScore',
       type: 'number',
