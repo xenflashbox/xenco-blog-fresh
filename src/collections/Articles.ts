@@ -153,6 +153,62 @@ const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation 
   return args
 }
 
+/**
+ * Recursively walks a Lexical node tree and normalises upload nodes that were
+ * built with the wrong structure by Make.com's content pipeline.
+ *
+ * Make.com sends:  { "type":"upload", "version":2, "id":243, "fields":null, ... }
+ * Payload expects: { "type":"upload", "version":1, "value":243, "fields":{}, ... }
+ *
+ * Differences:
+ *   - version 2 → 1
+ *   - id: N (top-level integer) → value: N
+ *   - fields: null → fields: {}
+ */
+function sanitizeLexicalUploads(node: any): any {
+  if (!node || typeof node !== 'object') return node
+
+  if (Array.isArray(node)) {
+    return node.map(sanitizeLexicalUploads)
+  }
+
+  if (node.type === 'upload') {
+    const fixed: any = { ...node }
+
+    // version: always 1 for Payload Lexical upload nodes
+    fixed.version = 1
+
+    // value: the media integer ID. Make.com puts it in "id"; Payload expects "value".
+    if (fixed.value == null && fixed.id != null && typeof fixed.id === 'number') {
+      fixed.value = fixed.id
+      delete fixed.id
+    }
+
+    // fields must be an object — null causes "not a valid upload ID" validation failure
+    if (fixed.fields == null) {
+      fixed.fields = {}
+    }
+
+    // Ensure required Lexical node props are present
+    if (fixed.format == null) fixed.format = ''
+    if (fixed.indent == null) fixed.indent = 0
+
+    // Recurse into children if any (upload nodes usually have none, but be safe)
+    if (Array.isArray(fixed.children)) {
+      fixed.children = fixed.children.map(sanitizeLexicalUploads)
+    }
+
+    return fixed
+  }
+
+  // For all other node types, recurse into children
+  const result: any = { ...node }
+  if (Array.isArray(result.children)) {
+    result.children = result.children.map(sanitizeLexicalUploads)
+  }
+  return result
+}
+
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   if (!data) return data
 
@@ -170,6 +226,12 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
     } catch {
       throw new Error('Article.content must be valid Lexical JSON.')
     }
+  }
+
+  // Sanitize Lexical upload nodes — Make.com sends version:2, id:N, fields:null
+  // but Payload expects version:1, value:N, fields:{}.
+  if ((data as any).content && typeof (data as any).content === 'object') {
+    ;(data as any).content = sanitizeLexicalUploads((data as any).content)
   }
 
   // Normalize/auto-slug if missing
