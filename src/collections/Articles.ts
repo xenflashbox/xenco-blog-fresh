@@ -154,6 +154,74 @@ const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation 
 }
 
 /**
+ * Resolves a list of category or tag values to integer IDs.
+ *
+ * Make.com sends slugs (or names) instead of IDs because the content pipeline
+ * doesn't have access to Payload's internal integer IDs. This resolver accepts
+ * a mixed array of integers and/or strings, looks up each string by slug first
+ * then by title/name, and returns a clean array of integer IDs.
+ *
+ * Items that are already integers pass through unchanged (backward compatible).
+ * Strings that don't match any record are logged and dropped.
+ */
+async function resolveRelationIds(
+  payload: { find: (args: any) => Promise<any>; logger: any },
+  collection: 'categories' | 'tags',
+  values: any[],
+  siteId: string | null,
+): Promise<number[]> {
+  const ids: number[] = []
+
+  for (const val of values) {
+    // Already a valid integer ID — pass through
+    if (typeof val === 'number' && Number.isInteger(val)) {
+      ids.push(val)
+      continue
+    }
+    if (typeof val === 'string' && /^\d+$/.test(val)) {
+      ids.push(Number(val))
+      continue
+    }
+
+    // String slug or name — look it up
+    if (typeof val === 'string') {
+      const nameField = collection === 'categories' ? 'title' : 'name'
+      const siteFilter = siteId ? [{ site: { equals: Number(siteId) } }] : []
+
+      // Try slug first, then title/name
+      for (const filter of [{ slug: { equals: val } }, { [nameField]: { equals: val } }]) {
+        const res = await payload.find({
+          collection,
+          where: siteFilter.length ? { and: [filter, ...siteFilter] } : filter,
+          limit: 1,
+          depth: 0,
+          overrideAccess: true,
+        })
+        const found = res.docs?.[0]
+        if (found?.id) {
+          ids.push(Number(found.id))
+          break
+        }
+      }
+
+      if (!ids.length || ids[ids.length - 1] === undefined) {
+        payload.logger.warn(
+          `Articles beforeChange: ${collection} slug/name "${val}" not found for site ${siteId ?? 'any'} — skipping`,
+        )
+      }
+      continue
+    }
+
+    // Object with id property (e.g. already-populated relationship)
+    if (val && typeof val === 'object' && val.id) {
+      ids.push(Number(val.id))
+    }
+  }
+
+  return ids
+}
+
+/**
  * Recursively walks a Lexical node tree and normalises upload nodes that were
  * built with the wrong structure by Make.com's content pipeline.
  *
@@ -282,6 +350,28 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
   const prevStatus = (originalDoc as any)?.status
   if (nextStatus === 'published' && prevStatus !== 'published' && !(data as any).publishedAt) {
     ;(data as any).publishedAt = new Date().toISOString()
+  }
+
+  // Resolve category and tag slugs/names to integer IDs.
+  // Make.com sends strings (slugs or names) since the content pipeline doesn't have
+  // access to Payload's internal integer IDs. We look them up server-side so Make.com
+  // never needs to manage IDs.
+  const resolvedSiteId = String((data as any).site ?? existingSite ?? '') || null
+  if (Array.isArray((data as any).categories) && (data as any).categories.length > 0) {
+    ;(data as any).categories = await resolveRelationIds(
+      req.payload,
+      'categories',
+      (data as any).categories,
+      resolvedSiteId,
+    )
+  }
+  if (Array.isArray((data as any).tags) && (data as any).tags.length > 0) {
+    ;(data as any).tags = await resolveRelationIds(
+      req.payload,
+      'tags',
+      (data as any).tags,
+      resolvedSiteId,
+    )
   }
 
   // Ensure slug unique PER SITE (allow same slug across different sites)
