@@ -42,6 +42,15 @@ next-env.d.ts
 .archive/*
 /media
 
+# Claude/AI assistant files (keep production configs)
+.claude/
+.mcp.json
+CLAUDE.md
+.snapshots/
+
+# Keep for reference but don't commit secrets
+# .env.production
+
 # Playwright
 node_modules/
 /test-results/

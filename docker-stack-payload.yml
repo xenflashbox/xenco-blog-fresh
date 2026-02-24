@@ -1,0 +1,96 @@
+version: '3.8'
+
+# Payload CMS Stack for Docker Swarm
+# 3 replicas with Traefik routing via traefik_proxy network
+# Domain: publish.xencolabs.com
+# Cert resolver: cf (Cloudflare)
+
+services:
+  payload:
+    image: registry.xencolabs.com/payload-swarm:latest
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URI: ${DATABASE_URI}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      PAYLOAD_PUBLIC_SERVER_URL: https://publish.xencolabs.com
+      NEXT_PUBLIC_PAYLOAD_URL: https://publish.xencolabs.com
+      # R2 Storage
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET: ${R2_BUCKET}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+      # Meilisearch
+      MEILISEARCH_HOST: ${MEILISEARCH_HOST}
+      MEILISEARCH_KEY: ${MEILISEARCH_KEY}
+      # SEO Scorer
+      SEO_SCORER_URL: ${SEO_SCORER_URL}
+      SEO_SCORER_API_KEY: ${SEO_SCORER_API_KEY}
+      SEO_SCORER_HEADER: X-API-Key
+      # Image Gen
+      IMAGE_GEN_API_URL: ${IMAGE_GEN_API_URL}
+      IMAGE_GEN_API_KEY: ${IMAGE_GEN_API_KEY}
+      # Support API Keys
+      REINDEX_API_KEY: ${REINDEX_API_KEY}
+      SUPPORT_SLACK_WEBHOOK_URL: ${SUPPORT_SLACK_WEBHOOK_URL}
+      SUPPORT_HEALTH_TOKEN: ${SUPPORT_HEALTH_TOKEN}
+      PAYLOAD_ADMIN_API_KEY: ${PAYLOAD_ADMIN_API_KEY}
+      SUPPORT_RATE_LIMIT_ENABLED: "true"
+      SUPPORT_TRIAGE_TOKEN: ${SUPPORT_TRIAGE_TOKEN}
+      SUPPORT_AUTOFIX_TOKEN: ${SUPPORT_AUTOFIX_TOKEN}
+      SUPPORT_ADMIN_TOKEN: ${SUPPORT_ADMIN_TOKEN}
+    networks:
+      - traefik_proxy
+      - payload-internal
+    deploy:
+      replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_proxy"
+        # HTTP Router
+        - "traefik.http.routers.payload-swarm.rule=Host(`publish.xencolabs.com`)"
+        - "traefik.http.routers.payload-swarm.entrypoints=websecure"
+        - "traefik.http.routers.payload-swarm.tls=true"
+        - "traefik.http.routers.payload-swarm.tls.certresolver=cf"
+        # Service
+        - "traefik.http.services.payload-swarm.loadbalancer.server.port=3000"
+        - "traefik.http.services.payload-swarm.loadbalancer.sticky.cookie=true"
+        - "traefik.http.services.payload-swarm.loadbalancer.sticky.cookie.name=payload_swarm_sticky"
+        - "traefik.http.services.payload-swarm.loadbalancer.sticky.cookie.httpOnly=true"
+        - "traefik.http.services.payload-swarm.loadbalancer.sticky.cookie.secure=true"
+        # Health check
+        - "traefik.http.services.payload-swarm.loadbalancer.healthcheck.path=/"
+        - "traefik.http.services.payload-swarm.loadbalancer.healthcheck.interval=30s"
+        - "traefik.http.services.payload-swarm.loadbalancer.healthcheck.timeout=10s"
+
+networks:
+  traefik_proxy:
+    external: true
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
