@@ -1,7 +1,7 @@
 version: '3.8'
 
 # Payload CMS Stack for Docker Swarm
-# 3 replicas with Traefik routing via traefik_proxy network
+# 3 replicas with Traefik routing via traefik_proxy_v2 network
 # Domain: publish.xencolabs.com
 # Cert resolver: cf (Cloudflare)
 
@@ -10,6 +10,7 @@ services:
     image: registry.xencolabs.com/payload-swarm:latest
     environment:
       NODE_ENV: production
+      HOSTNAME: "0.0.0.0"
       PORT: "3000"
       DATABASE_URI: ${DATABASE_URI}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
@@ -41,9 +42,22 @@ services:
       SUPPORT_TRIAGE_TOKEN: ${SUPPORT_TRIAGE_TOKEN}
       SUPPORT_AUTOFIX_TOKEN: ${SUPPORT_AUTOFIX_TOKEN}
       SUPPORT_ADMIN_TOKEN: ${SUPPORT_ADMIN_TOKEN}
+      INTERNAL_LINKER_API_KEY: ${INTERNAL_LINKER_API_KEY}
+      # Redis Caching Configuration
+      # Native Redis VM Sentinel Cluster (not Docker) for HA session/auth
+      # Sentinel nodes: xenco5 (10.8.8.17), xenco4 (10.8.8.16), xenco3 (10.8.8.15)
+      REDIS_SENTINEL_HOSTS: 10.8.8.17:26379,10.8.8.16:26379,10.8.8.15:26379
+      REDIS_SENTINEL_MASTER: mymaster
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # Dedicated local cache for query/page caching (Docker Redis)
+      REDIS_CACHE_URL: redis://payload-redis-cache_payload-cache:6379
+      REDIS_CACHE_TTL: "3600"
+      # Enable caching
+      CACHE_ENABLED: "true"
     networks:
-      - traefik_proxy
+      - traefik_proxy_v2
       - payload-internal
+      - redis-sentinel
     deploy:
       replicas: 3
       placement:
@@ -71,9 +85,11 @@ services:
         window: 120s
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=traefik_proxy"
+        - "traefik.docker.network=traefik_proxy_v2"
         # HTTP Router
-        - "traefik.http.routers.payload-swarm.rule=Host(`publish.xencolabs.com`)"
+        # Add all CMS domains here - separate with || for OR
+        # All CMS domains - derived from sites_domains table
+        - "traefik.http.routers.payload-swarm.rule=Host(`publish.xencolabs.com`) || Host(`cms.blogcraft.app`) || Host(`cms.devmaestro.io`) || Host(`cms.diabetescompass.com`) || Host(`cms.fiberinsider.com`) || Host(`cms.fightclubtech.com`) || Host(`cms.fightmybank.com`) || Host(`cms.homebeautyspa.com`) || Host(`cms.imagecrafter.app`) || Host(`cms.isthisagoodjob.com`) || Host(`cms.landingcraft.app`) || Host(`cms.landlordhell.com`) || Host(`cms.lexiexplains.com`) || Host(`cms.mcpforge.org`) || Host(`cms.promptmarketer.app`) || Host(`cms.resumecoach.me`) || Host(`cms.snackabletiktok.com`) || Host(`cms.sonomagrovesuites.com`) || Host(`cms.tinatortoise.com`) || Host(`cms.winecountrycorner.com`) || Host(`cms.xencolabs.com`)"
         - "traefik.http.routers.payload-swarm.entrypoints=websecure"
         - "traefik.http.routers.payload-swarm.tls=true"
         - "traefik.http.routers.payload-swarm.tls.certresolver=cf"
@@ -89,8 +105,13 @@ services:
         - "traefik.http.services.payload-swarm.loadbalancer.healthcheck.timeout=10s"
 
 networks:
-  traefik_proxy:
+  traefik_proxy_v2:
     external: true
   payload-internal:
     external: true
     name: payload-postgres_payload-internal
+  # Redis Sentinel network - provides HAProxy bridge fallback
+  # Primary connection uses direct VM IPs for Sentinel-aware HA
+  redis-sentinel:
+    external: true
+    name: redis-sentinel_redis-network
