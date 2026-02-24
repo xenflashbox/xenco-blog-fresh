@@ -18,9 +18,14 @@ import { Tags } from './collections/Tags'
 import { SupportKBArticles } from './collections/SupportKBArticles'
 import { SupportPlaybooks } from './collections/SupportPlaybooks'
 import { SupportAnnouncements } from './collections/SupportAnnouncements'
+import { InternalLinkRules } from './collections/InternalLinkRules'
+import { InternalLinkEdges } from './collections/InternalLinkEdges'
+import { InternalLinkRuns } from './collections/InternalLinkRuns'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
+import { internalLinksRunEndpoint } from './endpoints/internalLinksRun'
+import { internalLinksRunStatusEndpoint } from './endpoints/internalLinksRunStatus'
 import {
   meiliConfigureEndpoint,
   meiliResyncEndpoint,
@@ -81,6 +86,9 @@ export default buildConfig({
     SupportKBArticles,
     SupportPlaybooks,
     SupportAnnouncements,
+    InternalLinkRules,
+    InternalLinkEdges,
+    InternalLinkRuns,
   ],
 
   endpoints: [
@@ -107,6 +115,8 @@ export default buildConfig({
     supportAdminTicketUpdateEndpoint,
     supportAdminTriageReportsEndpoint,
     supportAdminEventsListEndpoint,
+    internalLinksRunEndpoint,
+    internalLinksRunStatusEndpoint,
   ],
 
   editor: lexicalEditor(),

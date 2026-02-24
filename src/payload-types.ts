@@ -77,6 +77,9 @@ export interface Config {
     support_kb_articles: SupportKbArticle;
     support_playbooks: SupportPlaybook;
     support_announcements: SupportAnnouncement;
+    internal_link_rules: InternalLinkRule;
+    internal_link_edges: InternalLinkEdge;
+    internal_link_runs: InternalLinkRun;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +97,9 @@ export interface Config {
     support_kb_articles: SupportKbArticlesSelect<false> | SupportKbArticlesSelect<true>;
     support_playbooks: SupportPlaybooksSelect<false> | SupportPlaybooksSelect<true>;
     support_announcements: SupportAnnouncementsSelect<false> | SupportAnnouncementsSelect<true>;
+    internal_link_rules: InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
+    internal_link_edges: InternalLinkEdgesSelect<false> | InternalLinkEdgesSelect<true>;
+    internal_link_runs: InternalLinkRunsSelect<false> | InternalLinkRunsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -251,6 +257,38 @@ export interface Article {
   site: number | Site;
   status: 'draft' | 'published';
   publishedAt?: string | null;
+  /**
+   * Custom page <title> for search engines (50-60 chars). Falls back to title + site name.
+   */
+  metaTitle?: string | null;
+  /**
+   * Custom meta description for search results (150-160 chars). Falls back to excerpt.
+   */
+  metaDescription?: string | null;
+  /**
+   * Primary keyword this article targets. Used by SEO scoring and frontend optimization.
+   */
+  focusKeyword?: string | null;
+  /**
+   * Custom canonical URL if this article is syndicated or republished from another source.
+   */
+  canonicalUrl?: string | null;
+  /**
+   * Prevent search engines from indexing this article.
+   */
+  noIndex?: boolean | null;
+  /**
+   * Optional custom JSON-LD override. Leave empty to auto-generate Article schema.
+   */
+  structuredData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Latest SEO score (0–100).
    */
@@ -461,6 +499,89 @@ export interface SupportAnnouncement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_rules".
+ */
+export interface InternalLinkRule {
+  id: number;
+  site: number | Site;
+  targetArticle: number | Article;
+  keywords: {
+    keyword: string;
+    id?: string | null;
+  }[];
+  priority?: number | null;
+  maxLinksPerSource?: number | null;
+  caseSensitive?: boolean | null;
+  partialMatch?: boolean | null;
+  enabled?: boolean | null;
+  source: 'manual' | 'generated';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_edges".
+ */
+export interface InternalLinkEdge {
+  id: number;
+  site: number | Site;
+  sourceArticle: number | Article;
+  targetArticle: number | Article;
+  keywordUsed?: string | null;
+  anchorText?: string | null;
+  contextHash: string;
+  placement: 'in_body' | 'related_reading';
+  runId: number | InternalLinkRun;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Run internal linker manually via endpoint: POST /api/internal-links/run?mode=dry_run|apply&site=all|<id>
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_runs".
+ */
+export interface InternalLinkRun {
+  id: number;
+  site?: (number | null) | Site;
+  mode: 'dry_run' | 'apply';
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'partial';
+  strategyVersion: string;
+  trigger: 'manual' | 'scheduled' | 'endpoint';
+  startedAt?: string | null;
+  endedAt?: string | null;
+  cursor?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  stats:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  errors?:
+    | {
+        articleId?: string | null;
+        message: string;
+        id?: string | null;
+      }[]
+    | null;
+  lockKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -522,6 +643,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'support_announcements';
         value: number | SupportAnnouncement;
+      } | null)
+    | ({
+        relationTo: 'internal_link_rules';
+        value: number | InternalLinkRule;
+      } | null)
+    | ({
+        relationTo: 'internal_link_edges';
+        value: number | InternalLinkEdge;
+      } | null)
+    | ({
+        relationTo: 'internal_link_runs';
+        value: number | InternalLinkRun;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -647,6 +780,12 @@ export interface ArticlesSelect<T extends boolean = true> {
   site?: T;
   status?: T;
   publishedAt?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  focusKeyword?: T;
+  canonicalUrl?: T;
+  noIndex?: T;
+  structuredData?: T;
   seoScore?: T;
   seoGrade?: T;
   seoScoredAt?: T;
@@ -773,6 +912,70 @@ export interface SupportAnnouncementsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_rules_select".
+ */
+export interface InternalLinkRulesSelect<T extends boolean = true> {
+  site?: T;
+  targetArticle?: T;
+  keywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  priority?: T;
+  maxLinksPerSource?: T;
+  caseSensitive?: T;
+  partialMatch?: T;
+  enabled?: T;
+  source?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_edges_select".
+ */
+export interface InternalLinkEdgesSelect<T extends boolean = true> {
+  site?: T;
+  sourceArticle?: T;
+  targetArticle?: T;
+  keywordUsed?: T;
+  anchorText?: T;
+  contextHash?: T;
+  placement?: T;
+  runId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal_link_runs_select".
+ */
+export interface InternalLinkRunsSelect<T extends boolean = true> {
+  site?: T;
+  mode?: T;
+  status?: T;
+  strategyVersion?: T;
+  trigger?: T;
+  startedAt?: T;
+  endedAt?: T;
+  cursor?: T;
+  stats?: T;
+  errors?:
+    | T
+    | {
+        articleId?: T;
+        message?: T;
+        id?: T;
+      };
+  lockKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
