@@ -1,22 +1,9 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Build and push Payload CMS Docker image to GitHub Container Registry
-# Usage: ./build-and-push.sh [tag]
+TAG="${1:-latest}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}"
 
-TAG=${1:-latest}
-IMAGE_NAME="ghcr.io/xenflashbox/payload-swarm"
-
-echo "Building Payload CMS Docker image..."
-docker build -t "${IMAGE_NAME}:${TAG}" .
-
-echo "Pushing to GitHub Container Registry..."
-docker push "${IMAGE_NAME}:${TAG}"
-
-# Also tag as latest if building a specific version
-if [ "$TAG" != "latest" ]; then
-    docker tag "${IMAGE_NAME}:${TAG}" "${IMAGE_NAME}:latest"
-    docker push "${IMAGE_NAME}:latest"
-fi
-
-echo "Done! Image available at ${IMAGE_NAME}:${TAG}"
+./scripts/build.sh "${TAG}"
+./scripts/push.sh "${TAG}"
