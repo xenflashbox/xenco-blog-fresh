@@ -9,11 +9,14 @@ import * as migration_20251215_185759_fix_unique_indexes_categories_tags from '.
 import * as migration_20251223_add_support_collections from './20251223_add_support_collections';
 import * as migration_20251223_fix_announcements_columns from './20251223_fix_announcements_columns';
 import * as migration_20251226_add_kb_steps_triggers from './20251226_add_kb_steps_triggers';
-import * as migration_20260218_add_article_seo_fields from './20260218_add_article_seo_fields';
-import * as migration_20260224_add_internal_linker_collections from './20260224_add_internal_linker_collections';
 // Migration 20251229 causes Vercel startup issues - run SQL manually instead.
 // See: src/migrations/20251229_add_support_events_triage.ts for the SQL.
 // import * as migration_20251229_add_support_events_triage from './20251229_add_support_events_triage';
+import * as migration_20260218_add_article_seo_fields from './20260218_add_article_seo_fields';
+import * as migration_20260224_add_internal_linker_collections from './20260224_add_internal_linker_collections';
+import * as migration_20260224_internal_linker_hardening from './20260224_internal_linker_hardening';
+import * as migration_20260225_add_sites_revalidate_columns from './20260225_add_sites_revalidate_columns';
+import * as migration_20260227_214422 from './20260227_214422';
 
 export const migrations = [
   {
@@ -59,17 +62,17 @@ export const migrations = [
   {
     up: migration_20251223_add_support_collections.up,
     down: migration_20251223_add_support_collections.down,
-    name: '20251223_add_support_collections'
+    name: '20251223_add_support_collections',
   },
   {
     up: migration_20251223_fix_announcements_columns.up,
     down: migration_20251223_fix_announcements_columns.down,
-    name: '20251223_fix_announcements_columns'
+    name: '20251223_fix_announcements_columns',
   },
   {
     up: migration_20251226_add_kb_steps_triggers.up,
     down: migration_20251226_add_kb_steps_triggers.down,
-    name: '20251226_add_kb_steps_triggers'
+    name: '20251226_add_kb_steps_triggers',
   },
   // Disabled - run SQL manually. See comment at top of file.
   // {
@@ -86,5 +89,20 @@ export const migrations = [
     up: migration_20260224_add_internal_linker_collections.up,
     down: migration_20260224_add_internal_linker_collections.down,
     name: '20260224_add_internal_linker_collections',
+  },
+  {
+    up: migration_20260224_internal_linker_hardening.up,
+    down: migration_20260224_internal_linker_hardening.down,
+    name: '20260224_internal_linker_hardening',
+  },
+  {
+    up: migration_20260225_add_sites_revalidate_columns.up,
+    down: migration_20260225_add_sites_revalidate_columns.down,
+    name: '20260225_add_sites_revalidate_columns',
+  },
+  {
+    up: migration_20260227_214422.up,
+    down: migration_20260227_214422.down,
+    name: '20260227_214422'
   },
 ];

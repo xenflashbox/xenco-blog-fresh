@@ -21,11 +21,16 @@ import { SupportAnnouncements } from './collections/SupportAnnouncements'
 import { InternalLinkRules } from './collections/InternalLinkRules'
 import { InternalLinkEdges } from './collections/InternalLinkEdges'
 import { InternalLinkRuns } from './collections/InternalLinkRuns'
+import { Suites } from './collections/Suites'
+import { Reviews } from './collections/Reviews'
+import { DirectoryEntries } from './collections/DirectoryEntries'
+import { Events } from './collections/Events'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
 import { internalLinksRunEndpoint } from './endpoints/internalLinksRun'
 import { internalLinksRunStatusEndpoint } from './endpoints/internalLinksRunStatus'
+import { internalLinksRevertEndpoint } from './endpoints/internalLinksRevert'
 import {
   meiliConfigureEndpoint,
   meiliResyncEndpoint,
@@ -89,6 +94,10 @@ export default buildConfig({
     InternalLinkRules,
     InternalLinkEdges,
     InternalLinkRuns,
+    Suites,
+    Reviews,
+    DirectoryEntries,
+    Events,
   ],
 
   endpoints: [
@@ -117,6 +126,7 @@ export default buildConfig({
     supportAdminEventsListEndpoint,
     internalLinksRunEndpoint,
     internalLinksRunStatusEndpoint,
+    internalLinksRevertEndpoint,
   ],
 
   editor: lexicalEditor(),
