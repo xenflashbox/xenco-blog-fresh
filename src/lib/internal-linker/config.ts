@@ -9,5 +9,5 @@ export const INTERNAL_LINKER_PRESERVE_MANUAL_LINKS = true
 export const INTERNAL_LINKER_PERSIST_GENERATED_RULES = false
 
 export type InternalLinkRunMode = 'dry_run' | 'apply'
-export type InternalLinkRunStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'partial'
+export type InternalLinkRunStatus = 'queued' | 'running' | 'succeeded' | 'failed' | 'partial' | 'reverted'
 export type InternalLinkPlacement = 'in_body' | 'related_reading'

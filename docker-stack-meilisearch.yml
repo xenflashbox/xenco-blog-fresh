@@ -1,0 +1,96 @@
+version: '3.8'
+
+# ============================================================================
+# PAYLOAD MEILISEARCH STACK - Blog Search Engine
+# ============================================================================
+# Deploy with: docker stack deploy -c docker-stack-meilisearch.yml payload-blog
+#
+# This is the Meilisearch instance for Payload CMS blog sites
+# Domain: search.xencolabs.com
+# Data Volume: payload-blog_meilisearch-data (existing, preserves indexed data)
+#
+# NOTE: This is SEPARATE from DevMaestro Meilisearch (search.devmaestro.io)
+# which is used for agent memory/history storage
+#
+# Part of the payload-swarm infrastructure - consolidated here as source of truth
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # MEILISEARCH - Full-Text Search for Payload CMS Blog Sites
+  # ==========================================================================
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    environment:
+      - MEILI_ENV=production
+      - MEILI_DB_PATH=/meili_data
+      - MEILI_HTTP_ADDR=0.0.0.0:7700
+      - MEILI_MAX_INDEXING_MEMORY=2048MB
+    secrets:
+      - meili_master_key
+    command: >
+      sh -c '
+      export MEILI_MASTER_KEY=$$(cat /run/secrets/meili_master_key)
+      && exec /bin/meilisearch
+      '
+    volumes:
+      - meilisearch-data:/meili_data
+    networks:
+      - traefik_proxy_v2
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname != xenco2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        # Enable Traefik
+        - traefik.enable=true
+        - traefik.docker.network=traefik_proxy_v2
+        # Service definition
+        - traefik.http.services.payload-meilisearch-svc.loadbalancer.server.port=7700
+        - traefik.http.services.payload-meilisearch-svc.loadbalancer.server.scheme=http
+        # HTTPS router
+        - traefik.http.routers.payload-meilisearch-https.rule=Host(`search.xencolabs.com`)
+        - traefik.http.routers.payload-meilisearch-https.entrypoints=websecure
+        - traefik.http.routers.payload-meilisearch-https.tls=true
+        - traefik.http.routers.payload-meilisearch-https.tls.certresolver=cf
+        - traefik.http.routers.payload-meilisearch-https.service=payload-meilisearch-svc
+        # HTTP to HTTPS redirect
+        - traefik.http.routers.payload-meilisearch-http.rule=Host(`search.xencolabs.com`)
+        - traefik.http.routers.payload-meilisearch-http.entrypoints=web
+        - traefik.http.routers.payload-meilisearch-http.middlewares=payload-meilisearch-https-redirect
+        - traefik.http.routers.payload-meilisearch-http.service=payload-meilisearch-svc
+        - traefik.http.middlewares.payload-meilisearch-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.payload-meilisearch-https-redirect.redirectscheme.permanent=true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  traefik_proxy_v2:
+    external: true
+
+# ============================================================================
+# SECRETS
+# ============================================================================
+secrets:
+  meili_master_key:
+    external: true
+
+# ============================================================================
+# VOLUMES - Uses existing volume with indexed data
+# ============================================================================
+volumes:
+  meilisearch-data:
+    external: true
+    name: payload-blog_meilisearch-data

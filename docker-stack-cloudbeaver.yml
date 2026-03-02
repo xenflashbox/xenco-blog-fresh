@@ -1,0 +1,62 @@
+version: '3.8'
+
+# CloudBeaver - Modern SQL Editor for Payload PostgreSQL
+# URL: sql.xencolabs.com
+# Protected with basic auth
+# Updated: 2026-01-27 - Using NFS storage for persistent configuration
+
+services:
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    environment:
+      CB_SERVER_NAME: "Xenco SQL Manager"
+      CB_ADMIN_NAME: admin
+      CB_ADMIN_PASSWORD: xenco2025
+      # Disable forceHttps since Traefik handles SSL termination
+      CLOUDBEAVER_FORCE_HTTPS: "false"
+    volumes:
+      # NFS bind mount for persistent storage across nodes
+      - /nfs/swarm/cloudbeaver:/opt/cloudbeaver/workspace
+    networks:
+      - traefik_proxy_v2
+      - payload-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          # Run on xenco6 which has the full NFS swarm share mounted
+          - node.hostname == xenco6
+      resources:
+        limits:
+          cpus: '1'
+          memory: 768M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_proxy_v2"
+        # HTTP Router with Basic Auth
+        - "traefik.http.routers.cloudbeaver.rule=Host(`sql.xencolabs.com`)"
+        - "traefik.http.routers.cloudbeaver.entrypoints=websecure"
+        - "traefik.http.routers.cloudbeaver.tls=true"
+        - "traefik.http.routers.cloudbeaver.tls.certresolver=cf"
+        # Basic Auth Middleware
+        - "traefik.http.routers.cloudbeaver.middlewares=cloudbeaver-auth"
+        - "traefik.http.middlewares.cloudbeaver-auth.basicauth.users=admin:$$apr1$$ceBq//Pa$$W5P9Qt0fH/lanYJP54EjU1"
+        - "traefik.http.middlewares.cloudbeaver-auth.basicauth.realm=Xenco SQL Manager"
+        # Service
+        - "traefik.http.services.cloudbeaver.loadbalancer.server.port=8978"
+
+networks:
+  traefik_proxy_v2:
+    external: true
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
+
+# No volumes section needed - using bind mount to NFS

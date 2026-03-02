@@ -80,6 +80,10 @@ export interface Config {
     internal_link_rules: InternalLinkRule;
     internal_link_edges: InternalLinkEdge;
     internal_link_runs: InternalLinkRun;
+    suites: Suite;
+    reviews: Review;
+    'directory-entries': DirectoryEntry;
+    events: Event;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +104,10 @@ export interface Config {
     internal_link_rules: InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
     internal_link_edges: InternalLinkEdgesSelect<false> | InternalLinkEdgesSelect<true>;
     internal_link_runs: InternalLinkRunsSelect<false> | InternalLinkRunsSelect<true>;
+    suites: SuitesSelect<false> | SuitesSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'directory-entries': DirectoryEntriesSelect<false> | DirectoryEntriesSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -345,6 +353,7 @@ export interface Author {
   slug: string;
   bio?: string | null;
   avatar?: (number | null) | Media;
+  avatarUrl?: string | null;
   website?: string | null;
   site: number | Site;
   isDefault?: boolean | null;
@@ -532,7 +541,14 @@ export interface InternalLinkEdge {
   anchorText?: string | null;
   contextHash: string;
   placement: 'in_body' | 'related_reading';
+  targetUrl?: string | null;
+  leftContext?: string | null;
+  rightContext?: string | null;
+  fingerprint?: string | null;
+  status: 'active' | 'stale' | 'reverted';
   runId: number | InternalLinkRun;
+  lastSeenRunId?: (number | null) | InternalLinkRun;
+  revertRunId?: (number | null) | InternalLinkRun;
   updatedAt: string;
   createdAt: string;
 }
@@ -546,7 +562,8 @@ export interface InternalLinkRun {
   id: number;
   site?: (number | null) | Site;
   mode: 'dry_run' | 'apply';
-  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'partial';
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'partial' | 'reverted';
+  action: 'link' | 'revert';
   strategyVersion: string;
   trigger: 'manual' | 'scheduled' | 'endpoint';
   startedAt?: string | null;
@@ -577,6 +594,214 @@ export interface InternalLinkRun {
       }[]
     | null;
   lockKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suites".
+ */
+export interface Suite {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  tagline: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  shortDescription?: string | null;
+  details: {
+    bedrooms: number;
+    bathrooms: number;
+    maxGuests: number;
+    sqft?: number | null;
+    floor?: ('ground' | 'upper') | null;
+    hasPatio?: boolean | null;
+    hasEnSuite?: boolean | null;
+    isADACompliant?: boolean | null;
+  };
+  amenities?:
+    | {
+        name: string;
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  images?:
+    | {
+        image: number | Media;
+        alt: string;
+        caption?: string | null;
+        isPrimary?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  lodgifyPropertyId: string;
+  pricing?: {
+    baseNightlyRate?: number | null;
+    cleaningFee?: number | null;
+    directBookingDiscount?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  status?: ('active' | 'inactive') | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  site: number | Site;
+  reviewerName: string;
+  reviewerLocation?: string | null;
+  suite: number | Suite;
+  rating: number;
+  title?: string | null;
+  content: string;
+  date: string;
+  highlights?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  source?: ('airbnb' | 'vrbo' | 'booking' | 'direct' | 'google') | null;
+  isFeatured?: boolean | null;
+  status?: ('active' | 'hidden') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "directory-entries".
+ */
+export interface DirectoryEntry {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  shortDescription?: string | null;
+  category: 'wineries' | 'restaurants' | 'activities' | 'venues';
+  subcategory?: string | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  featuredImage?: (number | null) | Media;
+  logo?: (number | null) | Media;
+  location?: {
+    address?: string | null;
+    city?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    distanceFromProperty?: string | null;
+    driveTimeMinutes?: number | null;
+  };
+  contact?: {
+    website?: string | null;
+    phone?: string | null;
+    email?: string | null;
+  };
+  details?: {
+    priceRange?: ('$' | '$$' | '$$$' | '$$$$') | null;
+    hours?: string | null;
+    reservationRequired?: boolean | null;
+    tastingFeeRange?: string | null;
+    cuisineType?: string | null;
+    capacity?: string | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  isFeatured?: boolean | null;
+  sortOrder?: number | null;
+  status?: ('active' | 'inactive') | null;
+  sourceUrl?: string | null;
+  lastCrawledAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  shortDescription?: string | null;
+  featuredImage?: (number | null) | Media;
+  startDate: string;
+  endDate?: string | null;
+  category?: ('music' | 'wine-food' | 'arts-culture' | 'seasonal' | 'community' | 'festivals') | null;
+  location?: {
+    venueName?: string | null;
+    address?: string | null;
+    city?: string | null;
+  };
+  externalUrl?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  isFeatured?: boolean | null;
+  status?: ('active' | 'past') | null;
+  sourceUrl?: string | null;
+  lastCrawledAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -655,6 +880,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'internal_link_runs';
         value: number | InternalLinkRun;
+      } | null)
+    | ({
+        relationTo: 'suites';
+        value: number | Suite;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'directory-entries';
+        value: number | DirectoryEntry;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -948,7 +1189,14 @@ export interface InternalLinkEdgesSelect<T extends boolean = true> {
   anchorText?: T;
   contextHash?: T;
   placement?: T;
+  targetUrl?: T;
+  leftContext?: T;
+  rightContext?: T;
+  fingerprint?: T;
+  status?: T;
   runId?: T;
+  lastSeenRunId?: T;
+  revertRunId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -960,6 +1208,7 @@ export interface InternalLinkRunsSelect<T extends boolean = true> {
   site?: T;
   mode?: T;
   status?: T;
+  action?: T;
   strategyVersion?: T;
   trigger?: T;
   startedAt?: T;
@@ -974,6 +1223,186 @@ export interface InternalLinkRunsSelect<T extends boolean = true> {
         id?: T;
       };
   lockKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suites_select".
+ */
+export interface SuitesSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  tagline?: T;
+  description?: T;
+  shortDescription?: T;
+  details?:
+    | T
+    | {
+        bedrooms?: T;
+        bathrooms?: T;
+        maxGuests?: T;
+        sqft?: T;
+        floor?: T;
+        hasPatio?: T;
+        hasEnSuite?: T;
+        isADACompliant?: T;
+      };
+  amenities?:
+    | T
+    | {
+        name?: T;
+        icon?: T;
+        id?: T;
+      };
+  images?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        caption?: T;
+        isPrimary?: T;
+        id?: T;
+      };
+  lodgifyPropertyId?: T;
+  pricing?:
+    | T
+    | {
+        baseNightlyRate?: T;
+        cleaningFee?: T;
+        directBookingDiscount?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  status?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  site?: T;
+  reviewerName?: T;
+  reviewerLocation?: T;
+  suite?: T;
+  rating?: T;
+  title?: T;
+  content?: T;
+  date?: T;
+  highlights?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  source?: T;
+  isFeatured?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "directory-entries_select".
+ */
+export interface DirectoryEntriesSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  description?: T;
+  shortDescription?: T;
+  category?: T;
+  subcategory?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  featuredImage?: T;
+  logo?: T;
+  location?:
+    | T
+    | {
+        address?: T;
+        city?: T;
+        latitude?: T;
+        longitude?: T;
+        distanceFromProperty?: T;
+        driveTimeMinutes?: T;
+      };
+  contact?:
+    | T
+    | {
+        website?: T;
+        phone?: T;
+        email?: T;
+      };
+  details?:
+    | T
+    | {
+        priceRange?: T;
+        hours?: T;
+        reservationRequired?: T;
+        tastingFeeRange?: T;
+        cuisineType?: T;
+        capacity?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  isFeatured?: T;
+  sortOrder?: T;
+  status?: T;
+  sourceUrl?: T;
+  lastCrawledAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  description?: T;
+  shortDescription?: T;
+  featuredImage?: T;
+  startDate?: T;
+  endDate?: T;
+  category?: T;
+  location?:
+    | T
+    | {
+        venueName?: T;
+        address?: T;
+        city?: T;
+      };
+  externalUrl?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  isFeatured?: T;
+  status?: T;
+  sourceUrl?: T;
+  lastCrawledAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

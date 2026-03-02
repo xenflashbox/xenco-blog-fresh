@@ -4,11 +4,29 @@ import type {
   CollectionBeforeDeleteHook,
 } from 'payload'
 import { normalizeDomain } from '../lib/site'
+import { syncDomainsAfterChange, syncDomainsAfterDelete } from '../hooks/syncDomainsToTraefik'
+
+function normalizeDomainPreserveSubdomain(raw: string): string | null {
+  const value = String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .split('/')[0]
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/:\d+$/, '')
+    .replace(/\.$/, '')
+    .replace(/\/+$/, '')
+
+  return value || null
+}
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc }) => {
   if (!data) return data
 
-  // Normalize domains - store only root domains (remove cms. and www. prefixes)
+  // Normalize domains while preserving subdomains.
+  // This keeps explicit entries like `cms.example.com` and `www.example.com`
+  // visible in admin instead of collapsing them into `example.com`.
   if (Array.isArray(data.domains)) {
     data.domains = data.domains
       .map((d: any) => {
@@ -21,12 +39,10 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc
 
         if (!raw) return null
 
-        const normalized = normalizeDomain(raw)
+        const normalized = normalizeDomainPreserveSubdomain(raw)
         if (!normalized) return null
 
-        // Strip cms. and www. prefixes to store only root domain
-        const canonical = normalized.replace(/^cms\./, '').replace(/^www\./, '')
-        return canonical ? { domain: canonical } : null
+        return { domain: normalized }
       })
       .filter((d: any) => d !== null)
 
@@ -176,6 +192,8 @@ export const Sites: CollectionConfig = {
   hooks: {
     beforeChange: [beforeChange],
     beforeDelete: [beforeDelete],
+    afterChange: [syncDomainsAfterChange],
+    afterDelete: [syncDomainsAfterDelete],
   },
   fields: [
     { name: 'name', type: 'text', required: true },

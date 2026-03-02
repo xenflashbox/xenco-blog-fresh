@@ -43,6 +43,17 @@ export const InternalLinkRuns: CollectionConfig = {
         { label: 'Succeeded', value: 'succeeded' },
         { label: 'Failed', value: 'failed' },
         { label: 'Partial', value: 'partial' },
+        { label: 'Reverted', value: 'reverted' },
+      ],
+    },
+    {
+      name: 'action',
+      type: 'select',
+      required: true,
+      defaultValue: 'link',
+      options: [
+        { label: 'Link', value: 'link' },
+        { label: 'Revert', value: 'revert' },
       ],
     },
     {

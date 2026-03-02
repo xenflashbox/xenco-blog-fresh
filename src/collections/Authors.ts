@@ -89,6 +89,13 @@ export const Authors: CollectionConfig = {
 
     // optional quality-of-life
     { name: 'avatar', type: 'upload', relationTo: 'media' },
+    {
+      name: 'avatarUrl',
+      type: 'text',
+      admin: {
+        description: 'External image URL (e.g. from R2/Blogcraft). Used when no uploaded avatar is set.',
+      },
+    },
     { name: 'website', type: 'text' },
 
     // multi-site link

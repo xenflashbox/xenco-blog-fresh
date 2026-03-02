@@ -7,6 +7,7 @@ import {
   INTERNAL_LINKER_STRATEGY_VERSION,
   type InternalLinkRunMode,
 } from './config'
+import { collectInternalLinkOccurrences, normalizeInternalHref } from './contentState'
 import { buildContextHash } from './hash'
 import { insertInBodyLinks } from './lexicalTransform'
 import { upsertRelatedReadingBlock } from './relatedReading'
@@ -19,6 +20,26 @@ type RunResult = {
   status: 'succeeded' | 'failed' | 'partial'
   stats: ReturnType<typeof createEmptyStats>
   message: string
+}
+
+export async function createInternalLinkerRun(payload: Payload, request: RunRequest): Promise<string> {
+  const runDoc = await payload.create({
+    collection: 'internal_link_runs',
+    data: {
+      site: request.site === 'all' ? null : Number(request.site),
+      mode: request.mode,
+      status: 'running',
+      action: 'link',
+      strategyVersion: INTERNAL_LINKER_STRATEGY_VERSION,
+      trigger: request.trigger,
+      startedAt: new Date().toISOString(),
+      lockKey: `internal-linker:${request.site}`,
+      stats: createEmptyStats(),
+      errors: [],
+    },
+    overrideAccess: true,
+  })
+  return String(runDoc.id)
 }
 
 function toSafeLimit(limit: number): number {
@@ -167,6 +188,9 @@ async function alreadyLinked(payload: Payload, args: {
       { site: { equals: args.siteId } },
       { sourceArticle: { equals: args.sourceArticleId } },
       { targetArticle: { equals: args.targetArticleId } },
+      {
+        or: [{ status: { equals: 'active' } }, { status: { exists: false } }],
+      },
     ],
   }
   if (args.placement) {
@@ -189,6 +213,7 @@ async function writeEdge(payload: Payload, args: {
   link: InsertedLink
   runId: string
   strategyVersion: string
+  occurrenceByHref: Map<string, Array<{ leftContext: string; rightContext: string; fingerprint: string }>>
 }) {
   const contextHash = buildContextHash({
     sourceArticleId: args.sourceArticleId,
@@ -197,6 +222,45 @@ async function writeEdge(payload: Payload, args: {
     anchorText: args.link.anchorText,
     strategyVersion: args.strategyVersion,
   })
+
+  const href = normalizeInternalHref(args.link.href)
+  const matchedOccurrence = href ? args.occurrenceByHref.get(href)?.shift() : undefined
+
+  const existing = await payload.find({
+    collection: 'internal_link_edges',
+    where: {
+      and: [
+        { site: { equals: args.siteId } },
+        { sourceArticle: { equals: args.sourceArticleId } },
+        { targetArticle: { equals: args.link.targetArticleId } },
+        { placement: { equals: args.link.placement } },
+        { contextHash: { equals: contextHash } },
+      ],
+    },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const existingDoc = existing.docs?.[0]
+  if (existingDoc?.id) {
+    await payload.update({
+      collection: 'internal_link_edges',
+      id: Number(existingDoc.id),
+      data: {
+        keywordUsed: args.link.keywordUsed,
+        anchorText: args.link.anchorText,
+        targetUrl: href,
+        leftContext: matchedOccurrence?.leftContext || null,
+        rightContext: matchedOccurrence?.rightContext || null,
+        fingerprint: matchedOccurrence?.fingerprint || null,
+        status: 'active',
+        lastSeenRunId: Number(args.runId),
+      },
+      overrideAccess: true,
+    })
+    return
+  }
 
   await payload.create({
     collection: 'internal_link_edges',
@@ -208,33 +272,67 @@ async function writeEdge(payload: Payload, args: {
       anchorText: args.link.anchorText,
       contextHash,
       placement: args.link.placement,
+      targetUrl: href,
+      leftContext: matchedOccurrence?.leftContext || null,
+      rightContext: matchedOccurrence?.rightContext || null,
+      fingerprint: matchedOccurrence?.fingerprint || null,
+      status: 'active',
       runId: Number(args.runId),
+      lastSeenRunId: Number(args.runId),
     },
     overrideAccess: true,
   })
 }
 
-export async function runInternalLinker(payload: Payload, request: RunRequest): Promise<RunResult> {
-  const stats = createEmptyStats()
-  const limit = toSafeLimit(request.limit || INTERNAL_LINKER_DEFAULT_BATCH_LIMIT)
-  const lockKey = `internal-linker:${request.site}`
+async function reconcileEdgeStateForSource(payload: Payload, args: {
+  siteId: string
+  sourceArticleId: string
+  content: unknown
+  runId: string
+}) {
+  const occurrences = collectInternalLinkOccurrences(args.content)
+  const hrefSet = new Set(occurrences.map((item) => item.href))
 
-  const runDoc = await payload.create({
-    collection: 'internal_link_runs',
-    data: {
-      site: request.site === 'all' ? null : Number(request.site),
-      mode: request.mode,
-      status: 'running',
-      strategyVersion: INTERNAL_LINKER_STRATEGY_VERSION,
-      trigger: request.trigger,
-      startedAt: new Date().toISOString(),
-      lockKey,
-      stats,
-      errors: [],
+  const existing = await payload.find({
+    collection: 'internal_link_edges',
+    where: {
+      and: [{ site: { equals: args.siteId } }, { sourceArticle: { equals: args.sourceArticleId } }],
     },
+    limit: 1000,
+    depth: 1,
     overrideAccess: true,
   })
-  const runId = String(runDoc.id)
+
+  for (const edge of existing.docs || []) {
+    const targetFromRelation =
+      typeof edge?.targetArticle === 'object' ? (edge.targetArticle as { slug?: string | null })?.slug : null
+    const edgeHref = normalizeInternalHref(edge?.targetUrl || (targetFromRelation ? `/${targetFromRelation}` : null))
+    if (!edgeHref) continue
+
+    const nextStatus = hrefSet.has(edgeHref) ? 'active' : 'stale'
+    const prevStatus = edge?.status || 'active'
+    if (nextStatus === prevStatus && String(edge?.lastSeenRunId || '') === args.runId) continue
+
+    await payload.update({
+      collection: 'internal_link_edges',
+      id: Number(edge.id),
+      data: {
+        status: nextStatus,
+        lastSeenRunId: Number(args.runId),
+      },
+      overrideAccess: true,
+    })
+  }
+}
+
+export async function runInternalLinker(
+  payload: Payload,
+  request: RunRequest,
+  options?: { runId?: string },
+): Promise<RunResult> {
+  const stats = createEmptyStats()
+  const limit = toSafeLimit(request.limit || INTERNAL_LINKER_DEFAULT_BATCH_LIMIT)
+  const runId = options?.runId || (await createInternalLinkerRun(payload, request))
 
   try {
     const sites = await fetchSites(payload, request.site)
@@ -256,9 +354,11 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
     for (const site of sites) {
       const siteId = String(site.id)
       const rules = await fetchRules(payload, siteId)
+      let processedForSite = 0
 
       let page = 1
       while (true) {
+        if (processedForSite >= limit) break
         const articlePage = await payload.find({
           collection: 'articles',
           where: {
@@ -268,7 +368,7 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
             ],
           },
           page,
-          limit,
+          limit: Math.min(100, Math.max(1, limit)),
           depth: 1,
           overrideAccess: true,
         })
@@ -276,6 +376,8 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
         if (!docs.length) break
 
         for (const source of docs) {
+          if (processedForSite >= limit) break
+          processedForSite++
           const sourceArticleId = String(source.id)
           stats.scanned++
 
@@ -293,6 +395,14 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
           }
 
           if (!candidates.length) {
+            if (request.mode === 'apply') {
+              await reconcileEdgeStateForSource(payload, {
+                siteId,
+                sourceArticleId,
+                content: source.content,
+                runId,
+              })
+            }
             stats.skippedNoMatch++
             continue
           }
@@ -312,6 +422,14 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
           }
 
           if (!filteredCandidates.length) {
+            if (request.mode === 'apply') {
+              await reconcileEdgeStateForSource(payload, {
+                siteId,
+                sourceArticleId,
+                content: source.content,
+                runId,
+              })
+            }
             stats.skippedNoMatch++
             continue
           }
@@ -342,6 +460,14 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
           }
 
           if (!insertedLinks.length) {
+            if (request.mode === 'apply') {
+              await reconcileEdgeStateForSource(payload, {
+                siteId,
+                sourceArticleId,
+                content: source.content,
+                runId,
+              })
+            }
             stats.skippedNoMatch++
             continue
           }
@@ -357,6 +483,19 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
             })
             stats.updated++
 
+            const occurrenceByHref = new Map<
+              string,
+              Array<{ leftContext: string; rightContext: string; fingerprint: string }>
+            >()
+            for (const occurrence of collectInternalLinkOccurrences(nextContent)) {
+              if (!occurrenceByHref.has(occurrence.href)) occurrenceByHref.set(occurrence.href, [])
+              occurrenceByHref.get(occurrence.href)!.push({
+                leftContext: occurrence.leftContext,
+                rightContext: occurrence.rightContext,
+                fingerprint: occurrence.fingerprint,
+              })
+            }
+
             for (const link of insertedLinks) {
               await writeEdge(payload, {
                 siteId,
@@ -364,8 +503,16 @@ export async function runInternalLinker(payload: Payload, request: RunRequest): 
                 link,
                 runId,
                 strategyVersion: INTERNAL_LINKER_STRATEGY_VERSION,
+                occurrenceByHref,
               })
             }
+
+            await reconcileEdgeStateForSource(payload, {
+              siteId,
+              sourceArticleId,
+              content: nextContent,
+              runId,
+            })
           }
 
           stats.linksInserted += insertedLinks.filter((item) => item.placement === 'in_body').length

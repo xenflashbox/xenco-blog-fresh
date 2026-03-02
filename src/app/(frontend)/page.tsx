@@ -1,30 +1,23 @@
 import Image from 'next/image'
 import React from 'react'
-import { fileURLToPath } from 'url'
 
 import './styles.css'
 
 // IMPORTANT: This page is completely static and does NOT query the database.
-// This allows Neon to scale to zero when there's no actual admin activity.
-// Previously this page called getPayload() and payload.auth() on EVERY visit,
-// which kept the database awake 24/7 even from bot/crawler traffic.
+// This allows the database to scale to zero when there's no actual admin activity.
 
 export default function HomePage() {
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
-
   return (
     <div className="home">
       <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        <h1>Welcome to your new project.</h1>
+        <Image
+          alt="Xenco Labs"
+          height={80}
+          src="/xencolabs-white-512.png"
+          width={240}
+          priority
+        />
+        <h1>Xenco Labs Blog CMS</h1>
         <div className="links">
           <a
             className="admin"
@@ -45,10 +38,7 @@ export default function HomePage() {
         </div>
       </div>
       <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
+        <p>Powered by Payload CMS</p>
       </div>
     </div>
   )

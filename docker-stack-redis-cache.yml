@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Redis Cache Stack for Payload CMS
+# Dedicated local cache instance for query/page caching
+# Note: HA Redis Sentinel is on native VMs (not Docker) - see REDIS_SENTINEL_CONFIG_GUIDE.md
+
+services:
+  # Option B: Dedicated Redis Cache for Payload
+  # Fast local caching for queries, page data, API responses
+  payload-cache:
+    image: redis:7-alpine
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly no
+      --save ""
+      --tcp-keepalive 300
+      --timeout 0
+    networks:
+      - payload-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.hostname == xenco3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 640M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Redis Exporter for monitoring the payload cache
+  cache-exporter:
+    image: oliver006/redis_exporter:latest
+    environment:
+      REDIS_ADDR: "redis://payload-cache:6379"
+    networks:
+      - payload-internal
+      - monitoring_default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+      labels:
+        - "prometheus.scrape=true"
+        - "prometheus.port=9121"
+        - "prometheus.path=/metrics"
+
+networks:
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
+  monitoring_default:
+    external: true
+    name: monitoring_monitoring
+  # HAProxy bridge to native Redis Sentinel cluster (fallback connectivity)
+  redis-sentinel:
+    external: true
+    name: redis-sentinel_redis-network

@@ -1,4 +1,5 @@
 import type { Endpoint } from 'payload'
+import { isInternalLinkerApiKeyValid } from '../lib/internal-linker/auth'
 
 function getHeaderValue(req: any, key: string): string | null {
   if (typeof req?.headers?.get === 'function') return req.headers.get(key)
@@ -19,7 +20,7 @@ export const internalLinksRunStatusEndpoint: Endpoint = {
   method: 'get',
   handler: async (req: any) => {
     const apiKey = getHeaderValue(req, 'x-api-key')
-    if (!apiKey || apiKey !== process.env.INTERNAL_LINKER_API_KEY) {
+    if (!isInternalLinkerApiKeyValid(apiKey)) {
       return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 

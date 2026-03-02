@@ -1,0 +1,37 @@
+version: '3.8'
+
+# PostgreSQL Exporter for Payload CMS Monitoring
+# Connects to existing monitoring stack via monitoring_default network
+
+services:
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:latest
+    environment:
+      DATA_SOURCE_NAME: "postgresql://payload:payload_db_secure_2025@payload-postgres_postgres:5432/payload?sslmode=disable"
+    networks:
+      - payload-internal
+      - monitoring_default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      labels:
+        - "prometheus.scrape=true"
+        - "prometheus.port=9187"
+        - "prometheus.path=/metrics"
+
+networks:
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
+  monitoring_default:
+    external: true
+    name: monitoring_monitoring

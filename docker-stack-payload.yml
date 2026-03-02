@@ -43,6 +43,7 @@ services:
       SUPPORT_AUTOFIX_TOKEN: ${SUPPORT_AUTOFIX_TOKEN}
       SUPPORT_ADMIN_TOKEN: ${SUPPORT_ADMIN_TOKEN}
       INTERNAL_LINKER_API_KEY: ${INTERNAL_LINKER_API_KEY}
+      INTERNAL_LINKER_API_KEY_FILE: /run/secrets/internal_linker_api_key
       # Redis Caching Configuration
       # Native Redis VM Sentinel Cluster (not Docker) for HA session/auth
       # Sentinel nodes: xenco5 (10.8.8.17), xenco4 (10.8.8.16), xenco3 (10.8.8.15)
@@ -58,6 +59,9 @@ services:
       - traefik_proxy_v2
       - payload-internal
       - redis-sentinel
+    secrets:
+      - payload_secret
+      - internal_linker_api_key
     deploy:
       replicas: 3
       placement:
@@ -115,3 +119,9 @@ networks:
   redis-sentinel:
     external: true
     name: redis-sentinel_redis-network
+
+secrets:
+  payload_secret:
+    external: true
+  internal_linker_api_key:
+    external: true

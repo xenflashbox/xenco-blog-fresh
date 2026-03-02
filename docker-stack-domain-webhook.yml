@@ -1,0 +1,48 @@
+version: '3.8'
+
+# Domain Webhook Server for Payload CMS
+# Automatically syncs Traefik labels when domains change
+# Internal service - only accessible within the swarm
+
+services:
+  domain-webhook:
+    image: python:3.11-alpine
+    command: sh -c "pip install --quiet psycopg2-binary && apk add --no-cache docker-cli && python3 /app/domain-webhook-server.py"
+    environment:
+      WEBHOOK_SECRET: payload-domain-sync-2025
+      STACK_FILE: /stack/docker-stack-payload.yml
+      DATABASE_URL: postgresql://payload:payload_db_secure_2025@payload-postgres_postgres:5432/payload
+    volumes:
+      - /home/xen/docker/apps/payload-swarm/scripts/domain-webhook-server.py:/app/domain-webhook-server.py:ro
+      - /home/xen/docker/apps/payload-swarm/docker-stack-payload.yml:/stack/docker-stack-payload.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - payload-internal
+      - traefik_proxy_v2
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.hostname == xenco3
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_proxy_v2"
+        - "traefik.http.routers.domain-webhook.rule=Host(`admin-api.xencolabs.com`) && PathPrefix(`/domains`)"
+        - "traefik.http.routers.domain-webhook.entrypoints=websecure"
+        - "traefik.http.routers.domain-webhook.tls=true"
+        - "traefik.http.routers.domain-webhook.tls.certresolver=cf"
+        - "traefik.http.routers.domain-webhook.middlewares=domain-webhook-stripprefix"
+        - "traefik.http.middlewares.domain-webhook-stripprefix.stripprefix.prefixes=/domains"
+        - "traefik.http.services.domain-webhook.loadbalancer.server.port=9099"
+
+networks:
+  payload-internal:
+    external: true
+    name: payload-postgres_payload-internal
+  traefik_proxy_v2:
+    external: true

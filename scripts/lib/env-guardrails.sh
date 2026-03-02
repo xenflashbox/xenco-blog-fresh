@@ -70,6 +70,50 @@ is_optional_env_var() {
   esac
 }
 
+ALLOWED_DB_HOST="payload-postgres_postgres"
+BLOCKED_DB_PATTERNS="neon.tech|supabase.co|rds.amazonaws.com|cloud.google.com"
+
+require_local_database() {
+  local var_name="$1"
+  local db_uri="${!var_name:-}"
+
+  [[ -n "${db_uri}" ]] || fail "${var_name} is empty"
+
+  if echo "${db_uri}" | grep -qEi "${BLOCKED_DB_PATTERNS}"; then
+    fail "${var_name} points to a BLOCKED external database provider. Must use local PostgreSQL (${ALLOWED_DB_HOST})."
+  fi
+
+  if ! echo "${db_uri}" | grep -q "${ALLOWED_DB_HOST}"; then
+    fail "${var_name} does not contain expected host '${ALLOWED_DB_HOST}'. Got: ${db_uri}"
+  fi
+
+  ok "${var_name} points to local database (${ALLOWED_DB_HOST})"
+}
+
+verify_runtime_database() {
+  local service_name="$1"
+  local env_key="${2:-DATABASE_URI}"
+
+  local runtime_val
+  runtime_val="$(docker service inspect "${service_name}" \
+    --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' 2>/dev/null \
+    | awk -F= -v key="${env_key}" '$1==key {sub(/^[^=]*=/,"",$0); print $0}' | tail -n 1)"
+
+  if [[ -z "${runtime_val}" ]]; then
+    fail "Runtime ${env_key} is empty on ${service_name}"
+  fi
+
+  if echo "${runtime_val}" | grep -qEi "${BLOCKED_DB_PATTERNS}"; then
+    fail "CRITICAL: ${service_name} runtime ${env_key} points to blocked external database!"
+  fi
+
+  if ! echo "${runtime_val}" | grep -q "${ALLOWED_DB_HOST}"; then
+    fail "CRITICAL: ${service_name} runtime ${env_key} does not point to local database. Got: ${runtime_val}"
+  fi
+
+  ok "${service_name} runtime ${env_key} verified local (${ALLOWED_DB_HOST})"
+}
+
 ensure_swarm_secret() {
   local secret_name="$1"
   local secret_value="$2"

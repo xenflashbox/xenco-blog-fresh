@@ -89,6 +89,48 @@ async function ensureUniqueSlugForSite(args: {
   }
 }
 
+function hasApiKeyAuthSignal(req: any): boolean {
+  const user = req?.user
+  if (user && (user.apiKey || user._strategy === 'api-key' || user.collection === 'users')) {
+    const authHeader =
+      typeof req?.headers?.get === 'function'
+        ? req.headers.get('authorization')
+        : req?.headers?.authorization || req?.headers?.Authorization || ''
+    if (typeof authHeader === 'string' && /api[- ]?key/i.test(authHeader)) return true
+  }
+  return false
+}
+
+function collectSiteEqualsValues(node: any, output: Array<string | number>): void {
+  if (!node || typeof node !== 'object') return
+
+  if (Array.isArray(node)) {
+    for (const item of node) collectSiteEqualsValues(item, output)
+    return
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'site' && value && typeof value === 'object' && 'equals' in (value as Record<string, any>)) {
+      output.push((value as Record<string, any>).equals)
+    }
+
+    if (value && typeof value === 'object') {
+      collectSiteEqualsValues(value, output)
+    }
+  }
+}
+
+function hasAnySiteConstraint(node: any): boolean {
+  if (!node || typeof node !== 'object') return false
+  if (Array.isArray(node)) return node.some((item) => hasAnySiteConstraint(item))
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'site') return true
+    if (value && typeof value === 'object' && hasAnySiteConstraint(value)) return true
+  }
+  return false
+}
+
 /**
  * Domain-based site scoping for read operations.
  *
@@ -107,16 +149,39 @@ async function ensureUniqueSlugForSite(args: {
 const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation }) => {
   if (operation !== 'read') return args
 
-  // Skip internal/system reads — Payload's own calls (relationship population, hooks,
-  // admin operations) use overrideAccess:true. We must not scope those.
+  // Skip internal/system reads — Payload's own calls (relationship population, hooks)
+  // often use overrideAccess:true. We must not scope those.
   if ((args as any).overrideAccess === true) return args
 
-  const where = (args as any)?.where
-  const siteValue = where?.site?.equals
+  const req = (args as any).req
+  const reqUser = (req as any)?.user
+  const reqUrl =
+    typeof (req as any)?.originalUrl === 'string'
+      ? (req as any).originalUrl
+      : typeof (req as any)?.url === 'string'
+        ? (req as any).url
+        : ''
+  const referer =
+    typeof req?.headers?.get === 'function'
+      ? req.headers.get('referer')
+      : req?.headers?.referer || req?.headers?.Referer || ''
+  const isAdminRequest =
+    /\/admin(?:\/|$)/.test(String(reqUrl)) || /\/admin(?:\/|$)/.test(String(referer))
+  const isApiKeyAuth = hasApiKeyAuthSignal(req)
 
-  // If caller explicitly passed a site filter, validate it's a usable integer ID.
-  // UUID strings cause Number() → NaN → Postgres "invalid input syntax for type integer" → 500.
-  if (siteValue != null) {
+  // Do not auto-scope authenticated admin reads. Admin users must be able to
+  // view and manage content across all sites.
+  // Also skip for API-key auth callers (e.g. server-side sitemap/query jobs).
+  if ((reqUser && isAdminRequest) || isApiKeyAuth) return args
+
+  const where = (args as any)?.where
+  const siteEqualsValues: Array<string | number> = []
+  collectSiteEqualsValues(where, siteEqualsValues)
+  const hasSiteConstraint = hasAnySiteConstraint(where)
+
+  // If caller explicitly passed a site filter (including nested where/and/or),
+  // validate equals values and never inject domain scoping.
+  for (const siteValue of siteEqualsValues) {
     if (typeof siteValue === 'string' && isNaN(Number(siteValue))) {
       throw new APIError(
         `Invalid site ID "${siteValue}". The where[site][equals] filter must be a numeric ` +
@@ -128,13 +193,14 @@ const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation 
         true,
       )
     }
-    // Valid integer provided — let it pass through as-is.
+  }
+
+  if (hasSiteConstraint) {
     return args
   }
 
   // No site filter provided — auto-inject from the request domain.
   // cms.resumecoach.me → Resume Coach (id: 1), cms.blogcraft.app → BlogCraft (id: 6), etc.
-  const req = (args as any).req
   if (req?.payload && req?.headers) {
     try {
       const site = await resolveSiteForRequest(req.payload, req.headers)
@@ -308,15 +374,14 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
   }
 
   // Ensure site is set:
-  // - On update: keep original site unless user explicitly provided one
-  // - On create: try to assign from Host header, then default site
+  // - On update: never infer from Host if site was not explicitly provided
+  //   (prevents background jobs from accidentally re-scoping articles by domain)
+  // - On create: assign from Host header, then default site
   const incomingSite = (data as any).site
   const existingSite = (originalDoc as any)?.site
 
   if (!incomingSite) {
-    if (operation === 'update' && existingSite) {
-      ;(data as any).site = existingSite
-    } else {
+    if (operation !== 'update') {
       // Try to resolve site from request Host header
       let siteId: string | null = null
       try {
