@@ -660,7 +660,7 @@ export interface Suite {
     metaDescription?: string | null;
     ogImage?: (number | null) | Media;
   };
-  status?: ('active' | 'inactive') | null;
+  status?: ('published' | 'active' | 'inactive') | null;
   sortOrder?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -753,7 +753,7 @@ export interface DirectoryEntry {
   };
   isFeatured?: boolean | null;
   sortOrder?: number | null;
-  status?: ('active' | 'inactive') | null;
+  status?: ('published' | 'active' | 'inactive') | null;
   sourceUrl?: string | null;
   lastCrawledAt?: string | null;
   updatedAt: string;

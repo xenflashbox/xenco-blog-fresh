@@ -106,10 +106,11 @@ export const DirectoryEntries: CollectionConfig = {
       name: 'status',
       type: 'select',
       options: [
+        { label: 'Published', value: 'published' },
         { label: 'Active', value: 'active' },
         { label: 'Inactive', value: 'inactive' },
       ],
-      defaultValue: 'active',
+      defaultValue: 'published',
       admin: { position: 'sidebar' },
     },
     { name: 'sourceUrl', type: 'text' },

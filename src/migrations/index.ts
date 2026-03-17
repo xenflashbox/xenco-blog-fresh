@@ -18,6 +18,7 @@ import * as migration_20260224_internal_linker_hardening from './20260224_intern
 import * as migration_20260225_add_sites_revalidate_columns from './20260225_add_sites_revalidate_columns';
 import * as migration_20260227_214422 from './20260227_214422';
 import * as migration_20260302_add_author_avatar_url from './20260302_add_author_avatar_url';
+import * as migration_20260317_add_published_to_directory_entries_status from './20260317_add_published_to_directory_entries_status';
 
 export const migrations = [
   {
@@ -110,5 +111,10 @@ export const migrations = [
     up: migration_20260302_add_author_avatar_url.up,
     down: migration_20260302_add_author_avatar_url.down,
     name: '20260302_add_author_avatar_url',
+  },
+  {
+    up: migration_20260317_add_published_to_directory_entries_status.up,
+    down: migration_20260317_add_published_to_directory_entries_status.down,
+    name: '20260317_add_published_to_directory_entries_status',
   },
 ];
