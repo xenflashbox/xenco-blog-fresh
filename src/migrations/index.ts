@@ -9,9 +9,7 @@ import * as migration_20251215_185759_fix_unique_indexes_categories_tags from '.
 import * as migration_20251223_add_support_collections from './20251223_add_support_collections';
 import * as migration_20251223_fix_announcements_columns from './20251223_fix_announcements_columns';
 import * as migration_20251226_add_kb_steps_triggers from './20251226_add_kb_steps_triggers';
-// Migration 20251229 causes Vercel startup issues - run SQL manually instead.
-// See: src/migrations/20251229_add_support_events_triage.ts for the SQL.
-// import * as migration_20251229_add_support_events_triage from './20251229_add_support_events_triage';
+import * as migration_20251229_add_support_events_triage from './20251229_add_support_events_triage';
 import * as migration_20260218_add_article_seo_fields from './20260218_add_article_seo_fields';
 import * as migration_20260224_add_internal_linker_collections from './20260224_add_internal_linker_collections';
 import * as migration_20260224_internal_linker_hardening from './20260224_internal_linker_hardening';
@@ -19,6 +17,7 @@ import * as migration_20260225_add_sites_revalidate_columns from './20260225_add
 import * as migration_20260227_214422 from './20260227_214422';
 import * as migration_20260302_add_author_avatar_url from './20260302_add_author_avatar_url';
 import * as migration_20260317_add_published_to_directory_entries_status from './20260317_add_published_to_directory_entries_status';
+import * as migration_20260324_180149 from './20260324_180149';
 
 export const migrations = [
   {
@@ -76,12 +75,11 @@ export const migrations = [
     down: migration_20251226_add_kb_steps_triggers.down,
     name: '20251226_add_kb_steps_triggers',
   },
-  // Disabled - run SQL manually. See comment at top of file.
-  // {
-  //   up: migration_20251229_add_support_events_triage.up,
-  //   down: migration_20251229_add_support_events_triage.down,
-  //   name: '20251229_add_support_events_triage'
-  // },
+  {
+    up: migration_20251229_add_support_events_triage.up,
+    down: migration_20251229_add_support_events_triage.down,
+    name: '20251229_add_support_events_triage',
+  },
   {
     up: migration_20260218_add_article_seo_fields.up,
     down: migration_20260218_add_article_seo_fields.down,
@@ -105,7 +103,7 @@ export const migrations = [
   {
     up: migration_20260227_214422.up,
     down: migration_20260227_214422.down,
-    name: '20260227_214422'
+    name: '20260227_214422',
   },
   {
     up: migration_20260302_add_author_avatar_url.up,
@@ -116,5 +114,10 @@ export const migrations = [
     up: migration_20260317_add_published_to_directory_entries_status.up,
     down: migration_20260317_add_published_to_directory_entries_status.down,
     name: '20260317_add_published_to_directory_entries_status',
+  },
+  {
+    up: migration_20260324_180149.up,
+    down: migration_20260324_180149.down,
+    name: '20260324_180149'
   },
 ];

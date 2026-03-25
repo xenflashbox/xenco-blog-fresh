@@ -15,6 +15,7 @@ Before ANY infra action:
 
 ## Deployment rule
 - Only deploy using: ./scripts/deploy.sh
+- Domain Traefik sync / webhook redeploy must use `./scripts/stack-deploy-payload.sh` (never raw `docker stack deploy` without `.env.production` — empty `DATABASE_URI` breaks the CMS).
 - Deploy BLOCKS if git is dirty unless you pass --force
 
 ## Emergency only

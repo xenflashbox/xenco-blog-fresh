@@ -51,6 +51,9 @@ CLAUDE.md
 # Keep for reference but don't commit secrets
 # .env.production
 
+# Root-level DB dumps (Neon/pg); not the same as src/migrations/
+/migrations/
+
 # Playwright
 node_modules/
 /test-results/

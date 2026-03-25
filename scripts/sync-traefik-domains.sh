@@ -62,12 +62,13 @@ DOMAINS=$(docker exec "${CONTAINER_ID}" psql -U payload -d payload -t -c "
     ORDER BY base_domain;
 " | tr -d ' ' | grep -v '^$')
 
-# Always include primary domain
-PRIMARY_DOMAIN="publish.xencolabs.com"
+# Canonical CMS + legacy publish host (see docker-stack-payload.yml)
+PRIMARY_DOMAIN="cms.xencolabs.com"
+LEGACY_DOMAIN="publish.xencolabs.com"
 
 # Build the Traefik rule
 echo "🔧 Building Traefik rule..."
-RULE="Host(\`${PRIMARY_DOMAIN}\`)"
+RULE="Host(\`${PRIMARY_DOMAIN}\`) || Host(\`${LEGACY_DOMAIN}\`)"
 
 # Add cms. subdomain for each base domain
 for domain in $DOMAINS; do
@@ -109,10 +110,10 @@ sed -i "s|traefik.http.routers.payload-swarm.rule=.*\"|traefik.http.routers.payl
 
 echo "✏️  Updated stack file"
 
-# Deploy the updated stack
+# Deploy the updated stack (loads .env.production so DATABASE_URI is never empty)
 echo ""
 echo "🚀 Deploying updated stack..."
-docker stack deploy -c "${STACK_FILE}" payload-swarm --with-registry-auth
+bash "${SCRIPT_DIR}/stack-deploy-payload.sh"
 
 echo ""
 echo "✅ Domain sync complete!"

@@ -60,7 +60,7 @@ echo "Deploying stack payload-postgres"
 docker stack deploy -c "docker-stack-postgres.yml" "payload-postgres"
 
 echo "Deploying stack payload-swarm"
-docker stack deploy -c "docker-stack-payload.yml" --with-registry-auth "payload-swarm"
+./scripts/stack-deploy-payload.sh
 
 SERVICE_NAME="$(python3 - <<'PY'
 import json

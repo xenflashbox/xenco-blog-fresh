@@ -23,7 +23,36 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
-  upload: true,
+  // Sharp is enabled globally in payload.config.ts; these options actually generate variants in R2.
+  upload: {
+    focalPoint: true,
+    // Cap the stored “full” image width (still large enough for hero); avoids 15MB+ originals when possible.
+    resizeOptions: {
+      width: 2560,
+      withoutEnlargement: true,
+    },
+    imageSizes: [
+      {
+        name: 'thumbnail',
+        width: 400,
+        height: 400,
+        position: 'centre',
+      },
+      {
+        name: 'card',
+        width: 1200,
+        height: 675,
+        position: 'centre',
+      },
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        position: 'centre',
+      },
+    ],
+    adminThumbnail: 'thumbnail',
+  },
   hooks: {
     beforeChange: [beforeChange],
   },

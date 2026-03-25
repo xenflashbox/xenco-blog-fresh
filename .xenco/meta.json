@@ -8,8 +8,8 @@
     "manager_host": "10.8.8.14",
     "docker_image": "registry.xencolabs.com/payload-swarm",
     "swarm_service": "payload-swarm_payload",
-    "health_url": "https://publish.xencolabs.com/api/support/uptime",
-    "version_url": "https://publish.xencolabs.com/api/support/health"
+    "health_url": "https://cms.xencolabs.com/api/support/uptime",
+    "version_url": "https://cms.xencolabs.com/api/support/health"
   },
   "workspace": {
     "expected_repo_root": "/home/xen/docker/apps/payload-swarm"

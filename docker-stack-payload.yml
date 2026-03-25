@@ -2,7 +2,7 @@ version: '3.8'
 
 # Payload CMS Stack for Docker Swarm
 # 3 replicas with Traefik routing via traefik_proxy_v2 network
-# Domain: publish.xencolabs.com
+# Canonical public URL: https://cms.xencolabs.com (publish.xencolabs.com = legacy alias in Traefik)
 # Cert resolver: cf (Cloudflare)
 
 services:
@@ -12,10 +12,11 @@ services:
       NODE_ENV: production
       HOSTNAME: "0.0.0.0"
       PORT: "3000"
+      # NEVER deploy this stack without DATABASE_URI in the shell env (use ./scripts/deploy.sh or ./scripts/stack-deploy-payload.sh)
       DATABASE_URI: ${DATABASE_URI}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-      PAYLOAD_PUBLIC_SERVER_URL: https://publish.xencolabs.com
-      NEXT_PUBLIC_PAYLOAD_URL: https://publish.xencolabs.com
+      PAYLOAD_PUBLIC_SERVER_URL: https://cms.xencolabs.com
+      NEXT_PUBLIC_PAYLOAD_URL: https://cms.xencolabs.com
       # R2 Storage
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
@@ -93,7 +94,7 @@ services:
         # HTTP Router
         # Add all CMS domains here - separate with || for OR
         # All CMS domains - derived from sites_domains table
-        - "traefik.http.routers.payload-swarm.rule=Host(`publish.xencolabs.com`) || Host(`cms.blogcraft.app`) || Host(`cms.devmaestro.io`) || Host(`cms.diabetescompass.com`) || Host(`cms.fiberinsider.com`) || Host(`cms.fightclubtech.com`) || Host(`cms.fightmybank.com`) || Host(`cms.homebeautyspa.com`) || Host(`cms.imagecrafter.app`) || Host(`cms.isthisagoodjob.com`) || Host(`cms.landingcraft.app`) || Host(`cms.landlordhell.com`) || Host(`cms.legalcraft.app`) || Host(`cms.lexiexplains.com`) || Host(`cms.mcpforge.org`) || Host(`cms.promptmarketer.app`) || Host(`cms.renterandlandlord.com`) || Host(`cms.resumecoach.me`) || Host(`cms.snackabletiktok.com`) || Host(`cms.sonomagrovesuites.com`) || Host(`cms.tinatortoise.com`) || Host(`cms.winecountrycorner.com`) || Host(`cms.xencolabs.com`)"
+        - "traefik.http.routers.payload-swarm.rule=Host(`cms.xencolabs.com`) || Host(`publish.xencolabs.com`) || Host(`cms.blogcraft.app`) || Host(`cms.devmaestro.io`) || Host(`cms.diabetescompass.com`) || Host(`cms.fiberinsider.com`) || Host(`cms.fightclubtech.com`) || Host(`cms.fightmybank.com`) || Host(`cms.homebeautyspa.com`) || Host(`cms.imagecrafter.app`) || Host(`cms.isthisagoodjob.com`) || Host(`cms.landingcraft.app`) || Host(`cms.landlordhell.com`) || Host(`cms.legalcraft.app`) || Host(`cms.lexiexplains.com`) || Host(`cms.mcpforge.org`) || Host(`cms.nexusguard.dev`) || Host(`cms.promptmarketer.app`) || Host(`cms.renterandlandlord.com`) || Host(`cms.resumecoach.me`) || Host(`cms.snackabletiktok.com`) || Host(`cms.sonomagrovesuites.com`) || Host(`cms.tinatortoise.com`) || Host(`cms.winecountrycorner.com`)"
         - "traefik.http.routers.payload-swarm.entrypoints=websecure"
         - "traefik.http.routers.payload-swarm.tls=true"
         - "traefik.http.routers.payload-swarm.tls.certresolver=cf"

@@ -22,6 +22,7 @@ import json
 import subprocess
 import logging
 import re
+from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
@@ -36,8 +37,15 @@ except ImportError:
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', 'payload-domain-sync-2025')
 STACK_FILE = os.environ.get('STACK_FILE', '/home/xen/docker/apps/payload-swarm/docker-stack-payload.yml')
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://payload:payload@payload-postgres_postgres:5432/payload')
-PRIMARY_DOMAIN = 'publish.xencolabs.com'
+# Canonical CMS hostname; publish.xencolabs.com kept as legacy Traefik Host (migration from Vercel).
+PRIMARY_DOMAIN = os.environ.get('PRIMARY_CMS_DOMAIN', 'cms.xencolabs.com')
+LEGACY_PUBLISH_DOMAIN = os.environ.get('LEGACY_PUBLISH_DOMAIN', 'publish.xencolabs.com')
 PORT = 9099
+
+_REPO = Path(STACK_FILE).resolve().parent
+GUARDED_DEPLOY_SCRIPT = Path(
+    os.environ.get('GUARDED_DEPLOY_SCRIPT', str(_REPO / 'scripts' / 'stack-deploy-payload.sh'))
+)
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -79,7 +87,10 @@ def get_domains_from_db():
 
 def build_traefik_rule(domains):
     """Build Traefik router rule from domain list"""
-    rules = [f"Host(`{PRIMARY_DOMAIN}`)"]
+    rules = [
+        f"Host(`{PRIMARY_DOMAIN}`)",
+        f"Host(`{LEGACY_PUBLISH_DOMAIN}`)",
+    ]
 
     for domain in domains:
         if domain:
@@ -113,18 +124,27 @@ def update_stack_file(rule):
         return False
 
 def deploy_stack():
-    """Deploy the updated stack using docker socket"""
+    """Redeploy via scripts/stack-deploy-payload.sh so DATABASE_URI is loaded from .env.production."""
+    repo_root = str(Path(STACK_FILE).resolve().parent)
+    script = str(GUARDED_DEPLOY_SCRIPT)
     try:
+        if not Path(script).is_file():
+            logger.error(
+                'Missing %s — mount repo scripts + .env.production on the webhook service (see docker-stack-domain-webhook.yml)',
+                script,
+            )
+            return False
         result = subprocess.run(
-            ['docker', 'stack', 'deploy', '-c', STACK_FILE, 'payload-swarm', '--with-registry-auth'],
-            capture_output=True, text=True
+            ['bash', script],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
         )
         if result.returncode == 0:
-            logger.info(f"Deploy output: {result.stdout}")
+            logger.info('Deploy output: %s', result.stdout)
             return True
-        else:
-            logger.error(f"Deploy failed: {result.stderr}")
-            return False
+        logger.error('Deploy failed stdout=%s stderr=%s', result.stdout, result.stderr)
+        return False
     except Exception as e:
         logger.error(f"Error deploying stack: {e}")
         return False
@@ -151,8 +171,9 @@ class WebhookHandler(BaseHTTPRequestHandler):
             rule = build_traefik_rule(domains)
             self.send_json(200, {
                 'primary': PRIMARY_DOMAIN,
+                'legacy': LEGACY_PUBLISH_DOMAIN,
                 'domains': [f'cms.{d}' for d in domains],
-                'total': len(domains) + 1,
+                'total': len(domains) + 2,
                 'rule': rule
             })
 
@@ -182,7 +203,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
             # Build rule
             rule = build_traefik_rule(domains)
-            logger.info(f"Built rule with {len(domains) + 1} hosts")
+            logger.info(f"Built rule with {len(domains) + 2} hosts")
 
             # Update stack file
             if not update_stack_file(rule):
@@ -196,7 +217,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
             self.send_json(200, {
                 'success': True,
-                'domains_synced': len(domains) + 1,
+                'domains_synced': len(domains) + 2,
                 'message': 'Traefik labels updated and stack redeployed'
             })
 

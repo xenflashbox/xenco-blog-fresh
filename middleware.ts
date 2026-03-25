@@ -12,31 +12,49 @@ export const config = {
   ],
 }
 
+/** Unauthenticated Payload auth routes (must match @payloadcms auth endpoints). */
+function isPublicUsersAuthPath(pathname: string, method: string): boolean {
+  const m = method.toUpperCase()
+  if (pathname === '/api/users/init' && (m === 'GET' || m === 'HEAD')) return true
+  if (pathname === '/api/users/access' && m === 'GET') return true
+  if (pathname === '/api/users/login' && m === 'POST') return true
+  if (pathname === '/api/users/forgot-password' && m === 'POST') return true
+  if (pathname === '/api/users/refresh-token' && m === 'POST') return true
+  if (pathname === '/api/users/first-register' && m === 'POST') return true
+  if (pathname === '/api/users/reset-password' && m === 'POST') return true
+  if (pathname === '/api/users/unlock' && m === 'POST') return true
+  if (pathname.startsWith('/api/users/verify/') && m === 'POST') return true
+  return false
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl
   const pathname = url.pathname
   const method = req.method.toUpperCase()
-  const isReadOnly = method === 'GET' || method === 'HEAD' || method === 'OPTIONS'
 
   // Protect sensitive endpoints: /api/users and GraphQL
-  // These always require authentication regardless of method
+  // /api/users/* requires auth except Payload's login, init, forgot-password, etc.
   if (
     pathname.startsWith('/api/users') ||
     pathname === '/api/graphql' ||
     pathname === '/api/graphql-playground'
   ) {
-    const hasPayloadToken = req.cookies.has('payload-token')
-    const authHeader = req.headers.get('authorization') || ''
-    const hasApiKey = authHeader.startsWith('Bearer ') || authHeader.includes('API-Key')
+    const skipUsersGate = pathname.startsWith('/api/users') && isPublicUsersAuthPath(pathname, method)
 
-    if (!hasPayloadToken && !hasApiKey) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Authentication required' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      )
+    if (!skipUsersGate) {
+      const hasPayloadToken = req.cookies.has('payload-token')
+      const authHeader = req.headers.get('authorization') || ''
+      const hasApiKey = authHeader.startsWith('Bearer ') || authHeader.includes('API-Key')
+
+      if (!hasPayloadToken && !hasApiKey) {
+        return new NextResponse(
+          JSON.stringify({ error: 'Authentication required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      }
     }
   }
 

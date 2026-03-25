@@ -61,15 +61,16 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const dbURI = process.env.DATABASE_URI
 if (!dbURI) {
-  throw new Error('Missing DATABASE_URI in runtime environment (Vercel)')
+  throw new Error('Missing DATABASE_URI in runtime environment (set DATABASE_URI for Docker Swarm / production)')
 }
-//const serverURL =
-//  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
-//  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
-//  ''
+
+const serverURL =
+  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
+  ''
 
 export default buildConfig({
-  //serverURL,
+  ...(serverURL ? { serverURL } : {}),
 
   admin: {
     user: Users.slug,

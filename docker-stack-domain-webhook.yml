@@ -7,7 +7,7 @@ version: '3.8'
 services:
   domain-webhook:
     image: python:3.11-alpine
-    command: sh -c "pip install --quiet psycopg2-binary && apk add --no-cache docker-cli && python3 /app/domain-webhook-server.py"
+    command: sh -c "pip install --quiet psycopg2-binary && apk add --no-cache docker-cli bash && python3 /app/domain-webhook-server.py"
     environment:
       WEBHOOK_SECRET: payload-domain-sync-2025
       STACK_FILE: /stack/docker-stack-payload.yml
@@ -15,6 +15,9 @@ services:
     volumes:
       - /home/xen/docker/apps/payload-swarm/scripts/domain-webhook-server.py:/app/domain-webhook-server.py:ro
       - /home/xen/docker/apps/payload-swarm/docker-stack-payload.yml:/stack/docker-stack-payload.yml
+      - /home/xen/docker/apps/payload-swarm/.env.production:/stack/.env.production:ro
+      - /home/xen/docker/apps/payload-swarm/scripts/stack-deploy-payload.sh:/stack/scripts/stack-deploy-payload.sh:ro
+      - /home/xen/docker/apps/payload-swarm/scripts/lib/env-guardrails.sh:/stack/scripts/lib/env-guardrails.sh:ro
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - payload-internal
