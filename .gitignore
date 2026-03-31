@@ -60,3 +60,11 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# SSL private keys (NEVER commit)
+*.key
+ssl/*.key
+pgbouncer/*.key
+
+# Environment files with secrets
+.env.production
