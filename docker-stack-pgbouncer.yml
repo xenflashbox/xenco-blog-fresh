@@ -43,7 +43,10 @@ services:
         parallelism: 1
         delay: 10s
         failure_action: rollback
-        order: start-first
+        # stop-first: with replicas=2 and max_replicas_per_node=1 on exactly two nodes,
+        # start-first cannot place the new task (no free node) and Swarm wedges with
+        # "max replicas per node limit exceed" + zombie Pending tasks.
+        order: stop-first
       rollback_config:
         parallelism: 1
         delay: 5s
