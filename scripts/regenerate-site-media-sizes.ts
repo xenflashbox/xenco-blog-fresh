@@ -130,7 +130,7 @@ async function main() {
   }
 
   const { getPayload } = await import('payload')
-  const { default: config } = await import('../src/payload.config.ts')
+  const { default: config } = await import('../src/payload.config')
 
   const payload = await getPayload({ config })
 
