@@ -33,7 +33,7 @@ if (fs.existsSync(prodEnv)) {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  process.env.NODE_ENV = 'production'
+  ;(process.env as Record<string, string>).NODE_ENV = 'production'
 }
 
 // Swarm-only hostname does not resolve on the host OS. PgBouncer publishes 5433 on managers (see docker-stack-pgbouncer.yml).
