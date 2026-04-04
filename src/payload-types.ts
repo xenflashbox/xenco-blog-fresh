@@ -84,6 +84,11 @@ export interface Config {
     reviews: Review;
     'directory-entries': DirectoryEntry;
     events: Event;
+    wineries: Winery;
+    wines: Wine;
+    restaurants: Restaurant;
+    accommodations: Accommodation;
+    'winery-events': WineryEvent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -108,6 +113,11 @@ export interface Config {
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'directory-entries': DirectoryEntriesSelect<false> | DirectoryEntriesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    wineries: WineriesSelect<false> | WineriesSelect<true>;
+    wines: WinesSelect<false> | WinesSelect<true>;
+    restaurants: RestaurantsSelect<false> | RestaurantsSelect<true>;
+    accommodations: AccommodationsSelect<false> | AccommodationsSelect<true>;
+    'winery-events': WineryEventsSelect<false> | WineryEventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -836,6 +846,183 @@ export interface Event {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries".
+ */
+export interface Winery {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  website?: string | null;
+  region?: ('Napa Valley' | 'Sonoma County' | 'Coombsville AVA' | 'Stags Leap District' | 'Other') | null;
+  subAppellation?: string | null;
+  varietalFocus?:
+    | {
+        varietal?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  tastingAvailable?: boolean | null;
+  tastingBookingUrl?: string | null;
+  wineClubEnabled?: boolean | null;
+  featured?: boolean | null;
+  featuredTier?: ('flagship' | 'featured' | 'listed') | null;
+  featuredOrder?: number | null;
+  featuredHero?: (number | null) | Media;
+  featuredStory?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  featuredQuote?: string | null;
+  featuredQuoteAttribution?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  instagramHandle?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  };
+  coordinates?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  partnerSince?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wines".
+ */
+export interface Wine {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  winery?: (number | null) | Winery;
+  varietal?: string | null;
+  vintage?: number | null;
+  tastingNotes?: string | null;
+  price?: number | null;
+  priceTier?: ('under-50' | '50-100' | '100-200' | 'over-200') | null;
+  rating?: number | null;
+  purchaseUrl?: string | null;
+  image?: (number | null) | Media;
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "restaurants".
+ */
+export interface Restaurant {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  website?: string | null;
+  region?: ('Napa Valley' | 'Sonoma County' | 'Other') | null;
+  city?: string | null;
+  cuisineType?:
+    | {
+        cuisine?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  priceRange?: ('$' | '$$' | '$$$' | '$$$$') | null;
+  wineFocused?: boolean | null;
+  reservationsUrl?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  };
+  phone?: string | null;
+  hours?: string | null;
+  featuredImage?: (number | null) | Media;
+  featured?: boolean | null;
+  featuredTier?: ('flagship' | 'featured' | 'listed') | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accommodations".
+ */
+export interface Accommodation {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  website?: string | null;
+  region?: ('Napa Valley' | 'Sonoma County' | 'Other') | null;
+  city?: string | null;
+  type?: ('hotel' | 'bb' | 'vacation-rental' | 'resort' | 'inn') | null;
+  priceRange?: ('$' | '$$' | '$$$' | '$$$$') | null;
+  bookingUrl?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  };
+  phone?: string | null;
+  amenities?:
+    | {
+        amenity?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  featuredImage?: (number | null) | Media;
+  featured?: boolean | null;
+  featuredTier?: ('flagship' | 'featured' | 'listed') | null;
+  description?: string | null;
+  /**
+   * Check for Sonoma Grove Suites — appears first in listings.
+   */
+  isOwned?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "winery-events".
+ */
+export interface WineryEvent {
+  id: number;
+  site: number | Site;
+  title: string;
+  slug: string;
+  winery?: (number | null) | Winery;
+  eventType?: ('tasting' | 'dinner' | 'harvest' | 'release' | 'club' | 'other') | null;
+  startDate: string;
+  endDate?: string | null;
+  price?: number | null;
+  priceFree?: boolean | null;
+  registrationUrl?: string | null;
+  description?: string | null;
+  featuredImage?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -925,6 +1112,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'wineries';
+        value: number | Winery;
+      } | null)
+    | ({
+        relationTo: 'wines';
+        value: number | Wine;
+      } | null)
+    | ({
+        relationTo: 'restaurants';
+        value: number | Restaurant;
+      } | null)
+    | ({
+        relationTo: 'accommodations';
+        value: number | Accommodation;
+      } | null)
+    | ({
+        relationTo: 'winery-events';
+        value: number | WineryEvent;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1467,6 +1674,169 @@ export interface EventsSelect<T extends boolean = true> {
   status?: T;
   sourceUrl?: T;
   lastCrawledAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wineries_select".
+ */
+export interface WineriesSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  website?: T;
+  region?: T;
+  subAppellation?: T;
+  varietalFocus?:
+    | T
+    | {
+        varietal?: T;
+        id?: T;
+      };
+  tastingAvailable?: T;
+  tastingBookingUrl?: T;
+  wineClubEnabled?: T;
+  featured?: T;
+  featuredTier?: T;
+  featuredOrder?: T;
+  featuredHero?: T;
+  featuredStory?: T;
+  featuredQuote?: T;
+  featuredQuoteAttribution?: T;
+  phone?: T;
+  email?: T;
+  instagramHandle?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zip?: T;
+      };
+  coordinates?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+      };
+  partnerSince?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wines_select".
+ */
+export interface WinesSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  winery?: T;
+  varietal?: T;
+  vintage?: T;
+  tastingNotes?: T;
+  price?: T;
+  priceTier?: T;
+  rating?: T;
+  purchaseUrl?: T;
+  image?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "restaurants_select".
+ */
+export interface RestaurantsSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  website?: T;
+  region?: T;
+  city?: T;
+  cuisineType?:
+    | T
+    | {
+        cuisine?: T;
+        id?: T;
+      };
+  priceRange?: T;
+  wineFocused?: T;
+  reservationsUrl?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zip?: T;
+      };
+  phone?: T;
+  hours?: T;
+  featuredImage?: T;
+  featured?: T;
+  featuredTier?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accommodations_select".
+ */
+export interface AccommodationsSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  website?: T;
+  region?: T;
+  city?: T;
+  type?: T;
+  priceRange?: T;
+  bookingUrl?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zip?: T;
+      };
+  phone?: T;
+  amenities?:
+    | T
+    | {
+        amenity?: T;
+        id?: T;
+      };
+  featuredImage?: T;
+  featured?: T;
+  featuredTier?: T;
+  description?: T;
+  isOwned?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "winery-events_select".
+ */
+export interface WineryEventsSelect<T extends boolean = true> {
+  site?: T;
+  title?: T;
+  slug?: T;
+  winery?: T;
+  eventType?: T;
+  startDate?: T;
+  endDate?: T;
+  price?: T;
+  priceFree?: T;
+  registrationUrl?: T;
+  description?: T;
+  featuredImage?: T;
   updatedAt?: T;
   createdAt?: T;
 }
