@@ -295,6 +295,10 @@ export interface Article {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Raw HTML from WordPress import. Rendered when Lexical content is not available.
+   */
+  html?: string | null;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
   author?: (number | null) | Author;
@@ -1285,6 +1289,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   featuredImage?: T;
   heroImage?: T;
   content?: T;
+  html?: T;
   categories?: T;
   tags?: T;
   author?: T;
