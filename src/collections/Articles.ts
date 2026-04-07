@@ -583,6 +583,14 @@ export const Articles: CollectionConfig = {
         description: 'Raw HTML from WordPress import. Rendered when Lexical content is not available.',
       },
     },
+    {
+      name: 'thumbnailUrl',
+      type: 'text',
+      label: 'Thumbnail Image URL',
+      admin: {
+        description: 'First image extracted from imported HTML. Used for article cards.',
+      },
+    },
 
     {
       name: 'categories',
