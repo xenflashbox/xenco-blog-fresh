@@ -299,6 +299,10 @@ export interface Article {
    * Raw HTML from WordPress import. Rendered when Lexical content is not available.
    */
   html?: string | null;
+  /**
+   * First image extracted from imported HTML. Used for article cards.
+   */
+  thumbnailUrl?: string | null;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
   author?: (number | null) | Author;
@@ -1290,6 +1294,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   heroImage?: T;
   content?: T;
   html?: T;
+  thumbnailUrl?: T;
   categories?: T;
   tags?: T;
   author?: T;

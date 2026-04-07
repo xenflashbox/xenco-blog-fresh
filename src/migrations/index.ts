@@ -20,6 +20,7 @@ import * as migration_20260317_add_published_to_directory_entries_status from '.
 import * as migration_20260324_180149 from './20260324_180149';
 import * as migration_20260404_233155_add_wcc_collections from './20260404_233155_add_wcc_collections';
 import * as migration_20260407_153609_add_articles_html_field from './20260407_153609_add_articles_html_field';
+import * as migration_20260407_203747_add_articles_thumbnail_url from './20260407_203747_add_articles_thumbnail_url';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20260407_153609_add_articles_html_field.up,
     down: migration_20260407_153609_add_articles_html_field.down,
-    name: '20260407_153609_add_articles_html_field'
+    name: '20260407_153609_add_articles_html_field',
+  },
+  {
+    up: migration_20260407_203747_add_articles_thumbnail_url.up,
+    down: migration_20260407_203747_add_articles_thumbnail_url.down,
+    name: '20260407_203747_add_articles_thumbnail_url'
   },
 ];
