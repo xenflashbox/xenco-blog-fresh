@@ -576,6 +576,15 @@ export const Articles: CollectionConfig = {
     },
 
     {
+      name: 'html',
+      type: 'textarea',
+      label: 'Imported HTML Content',
+      admin: {
+        description: 'Raw HTML from WordPress import. Rendered when Lexical content is not available.',
+      },
+    },
+
+    {
       name: 'categories',
       type: 'relationship',
       relationTo: 'categories',
