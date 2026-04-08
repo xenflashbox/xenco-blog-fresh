@@ -103,6 +103,14 @@ export const Wineries: CollectionConfig = {
       label: "Hero Image",
     },
     {
+      name: "heroImageUrl",
+      type: "text",
+      label: "Hero Image URL",
+      admin: {
+        description: "Fallback hero image URL for wineries without an uploaded media object.",
+      },
+    },
+    {
       name: "featuredStory",
       type: "richText",
       label: "Editorial Story",
