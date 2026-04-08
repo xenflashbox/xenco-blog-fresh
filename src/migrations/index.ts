@@ -21,6 +21,7 @@ import * as migration_20260324_180149 from './20260324_180149';
 import * as migration_20260404_233155_add_wcc_collections from './20260404_233155_add_wcc_collections';
 import * as migration_20260407_153609_add_articles_html_field from './20260407_153609_add_articles_html_field';
 import * as migration_20260407_203747_add_articles_thumbnail_url from './20260407_203747_add_articles_thumbnail_url';
+import * as migration_20260408_041441_add_wineries_hero_image_url from './20260408_041441_add_wineries_hero_image_url';
 
 export const migrations = [
   {
@@ -136,6 +137,11 @@ export const migrations = [
   {
     up: migration_20260407_203747_add_articles_thumbnail_url.up,
     down: migration_20260407_203747_add_articles_thumbnail_url.down,
-    name: '20260407_203747_add_articles_thumbnail_url'
+    name: '20260407_203747_add_articles_thumbnail_url',
+  },
+  {
+    up: migration_20260408_041441_add_wineries_hero_image_url.up,
+    down: migration_20260408_041441_add_wineries_hero_image_url.down,
+    name: '20260408_041441_add_wineries_hero_image_url'
   },
 ];

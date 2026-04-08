@@ -877,6 +877,10 @@ export interface Winery {
   featuredTier?: ('flagship' | 'featured' | 'listed') | null;
   featuredOrder?: number | null;
   featuredHero?: (number | null) | Media;
+  /**
+   * Fallback hero image URL for wineries without an uploaded media object.
+   */
+  heroImageUrl?: string | null;
   featuredStory?: {
     root: {
       type: string;
@@ -1711,6 +1715,7 @@ export interface WineriesSelect<T extends boolean = true> {
   featuredTier?: T;
   featuredOrder?: T;
   featuredHero?: T;
+  heroImageUrl?: T;
   featuredStory?: T;
   featuredQuote?: T;
   featuredQuoteAttribution?: T;
