@@ -162,7 +162,11 @@ export async function ensureArticlesIndexSettings(): Promise<void> {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await withTimeout((c as any).waitForTask(task.taskUid), 8000)
       }
-    })()
+    })().catch((e) => {
+      // Reset so the next call can retry (prevents caching a failed promise)
+      ensureSettingsPromise = null
+      throw e
+    })
   }
 
   return ensureSettingsPromise
