@@ -41,11 +41,12 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname != xenco2
+          - node.hostname == xenco1
       restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
+        condition: any
+        delay: 10s
+        max_attempts: 0
+        window: 120s
       labels:
         # Enable Traefik
         - traefik.enable=true
