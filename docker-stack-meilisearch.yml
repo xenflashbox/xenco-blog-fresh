@@ -36,7 +36,7 @@ services:
     volumes:
       - meilisearch-data:/meili_data
     networks:
-      - traefik_proxy_v2
+      - traefik_proxy
     deploy:
       replicas: 1
       placement:
@@ -50,7 +50,7 @@ services:
       labels:
         # Enable Traefik
         - traefik.enable=true
-        - traefik.docker.network=traefik_proxy_v2
+        - traefik.docker.network=traefik_proxy
         # Service definition
         - traefik.http.services.payload-meilisearch-svc.loadbalancer.server.port=7700
         - traefik.http.services.payload-meilisearch-svc.loadbalancer.server.scheme=http
@@ -78,7 +78,7 @@ services:
 # NETWORKS
 # ============================================================================
 networks:
-  traefik_proxy_v2:
+  traefik_proxy:
     external: true
 
 # ============================================================================
