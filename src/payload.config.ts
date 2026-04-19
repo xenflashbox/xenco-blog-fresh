@@ -145,6 +145,9 @@ const allowedOrigins = [
   'https://www.tinatortoise.com',
   'https://xencolabs.com',
   'https://www.xencolabs.com',
+  'https://cms.compareitad.com',
+  'https://compareitad.com',
+  'https://www.compareitad.com',
 ]
 
 export default buildConfig({
