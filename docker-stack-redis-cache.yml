@@ -33,9 +33,9 @@ services:
           cpus: '0.1'
           memory: 128M
       restart_policy:
-        condition: on-failure
+        condition: any
         delay: 5s
-        max_attempts: 3
+        max_attempts: 0
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

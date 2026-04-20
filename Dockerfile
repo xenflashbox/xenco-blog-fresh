@@ -30,6 +30,14 @@ COPY . .
 # Build-time only: Payload needs DATABASE_URI to generate types/importmap
 # This is a dummy value - actual connection is provided at runtime via secrets
 ENV DATABASE_URI="postgresql://build:build@localhost:5432/build"
+
+# Inject git commit hash for stable Server Action IDs across rolling updates.
+# See next.config.mjs generateBuildId — without this, every build gets a new
+# random build ID, causing "Failed to find Server Action" errors for users
+# whose browser has cached JS from the previous deployment.
+ARG GIT_COMMIT_HASH=unknown
+ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
+
 RUN pnpm run build
 
 # Production image, copy all the files and run next

@@ -12,6 +12,11 @@ require_stack_envs "${STACK_FILE}"
 IMAGE="$(current_image_from_stack "${STACK_FILE}")"
 [[ -n "${IMAGE}" ]] || fail "Could not resolve image from ${STACK_FILE}"
 
-echo "Building image ${IMAGE}:${TAG}"
-docker build -t "${IMAGE}:${TAG}" .
+GIT_COMMIT_HASH="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
+
+echo "Building image ${IMAGE}:${TAG} (git: ${GIT_COMMIT_HASH})"
+docker build \
+  --build-arg GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" \
+  -t "${IMAGE}:${TAG}" \
+  .
 echo "Build complete: ${IMAGE}:${TAG}"
