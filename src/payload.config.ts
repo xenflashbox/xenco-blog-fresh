@@ -69,11 +69,6 @@ if (!dbURI) {
   throw new Error('Missing DATABASE_URI in runtime environment (set DATABASE_URI for Docker Swarm / production)')
 }
 
-const serverURL =
-  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
-  process.env.NEXT_PUBLIC_PAYLOAD_URL ||
-  ''
-
 // All frontend domains that are allowed to call the CMS API from a browser.
 // Includes the cms.* subdomains (admin) and the root production domains (frontends).
 const allowedOrigins = [
@@ -151,7 +146,15 @@ const allowedOrigins = [
 ]
 
 export default buildConfig({
-  ...(serverURL ? { serverURL } : {}),
+  // NOTE: serverURL intentionally NOT passed to buildConfig.
+  // Payload v3.68.4 bug: getRouteWithoutAdmin() does route.replace(adminRoute,'')
+  // which on a full URL ('https://cms.xencolabs.com/admin/login') leaves the domain
+  // ('https://cms.xencolabs.com/login'), and isPublicAdminRoute() then fails to
+  // recognise the login page as public (startsWith('/login') is false on the full URL).
+  // This causes an infinite redirect loop for unauthenticated users.
+  // The env vars PAYLOAD_PUBLIC_SERVER_URL / NEXT_PUBLIC_PAYLOAD_URL are still used
+  // by client-side code and by frontend apps via their own containers.
+  // serverURL is only needed in Payload config for email links — not used here.
 
   cors: allowedOrigins,
 
