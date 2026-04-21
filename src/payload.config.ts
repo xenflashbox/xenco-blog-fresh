@@ -30,6 +30,12 @@ import { Wines } from './collections/Wines'
 import { Restaurants } from './collections/Restaurants'
 import { Accommodations } from './collections/Accommodations'
 import { WineryEvents } from './collections/WineryEvents'
+import { Industries } from './collections/Industries'
+import { Vendors } from './collections/Vendors'
+import { VendorCertifications } from './collections/VendorCertifications'
+import { VendorFacilities } from './collections/VendorFacilities'
+import { VendorServices } from './collections/VendorServices'
+import { Leads } from './collections/Leads'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
@@ -190,6 +196,13 @@ export default buildConfig({
     Restaurants,
     Accommodations,
     WineryEvents,
+    // Compare ITAD vendor directory
+    Industries,
+    Vendors,
+    VendorCertifications,
+    VendorFacilities,
+    VendorServices,
+    Leads,
   ],
 
   endpoints: [

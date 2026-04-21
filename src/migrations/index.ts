@@ -22,6 +22,7 @@ import * as migration_20260404_233155_add_wcc_collections from './20260404_23315
 import * as migration_20260407_153609_add_articles_html_field from './20260407_153609_add_articles_html_field';
 import * as migration_20260407_203747_add_articles_thumbnail_url from './20260407_203747_add_articles_thumbnail_url';
 import * as migration_20260408_041441_add_wineries_hero_image_url from './20260408_041441_add_wineries_hero_image_url';
+import * as migration_20260419_add_citad_collections from './20260419_add_citad_collections';
 
 export const migrations = [
   {
@@ -143,5 +144,10 @@ export const migrations = [
     up: migration_20260408_041441_add_wineries_hero_image_url.up,
     down: migration_20260408_041441_add_wineries_hero_image_url.down,
     name: '20260408_041441_add_wineries_hero_image_url'
+  },
+  {
+    up: migration_20260419_add_citad_collections.up,
+    down: migration_20260419_add_citad_collections.down,
+    name: '20260419_add_citad_collections',
   },
 ];
