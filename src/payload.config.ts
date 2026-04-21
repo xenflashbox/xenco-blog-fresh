@@ -261,6 +261,13 @@ export default buildConfig({
       collections: {
         media: {
           prefix: 'media',
+          // Return the public R2 CDN URL so media records store direct CDN links
+          // instead of /api/media/file/ proxy paths. The CDN URL is set via
+          // R2_PUBLIC_URL (e.g. https://media.xencolabs.com).
+          generateFileURL: ({ prefix, filename }: { prefix?: string; filename: string }) => {
+            const base = (process.env.R2_PUBLIC_URL || 'https://media.xencolabs.com').replace(/\/$/, '')
+            return prefix ? `${base}/${prefix}/${filename}` : `${base}/${filename}`
+          },
         },
       },
 

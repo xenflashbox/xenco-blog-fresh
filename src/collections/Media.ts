@@ -37,18 +37,24 @@ export const Media: CollectionConfig = {
         width: 400,
         height: 400,
         position: 'centre',
+        // WebP at q80 — ~60-80KB vs ~330KB PNG for typical photos
+        formatOptions: { format: 'webp', options: { quality: 80 } },
       },
       {
         name: 'card',
         width: 1200,
         height: 675,
         position: 'centre',
+        // WebP at q82 — ~150-300KB vs ~1.6MB PNG for typical 2560px photos
+        formatOptions: { format: 'webp', options: { quality: 82 } },
       },
       {
         name: 'og',
         width: 1200,
         height: 630,
         position: 'centre',
+        // OG image: Facebook/Twitter accept WebP; higher quality for social sharing
+        formatOptions: { format: 'webp', options: { quality: 85 } },
       },
     ],
     adminThumbnail: 'thumbnail',
