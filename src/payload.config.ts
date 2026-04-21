@@ -265,8 +265,15 @@ export default buildConfig({
           // instead of /api/media/file/ proxy paths. The CDN URL is set via
           // R2_PUBLIC_URL (e.g. https://media.xencolabs.com).
           generateFileURL: ({ prefix, filename }: { prefix?: string; filename: string }) => {
+            // Guard: variant images that were never generated have a null filename at
+            // runtime (despite the declared type). Return empty string so Payload
+            // stores null/empty rather than the literal path ".../media/null".
+            if (!filename) return ''
             const base = (process.env.R2_PUBLIC_URL || 'https://media.xencolabs.com').replace(/\/$/, '')
-            return prefix ? `${base}/${prefix}/${filename}` : `${base}/${filename}`
+            // encodeURIComponent handles filenames that contain spaces or parens
+            // (legacy uploads used raw filenames as R2 object keys).
+            const encoded = encodeURIComponent(filename)
+            return prefix ? `${base}/${prefix}/${encoded}` : `${base}/${encoded}`
           },
         },
       },
