@@ -23,6 +23,7 @@ import * as migration_20260407_153609_add_articles_html_field from './20260407_1
 import * as migration_20260407_203747_add_articles_thumbnail_url from './20260407_203747_add_articles_thumbnail_url';
 import * as migration_20260408_041441_add_wineries_hero_image_url from './20260408_041441_add_wineries_hero_image_url';
 import * as migration_20260419_add_citad_collections from './20260419_add_citad_collections';
+import * as migration_20260421_schema_addendum_2 from './20260421_schema_addendum_2';
 
 export const migrations = [
   {
@@ -149,5 +150,10 @@ export const migrations = [
     up: migration_20260419_add_citad_collections.up,
     down: migration_20260419_add_citad_collections.down,
     name: '20260419_add_citad_collections',
+  },
+  {
+    up: migration_20260421_schema_addendum_2.up,
+    down: migration_20260421_schema_addendum_2.down,
+    name: '20260421_schema_addendum_2',
   },
 ];
