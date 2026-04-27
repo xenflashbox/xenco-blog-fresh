@@ -69,7 +69,10 @@ const beforeChange: CollectionBeforeChangeHook = async ({
 
 export const Tags: CollectionConfig = {
   slug: 'tags',
-  admin: { useAsTitle: 'name' },
+  admin: {
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'slug', 'group', 'site'],
+  },
   access: {
     read: () => true,
     create: () => true,
@@ -82,6 +85,22 @@ export const Tags: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
+    {
+      name: 'group',
+      type: 'select',
+      required: true,
+      options: [
+        { label: 'Industry', value: 'industry' },
+        { label: 'Persona', value: 'persona' },
+        { label: 'Regulation', value: 'regulation' },
+        { label: 'Certification', value: 'certification' },
+        { label: 'Topic', value: 'topic' },
+        { label: 'Media', value: 'media' },
+        { label: 'Method', value: 'method' },
+        { label: 'Vendor Relationship', value: 'vendor-relationship' },
+      ],
+    },
+    { name: 'description', type: 'textarea' },
 
     {
       name: 'site',

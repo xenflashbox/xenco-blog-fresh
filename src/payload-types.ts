@@ -89,6 +89,12 @@ export interface Config {
     restaurants: Restaurant;
     accommodations: Accommodation;
     'winery-events': WineryEvent;
+    industries: Industry;
+    vendors: Vendor;
+    'vendor-certifications': VendorCertification;
+    'vendor-facilities': VendorFacility;
+    'vendor-services': VendorService;
+    leads: Lead;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -118,6 +124,12 @@ export interface Config {
     restaurants: RestaurantsSelect<false> | RestaurantsSelect<true>;
     accommodations: AccommodationsSelect<false> | AccommodationsSelect<true>;
     'winery-events': WineryEventsSelect<false> | WineryEventsSelect<true>;
+    industries: IndustriesSelect<false> | IndustriesSelect<true>;
+    vendors: VendorsSelect<false> | VendorsSelect<true>;
+    'vendor-certifications': VendorCertificationsSelect<false> | VendorCertificationsSelect<true>;
+    'vendor-facilities': VendorFacilitiesSelect<false> | VendorFacilitiesSelect<true>;
+    'vendor-services': VendorServicesSelect<false> | VendorServicesSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -358,7 +370,9 @@ export interface Category {
   id: number;
   title: string;
   slug: string;
+  url_segment: string;
   description?: string | null;
+  sort_order?: number | null;
   /**
    * Select parent category for hierarchy
    */
@@ -383,6 +397,8 @@ export interface Tag {
   id: number;
   name: string;
   slug: string;
+  group: 'industry' | 'persona' | 'regulation' | 'certification' | 'topic' | 'media' | 'method' | 'vendor-relationship';
+  description?: string | null;
   site: number | Site;
   updatedAt: string;
   createdAt: string;
@@ -1035,6 +1051,190 @@ export interface WineryEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industries".
+ */
+export interface Industry {
+  id: number;
+  display_name: string;
+  slug: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendors".
+ */
+export interface Vendor {
+  id: number;
+  name: string;
+  slug: string;
+  website?: string | null;
+  description?: string | null;
+  logo?: (number | null) | Media;
+  hq_city?: string | null;
+  hq_state?: string | null;
+  hq_country?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  founded_year?: number | null;
+  employee_count_range?: string | null;
+  industries_served?: (number | Industry)[] | null;
+  is_published?: boolean | null;
+  claim_status?: ('unclaimed' | 'pending-claim' | 'claimed') | null;
+  provenance?: {
+    primary_source_url?: string | null;
+    crawled_at?: string | null;
+    last_verified_at?: string | null;
+    crawler_version?: string | null;
+    verification_notes?: string | null;
+  };
+  /**
+   * Public-facing data quality context. These flags render in the provenance footer on the profile page so readers understand why a profile has less information than others.
+   */
+  data_quality_flags?: {
+    /**
+     * Check when the vendor's public website provides minimal self-reported data (e.g., OEM ITAD arms with marketing-heavy pages). Triggers a footer notice explaining why this profile is thinner than others.
+     */
+    sparse_data?: boolean | null;
+    /**
+     * Check when the profile's last_verified_at is older than 90 days or when editorial is aware of pending vendor changes. Triggers a footer notice that the profile is pending review.
+     */
+    awaiting_re_verification?: boolean | null;
+    /**
+     * Check when the vendor's website uses aggressive bot protection that limited our automated crawl (e.g., Cloudflare challenges, Blue Star Recycling situation). Profile content is human-verified only. Triggers a footer notice that crawl was limited.
+     */
+    bot_protection_limited_crawl?: boolean | null;
+    /**
+     * Optional editor-written note that appears in the footer when any of the above flags are true. Example: "This profile reflects publicly available information from the vendor's corporate website. Extended service details were not available on the pages crawled."
+     */
+    editor_note?: string | null;
+  };
+  /**
+   * Set when this vendor is a known subsidiary of another ITAD company.
+   */
+  parent_company?: (number | null) | Vendor;
+  /**
+   * Populate once parent_company is set.
+   */
+  acquisition?: {
+    acquired_date?: string | null;
+    announcement_url?: string | null;
+    subsidiary_status?: ('operating-as-brand' | 'merged-into-parent' | 'winding-down') | null;
+    acquired_entity_notes?: string | null;
+  };
+  /**
+   * For cases where the parent company is NOT in the Compare ITAD directory (e.g., a non-ITAD conglomerate parent like SK Group owning SK Tes). Use this instead of parent_company when the parent should not be a clickable directory link. If both fields are populated, parent_company (the relationship) takes precedence in the UI.
+   */
+  parent_company_text?: string | null;
+  /**
+   * Context for the parent_company_text relationship. Example: "SK Group is a South Korean industrial conglomerate; SK Tes is the ITAD operating unit following SK Ecoplant's acquisition of TES in 2022." This renders below the parent company name on the profile page.
+   */
+  parent_company_text_notes?: string | null;
+  seo?: {
+    meta_title?: string | null;
+    meta_description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-certifications".
+ */
+export interface VendorCertification {
+  id: number;
+  vendor: number | Vendor;
+  certification_name: string;
+  certification_body?: string | null;
+  cert_number?: string | null;
+  valid_from?: string | null;
+  valid_through?: string | null;
+  verification_status?: ('self-reported' | 'verified' | 'expired' | 'unverifiable') | null;
+  verification_url?: string | null;
+  verification_notes?: string | null;
+  /**
+   * Verbatim quote from the vendor's page making this certification claim. Required. A cert record without a source quote fails our provenance requirement and cannot be published. If you cannot find an explicit textual claim on the vendor's site, do not create the cert record — certifications inferred from logos or design cues alone are not self-reports.
+   */
+  source_quote: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-facilities".
+ */
+export interface VendorFacility {
+  id: number;
+  vendor: number | Vendor;
+  facility_name?: string | null;
+  address?: string | null;
+  city: string;
+  state?: string | null;
+  country?: string | null;
+  postal_code?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  ownership?: ('owned' | 'leased' | 'partner') | null;
+  is_headquarters?: boolean | null;
+  sq_footage?: number | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-services".
+ */
+export interface VendorService {
+  id: number;
+  vendor: number | Vendor;
+  service_type:
+    | 'itad'
+    | 'media-destruction'
+    | 'data-wiping'
+    | 'remarketing'
+    | 'recycling'
+    | 'refurbishment'
+    | 'logistics'
+    | 'leased-equipment-return'
+    | 'itam'
+    | 'cod'
+    | 'on-site'
+    | 'cloud-decommission'
+    | 'other';
+  description?: string | null;
+  service_url?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  first_name?: string | null;
+  last_name?: string | null;
+  email: string;
+  phone?: string | null;
+  company?: string | null;
+  vendor?: (number | null) | Vendor;
+  message?: string | null;
+  source?: string | null;
+  utm?: {
+    source?: string | null;
+    medium?: string | null;
+    campaign?: string | null;
+    term?: string | null;
+    content?: string | null;
+  };
+  status?: ('new' | 'contacted' | 'qualified' | 'closed') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1144,6 +1344,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'winery-events';
         value: number | WineryEvent;
+      } | null)
+    | ({
+        relationTo: 'industries';
+        value: number | Industry;
+      } | null)
+    | ({
+        relationTo: 'vendors';
+        value: number | Vendor;
+      } | null)
+    | ({
+        relationTo: 'vendor-certifications';
+        value: number | VendorCertification;
+      } | null)
+    | ({
+        relationTo: 'vendor-facilities';
+        value: number | VendorFacility;
+      } | null)
+    | ({
+        relationTo: 'vendor-services';
+        value: number | VendorService;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: number | Lead;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1340,7 +1564,9 @@ export interface AuthorsSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  url_segment?: T;
   description?: T;
+  sort_order?: T;
   parent?: T;
   site?: T;
   breadcrumbs?:
@@ -1361,6 +1587,8 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface TagsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  group?: T;
+  description?: T;
   site?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1852,6 +2080,151 @@ export interface WineryEventsSelect<T extends boolean = true> {
   registrationUrl?: T;
   description?: T;
   featuredImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industries_select".
+ */
+export interface IndustriesSelect<T extends boolean = true> {
+  display_name?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendors_select".
+ */
+export interface VendorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  website?: T;
+  description?: T;
+  logo?: T;
+  hq_city?: T;
+  hq_state?: T;
+  hq_country?: T;
+  phone?: T;
+  email?: T;
+  founded_year?: T;
+  employee_count_range?: T;
+  industries_served?: T;
+  is_published?: T;
+  claim_status?: T;
+  provenance?:
+    | T
+    | {
+        primary_source_url?: T;
+        crawled_at?: T;
+        last_verified_at?: T;
+        crawler_version?: T;
+        verification_notes?: T;
+      };
+  data_quality_flags?:
+    | T
+    | {
+        sparse_data?: T;
+        awaiting_re_verification?: T;
+        bot_protection_limited_crawl?: T;
+        editor_note?: T;
+      };
+  parent_company?: T;
+  acquisition?:
+    | T
+    | {
+        acquired_date?: T;
+        announcement_url?: T;
+        subsidiary_status?: T;
+        acquired_entity_notes?: T;
+      };
+  parent_company_text?: T;
+  parent_company_text_notes?: T;
+  seo?:
+    | T
+    | {
+        meta_title?: T;
+        meta_description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-certifications_select".
+ */
+export interface VendorCertificationsSelect<T extends boolean = true> {
+  vendor?: T;
+  certification_name?: T;
+  certification_body?: T;
+  cert_number?: T;
+  valid_from?: T;
+  valid_through?: T;
+  verification_status?: T;
+  verification_url?: T;
+  verification_notes?: T;
+  source_quote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-facilities_select".
+ */
+export interface VendorFacilitiesSelect<T extends boolean = true> {
+  vendor?: T;
+  facility_name?: T;
+  address?: T;
+  city?: T;
+  state?: T;
+  country?: T;
+  postal_code?: T;
+  lat?: T;
+  lng?: T;
+  ownership?: T;
+  is_headquarters?: T;
+  sq_footage?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vendor-services_select".
+ */
+export interface VendorServicesSelect<T extends boolean = true> {
+  vendor?: T;
+  service_type?: T;
+  description?: T;
+  service_url?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  first_name?: T;
+  last_name?: T;
+  email?: T;
+  phone?: T;
+  company?: T;
+  vendor?: T;
+  message?: T;
+  source?: T;
+  utm?:
+    | T
+    | {
+        source?: T;
+        medium?: T;
+        campaign?: T;
+        term?: T;
+        content?: T;
+      };
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

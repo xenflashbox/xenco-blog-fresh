@@ -71,7 +71,7 @@ export const Categories: CollectionConfig = {
   slug: 'categories',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'parent', 'site', 'slug'],
+    defaultColumns: ['title', 'slug', 'url_segment', 'sort_order', 'site'],
   },
   access: {
     read: () => true,
@@ -85,7 +85,9 @@ export const Categories: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
+    { name: 'url_segment', type: 'text', required: true },
     { name: 'description', type: 'textarea' },
+    { name: 'sort_order', type: 'number' },
 
     // Parent category (for hierarchy) - filtered by same site
     {
