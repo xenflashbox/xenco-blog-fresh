@@ -72,35 +72,32 @@ export const Promos: CollectionConfig = {
       relationTo: 'media',
       required: true,
     },
-    // Modeled as an array of group items rather than `select hasMany` so it
-    // maps cleanly onto the existing per-site array-table pattern used
-    // elsewhere in this codebase (e.g. wineries_varietal_focus).
+    // `select hasMany` so the frontend can query directly:
+    //   where[placement][in]=sidebar-mid
+    // Payload generates a `promos_placement` table with columns
+    // (order, parent_id, value) and an `enum_promos_placement` enum.
     {
       name: 'placement',
-      type: 'array',
-      admin: {
-        description: 'Where this promo should appear. Add one row per slot.',
-      },
-      fields: [
-        {
-          name: 'slot',
-          type: 'select',
-          required: true,
-          options: [
-            { label: 'Homepage banner', value: 'home-banner' },
-            { label: 'Sidebar (mid)', value: 'sidebar-mid' },
-            { label: 'Sidebar (bottom)', value: 'sidebar-bottom' },
-            { label: 'In-article', value: 'in-article' },
-            { label: 'Newsletter footer', value: 'newsletter-footer' },
-          ],
-        },
+      type: 'select',
+      hasMany: true,
+      index: true,
+      options: [
+        { label: 'Homepage banner', value: 'home-banner' },
+        { label: 'Sidebar (mid)', value: 'sidebar-mid' },
+        { label: 'Sidebar (bottom)', value: 'sidebar-bottom' },
+        { label: 'In-article', value: 'in-article' },
+        { label: 'Newsletter footer', value: 'newsletter-footer' },
       ],
+      admin: {
+        description: 'Where this promo should appear. Multi-select.',
+      },
     },
     {
       name: 'targetCategories',
       type: 'relationship',
       relationTo: 'categories',
       hasMany: true,
+      index: true,
       admin: {
         description: 'Optional — show this promo only on episodes in these categories.',
       },
@@ -120,10 +117,11 @@ export const Promos: CollectionConfig = {
       name: 'active',
       type: 'checkbox',
       defaultValue: true,
+      index: true,
       admin: { position: 'sidebar' },
     },
-    { name: 'startDate', type: 'date', admin: { position: 'sidebar' } },
-    { name: 'endDate', type: 'date', admin: { position: 'sidebar' } },
+    { name: 'startDate', type: 'date', index: true, admin: { position: 'sidebar' } },
+    { name: 'endDate', type: 'date', index: true, admin: { position: 'sidebar' } },
     {
       name: 'site',
       type: 'relationship',

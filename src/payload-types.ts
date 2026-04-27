@@ -1391,14 +1391,9 @@ export interface Promo {
   ctaUrl: string;
   image: number | Media;
   /**
-   * Where this promo should appear. Add one row per slot.
+   * Where this promo should appear. Multi-select.
    */
-  placement?:
-    | {
-        slot: 'home-banner' | 'sidebar-mid' | 'sidebar-bottom' | 'in-article' | 'newsletter-footer';
-        id?: string | null;
-      }[]
-    | null;
+  placement?: ('home-banner' | 'sidebar-mid' | 'sidebar-bottom' | 'in-article' | 'newsletter-footer')[] | null;
   /**
    * Optional — show this promo only on episodes in these categories.
    */
@@ -2494,12 +2489,7 @@ export interface PromosSelect<T extends boolean = true> {
   ctaText?: T;
   ctaUrl?: T;
   image?: T;
-  placement?:
-    | T
-    | {
-        slot?: T;
-        id?: T;
-      };
+  placement?: T;
   targetCategories?: T;
   active?: T;
   startDate?: T;

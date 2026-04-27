@@ -84,6 +84,18 @@ export const Categories: CollectionConfig = {
   },
   fields: [
     { name: 'title', type: 'text', required: true },
+
+    // ── Routing fields ───────────────────────────────────────────────────
+    // `slug` is CANONICAL for routing. The Lexi Explains frontend queries
+    //   GET /api/categories?where[slug][equals]=finance
+    // and that's the contract. Always set slug = the path segment users see
+    // in the URL (e.g. "finance", "ai", "tech").
+    //
+    // `url_segment` is a reserved variant slot used by other tenants
+    // (e.g. CompareITAD pillars) where a category's editorial title differs
+    // from its URL prefix. For Lexi, set url_segment = slug. The frontend
+    // does not query url_segment today; if a Lexi editor ever needs them to
+    // diverge, that's a follow-up that requires frontend changes too.
     { name: 'slug', type: 'text', required: true },
     { name: 'url_segment', type: 'text', required: true },
     { name: 'description', type: 'textarea' },
