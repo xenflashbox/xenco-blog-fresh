@@ -89,6 +89,39 @@ export const Categories: CollectionConfig = {
     { name: 'description', type: 'textarea' },
     { name: 'sort_order', type: 'number' },
 
+    // ── Lexi Explains category styling ────────────────────────────────────
+    // Optional visual fields used by the Lexi Explains site (lexiexplains.com).
+    // Other sites simply leave them blank; nothing else in the CMS depends on them.
+    {
+      name: 'color',
+      type: 'select',
+      options: [
+        { label: 'Money Green', value: 'green' },
+        { label: 'Electric Violet', value: 'violet' },
+        { label: 'Cyber Blue', value: 'blue' },
+        { label: 'Hot Coral', value: 'coral' },
+        { label: 'Champagne', value: 'champagne' },
+      ],
+      admin: {
+        description: 'Lexi Explains only — accent color used for category cards and chips.',
+      },
+    },
+    {
+      name: 'icon',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Lexi Explains only — custom SVG icon for this category.',
+      },
+    },
+    {
+      name: 'tagline',
+      type: 'text',
+      admin: {
+        description: 'Lexi Explains only — optional tagline shown on category landing pages.',
+      },
+    },
+
     // Parent category (for hierarchy) - filtered by same site
     {
       name: 'parent',

@@ -25,6 +25,7 @@ import * as migration_20260408_041441_add_wineries_hero_image_url from './202604
 import * as migration_20260419_add_citad_collections from './20260419_add_citad_collections';
 import * as migration_20260421_schema_addendum_2 from './20260421_schema_addendum_2';
 import * as migration_20260422_add_categories_tags_editorial_fields from './20260422_add_categories_tags_editorial_fields';
+import * as migration_20260426_add_lexi_collections from './20260426_add_lexi_collections';
 
 export const migrations = [
   {
@@ -161,5 +162,10 @@ export const migrations = [
     up: migration_20260422_add_categories_tags_editorial_fields.up,
     down: migration_20260422_add_categories_tags_editorial_fields.down,
     name: '20260422_add_categories_tags_editorial_fields',
+  },
+  {
+    up: migration_20260426_add_lexi_collections.up,
+    down: migration_20260426_add_lexi_collections.down,
+    name: '20260426_add_lexi_collections',
   },
 ];

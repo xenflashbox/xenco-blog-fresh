@@ -95,6 +95,9 @@ export interface Config {
     'vendor-facilities': VendorFacility;
     'vendor-services': VendorService;
     leads: Lead;
+    series: Series;
+    episodes: Episode;
+    promos: Promo;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -130,6 +133,9 @@ export interface Config {
     'vendor-facilities': VendorFacilitiesSelect<false> | VendorFacilitiesSelect<true>;
     'vendor-services': VendorServicesSelect<false> | VendorServicesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    series: SeriesSelect<false> | SeriesSelect<true>;
+    episodes: EpisodesSelect<false> | EpisodesSelect<true>;
+    promos: PromosSelect<false> | PromosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -373,6 +379,18 @@ export interface Category {
   url_segment: string;
   description?: string | null;
   sort_order?: number | null;
+  /**
+   * Lexi Explains only — accent color used for category cards and chips.
+   */
+  color?: ('green' | 'violet' | 'blue' | 'coral' | 'champagne') | null;
+  /**
+   * Lexi Explains only — custom SVG icon for this category.
+   */
+  icon?: (number | null) | Media;
+  /**
+   * Lexi Explains only — optional tagline shown on category landing pages.
+   */
+  tagline?: string | null;
   /**
    * Select parent category for hierarchy
    */
@@ -1235,6 +1253,165 @@ export interface Lead {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series".
+ */
+export interface Series {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  category: number | Category;
+  heroImage?: (number | null) | Media;
+  /**
+   * Planned total — episodes themselves are linked from the Episodes collection
+   */
+  totalEpisodes?: number | null;
+  status?: ('active' | 'complete' | 'paused') | null;
+  site: number | Site;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "episodes".
+ */
+export interface Episode {
+  id: number;
+  /**
+   * Episode title — keep it punchy, e.g. "Credit Scores Are Like Dating".
+   */
+  title: string;
+  slug: string;
+  /**
+   * Lexi’s opening line in the video — used as the meta description and excerpt.
+   */
+  hook?: string | null;
+  category: number | Category;
+  /**
+   * Optional — only set if this episode is part of a multi-part series.
+   */
+  series?: (number | null) | Series;
+  /**
+   * If part of a series, the episode number within the series.
+   */
+  episodeNumber?: number | null;
+  videoSource: 'youtube' | 'tiktok' | 'direct';
+  /**
+   * YouTube video ID (the part after watch?v=).
+   */
+  youtubeId?: string | null;
+  /**
+   * Full TikTok video URL used as the embed source.
+   */
+  tiktokUrl?: string | null;
+  directVideo?: (number | null) | Media;
+  /**
+   * Length in seconds.
+   */
+  duration?: number | null;
+  /**
+   * Vertical 9:16 still frame used as the thumbnail.
+   */
+  posterImage: number | Media;
+  /**
+   * Horizontal hero image for the article view (16:9 or similar).
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Full transcript of what Lexi says — also great for SEO.
+   */
+  transcript?: string | null;
+  /**
+   * Optional longer-form companion article.
+   */
+  extendedContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * 3-5 bullet takeaways shown in the sidebar.
+   */
+  keyTakeaways?:
+    | {
+        point: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Public TikTok URL once posted.
+   */
+  tiktokPostUrl?: string | null;
+  instagramUrl?: string | null;
+  youtubeShortUrl?: string | null;
+  /**
+   * Manually update for tracking — optional.
+   */
+  tiktokViews?: number | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImage?: (number | null) | Media;
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pin to homepage hero.
+   */
+  featured?: boolean | null;
+  status: 'draft' | 'scheduled' | 'published' | 'archived';
+  publishedAt?: string | null;
+  site: number | Site;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promos".
+ */
+export interface Promo {
+  id: number;
+  name: string;
+  product?: ('blogcraft' | 'resumecoach' | 'imagecrafter' | 'devmaestro' | 'mcpforge' | 'hisatech' | 'other') | null;
+  headline: string;
+  subhead?: string | null;
+  ctaText: string;
+  ctaUrl: string;
+  image: number | Media;
+  /**
+   * Where this promo should appear. Add one row per slot.
+   */
+  placement?:
+    | {
+        slot: 'home-banner' | 'sidebar-mid' | 'sidebar-bottom' | 'in-article' | 'newsletter-footer';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional — show this promo only on episodes in these categories.
+   */
+  targetCategories?: (number | Category)[] | null;
+  active?: boolean | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  site: number | Site;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1368,6 +1545,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'leads';
         value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'series';
+        value: number | Series;
+      } | null)
+    | ({
+        relationTo: 'episodes';
+        value: number | Episode;
+      } | null)
+    | ({
+        relationTo: 'promos';
+        value: number | Promo;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1567,6 +1756,9 @@ export interface CategoriesSelect<T extends boolean = true> {
   url_segment?: T;
   description?: T;
   sort_order?: T;
+  color?: T;
+  icon?: T;
+  tagline?: T;
   parent?: T;
   site?: T;
   breadcrumbs?:
@@ -2225,6 +2417,94 @@ export interface LeadsSelect<T extends boolean = true> {
         content?: T;
       };
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series_select".
+ */
+export interface SeriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  category?: T;
+  heroImage?: T;
+  totalEpisodes?: T;
+  status?: T;
+  site?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "episodes_select".
+ */
+export interface EpisodesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  hook?: T;
+  category?: T;
+  series?: T;
+  episodeNumber?: T;
+  videoSource?: T;
+  youtubeId?: T;
+  tiktokUrl?: T;
+  directVideo?: T;
+  duration?: T;
+  posterImage?: T;
+  heroImage?: T;
+  transcript?: T;
+  extendedContent?: T;
+  keyTakeaways?:
+    | T
+    | {
+        point?: T;
+        id?: T;
+      };
+  tiktokPostUrl?: T;
+  instagramUrl?: T;
+  youtubeShortUrl?: T;
+  tiktokViews?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  featured?: T;
+  status?: T;
+  publishedAt?: T;
+  site?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promos_select".
+ */
+export interface PromosSelect<T extends boolean = true> {
+  name?: T;
+  product?: T;
+  headline?: T;
+  subhead?: T;
+  ctaText?: T;
+  ctaUrl?: T;
+  image?: T;
+  placement?:
+    | T
+    | {
+        slot?: T;
+        id?: T;
+      };
+  targetCategories?: T;
+  active?: T;
+  startDate?: T;
+  endDate?: T;
+  site?: T;
   updatedAt?: T;
   createdAt?: T;
 }

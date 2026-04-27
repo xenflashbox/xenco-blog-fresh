@@ -36,6 +36,9 @@ import { VendorCertifications } from './collections/VendorCertifications'
 import { VendorFacilities } from './collections/VendorFacilities'
 import { VendorServices } from './collections/VendorServices'
 import { Leads } from './collections/Leads'
+import { Series } from './collections/Series'
+import { Episodes } from './collections/Episodes'
+import { Promos } from './collections/Promos'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
@@ -203,6 +206,10 @@ export default buildConfig({
     VendorFacilities,
     VendorServices,
     Leads,
+    // Lexi Explains content
+    Series,
+    Episodes,
+    Promos,
   ],
 
   endpoints: [
