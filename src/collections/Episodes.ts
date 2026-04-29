@@ -125,6 +125,18 @@ export const Episodes: CollectionConfig = {
       filterOptions: filterBySite,
     },
     {
+      name: 'author',
+      type: 'relationship',
+      relationTo: 'authors',
+      required: true,
+      index: true,
+      admin: {
+        description: 'Episode byline. Required — every episode has a host.',
+        position: 'sidebar',
+      },
+      filterOptions: filterBySite,
+    },
+    {
       name: 'series',
       type: 'relationship',
       relationTo: 'series',

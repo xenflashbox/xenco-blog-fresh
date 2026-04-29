@@ -1288,6 +1288,10 @@ export interface Episode {
   hook?: string | null;
   category: number | Category;
   /**
+   * Episode byline. Required — every episode has a host.
+   */
+  author: number | Author;
+  /**
    * Optional — only set if this episode is part of a multi-part series.
    */
   series?: (number | null) | Series;
@@ -2440,6 +2444,7 @@ export interface EpisodesSelect<T extends boolean = true> {
   slug?: T;
   hook?: T;
   category?: T;
+  author?: T;
   series?: T;
   episodeNumber?: T;
   videoSource?: T;
