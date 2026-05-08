@@ -28,6 +28,8 @@ import * as migration_20260422_add_categories_tags_editorial_fields from './2026
 import * as migration_20260426_add_lexi_collections from './20260426_add_lexi_collections';
 import * as migration_20260427_promos_queryable_fields from './20260427_promos_queryable_fields';
 import * as migration_20260429_add_episodes_author from './20260429_add_episodes_author';
+import * as migration_20260506_add_diabetescompass_collections from './20260506_add_diabetescompass_collections';
+import * as migration_20260508_vendor_profile_reframe_additions from './20260508-vendor-profile-reframe-additions';
 
 export const migrations = [
   {
@@ -179,5 +181,15 @@ export const migrations = [
     up: migration_20260429_add_episodes_author.up,
     down: migration_20260429_add_episodes_author.down,
     name: '20260429_add_episodes_author',
+  },
+  {
+    up: migration_20260506_add_diabetescompass_collections.up,
+    down: migration_20260506_add_diabetescompass_collections.down,
+    name: '20260506_add_diabetescompass_collections',
+  },
+  {
+    up: migration_20260508_vendor_profile_reframe_additions.up,
+    down: migration_20260508_vendor_profile_reframe_additions.down,
+    name: '20260508-vendor-profile-reframe-additions',
   },
 ];

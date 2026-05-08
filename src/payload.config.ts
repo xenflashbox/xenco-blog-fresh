@@ -30,6 +30,8 @@ import { Wines } from './collections/Wines'
 import { Restaurants } from './collections/Restaurants'
 import { Accommodations } from './collections/Accommodations'
 import { WineryEvents } from './collections/WineryEvents'
+import { Specialists } from './collections/Specialists'
+import { Regions } from './collections/Regions'
 import { Industries } from './collections/Industries'
 import { Vendors } from './collections/Vendors'
 import { VendorCertifications } from './collections/VendorCertifications'
@@ -199,6 +201,9 @@ export default buildConfig({
     Restaurants,
     Accommodations,
     WineryEvents,
+    // DiabetesCompass specialist directory
+    Specialists,
+    Regions,
     // Compare ITAD vendor directory
     Industries,
     Vendors,

@@ -211,7 +211,57 @@ export const Sites: CollectionConfig = {
 
     { name: 'isDefault', type: 'checkbox', defaultValue: false },
 
-    // ISR Revalidation settings for front-end cache invalidation
+    // ── Branding ──────────────────────────────────────────────────────────────
+    {
+      name: 'tagline',
+      type: 'text',
+      admin: { description: 'Short brand tagline (e.g. "Find your direction.")' },
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      admin: { description: 'Site description for admin reference and SEO defaults' },
+    },
+    {
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'Primary site logo (SVG or PNG)' },
+    },
+    {
+      name: 'favicon',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'Site favicon (SVG or ICO)' },
+    },
+    {
+      name: 'themeColor',
+      type: 'text',
+      label: 'Theme Color',
+      admin: { description: 'Primary brand color hex (e.g. #0F4C5C)' },
+    },
+    {
+      name: 'backgroundColor',
+      type: 'text',
+      label: 'Background Color',
+      admin: { description: 'Background color hex (e.g. #F4EDE0)' },
+    },
+
+    // ── Newsletter integrations ───────────────────────────────────────────────
+    {
+      name: 'listmonkListId',
+      type: 'text',
+      label: 'Listmonk List ID',
+      admin: { description: 'Listmonk mailing list ID for newsletter signups on this site' },
+    },
+    {
+      name: 'mauticSegmentId',
+      type: 'text',
+      label: 'Mautic Segment ID',
+      admin: { description: 'Mautic segment ID for this site' },
+    },
+
+    // ── ISR Revalidation settings for front-end cache invalidation ───────────
     {
       name: 'revalidateUrl',
       type: 'text',

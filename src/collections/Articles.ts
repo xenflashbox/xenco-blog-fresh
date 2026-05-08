@@ -101,7 +101,7 @@ function hasApiKeyAuthSignal(req: any): boolean {
   return false
 }
 
-function collectSiteEqualsValues(node: any, output: Array<string | number>): void {
+function collectSiteEqualsValues(node: any, output: Array<unknown>): void {
   if (!node || typeof node !== 'object') return
 
   if (Array.isArray(node)) {
@@ -118,6 +118,22 @@ function collectSiteEqualsValues(node: any, output: Array<string | number>): voi
       collectSiteEqualsValues(value, output)
     }
   }
+}
+
+function isValidSiteIdValue(value: unknown): boolean {
+  if (typeof value === 'number') {
+    return Number.isInteger(value) && value > 0
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return false
+
+    const numericValue = Number(trimmed)
+    return Number.isInteger(numericValue) && numericValue > 0
+  }
+
+  return false
 }
 
 function hasAnySiteConstraint(node: any): boolean {
@@ -175,17 +191,17 @@ const beforeOperation: CollectionBeforeOperationHook = async ({ args, operation 
   if ((reqUser && isAdminRequest) || isApiKeyAuth) return args
 
   const where = (args as any)?.where
-  const siteEqualsValues: Array<string | number> = []
+  const siteEqualsValues: Array<unknown> = []
   collectSiteEqualsValues(where, siteEqualsValues)
   const hasSiteConstraint = hasAnySiteConstraint(where)
 
   // If caller explicitly passed a site filter (including nested where/and/or),
   // validate equals values and never inject domain scoping.
   for (const siteValue of siteEqualsValues) {
-    if (typeof siteValue === 'string' && isNaN(Number(siteValue))) {
+    if (!isValidSiteIdValue(siteValue)) {
       throw new APIError(
-        `Invalid site ID "${siteValue}". The where[site][equals] filter must be a numeric ` +
-          `integer ID — not a UUID or slug. You can omit this filter entirely: the CMS ` +
+        `Invalid site ID "${String(siteValue)}". The where[site][equals] filter must be a positive ` +
+          `integer ID, not a UUID, slug, empty value, or NaN. You can omit this filter entirely: the CMS ` +
           `auto-scopes to the correct site based on the domain you're hitting ` +
           `(e.g. cms.resumecoach.me → site 1). Use GET /api/sites to list all sites.`,
         400,

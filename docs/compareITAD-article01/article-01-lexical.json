@@ -1,0 +1,4130 @@
+{
+  "root": {
+    "type": "root",
+    "format": "",
+    "indent": 0,
+    "version": 1,
+    "children": [
+      {
+        "type": "heading",
+        "tag": "h1",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "How to Choose an ITAD Vendor: The 2026 Enterprise Buyer's Guide",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 2,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A framework for evaluating IT asset disposition vendors when a bad choice carries eight-figure consequences.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "horizontalrule",
+        "version": 1
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The 200 laptops sitting in your storage closet are not a disposal problem. They are a liability ledger. Every device has employee records, customer data, credentials, proprietary code, or some combination of the four. Every day they sit there, your organization carries the risk of what's on them. And when you finally pick a vendor to take them away, that vendor's competence \u2014 or lack of it \u2014 becomes your competence or lack of it, in the eyes of regulators, auditors, plaintiff attorneys, and cyber insurance underwriters.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "This guide is for the person in your organization who will own that vendor selection. It's written for IT procurement leads, CISOs, compliance officers, and the general counsel who has to sign the contract. It is not written to sell you anything. Compare ITAD does not sell ITAD services, does not accept payment for vendor placement, and has no referral arrangements with the vendors discussed in this article.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "We walk through the seven evaluation dimensions that actually matter in 2026, the questions you should ask every shortlisted vendor, the documentation you should demand before signing a contract, and the regulatory context that will shape ITAD procurement for the next 24 months. At the end, we cover the common mistakes that produce bad outcomes and how to avoid them.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "If you are in a hurry: the most important single variable in vendor selection is documentation quality. Everything else is downstream of it.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Why 2026 is different",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "ITAD vendor selection got harder in the last 18 months, and not because the technology changed. Three regulatory and industry shifts converged:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "NIST SP 800-88 Rev. 2 replaced Rev. 1 as the reference standard for media sanitization.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Rev. 2 addresses modern storage media more rigorously \u2014 NVMe drives, SSDs with wear-leveling, storage-class memory \u2014 and formally recognizes cryptographic erase as a valid Purge method for self-encrypting drives. If your internal policy language still references Rev. 1, or still reads \"wipe drives\" without specifying Clear, Purge, or Destroy per the NIST taxonomy, you are carrying policy risk that a Rev. 2-aligned attacker in your next audit will find.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "CMMC 2.0 assessments went live for defense contractors.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Media protection controls (MP-6 and related) now require per-device destruction evidence for Controlled Unclassified Information (CUI). This is not a check-the-box exercise. Third-party assessors will ask for serialized destruction certificates and will fail the assessment if you cannot produce them. If your organization touches defense work at any level, your ITAD vendor must already be able to produce CMMC-aligned documentation. Most cannot.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Scope 3 emissions disclosure entered the ITAD conversation.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " California's SB 253 requires disclosure of Scope 3 emissions including IT equipment end-of-life treatment, with the first reporting period covering 2026 data. The EU's Corporate Sustainability Reporting Directive (CSRD) has similar downstream reporting requirements that reach US operations of EU-domiciled parents. Your ITAD vendor's ability to produce auditable carbon and material-recovery data is no longer a nice-to-have for ESG reporting \u2014 it's procurement criteria with a deadline.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A vendor that was good enough in 2023 may be inadequate for your 2026 requirements without you noticing. This guide is structured to surface that gap if it exists.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The seven dimensions of vendor evaluation",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "1. Certification portfolio \u2014 and how to verify it",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Certifications are the baseline filter. Any ITAD vendor operating at enterprise scale in North America in 2026 should hold at least:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "R2v3",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " (managed by SERI \u2014 Sustainable Electronics Recycling International) for downstream material controls and reuse standards",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "NAID AAA",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " (managed by i-SIGMA) for data destruction process verification, including unannounced audits and background-checked personnel",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ISO 14001:2015",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for environmental management",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A vendor that cannot produce current certificates in these three frameworks has either never achieved them or has allowed them to lapse. Either answer is disqualifying for enterprise procurement.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Organizations with stronger ESG positioning often prefer ",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "e-Stewards",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " (managed by Basel Action Network) over R2v3. The two standards cover similar ground; e-Stewards is more restrictive on export and prison labor, R2v3 is more operationally focused. A vendor that holds both is telling you something deliberate about their positioning. A vendor that holds neither is not in the conversation.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "For regulated industries, add:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ISO 27001",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for information security management if your vendor will access or transport data-bearing devices",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "SOC 2 Type II",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for vendors providing client portals or reporting systems that hold your asset data",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ISO 9001",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " if quality management documentation is part of your supplier evaluation",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "For federal contractors:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "NIST SP 800-88 Rev. 2 alignment",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " (not a formal certification but a capability requirement)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ITAR compliance workflows",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for any defense-related hardware",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Documentation formatted for ",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "FISCAM",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " review during CMMC 2.0 assessments",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "How to verify a claimed certification.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Do not rely on the vendor's website or PDF copies of certificates. Certificate fraud in the ITAD industry is real and persistent. Go to the issuing authority's public registry:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "R2v3 and R2:2013: ",
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 3,
+                "children": [
+                  {
+                    "type": "text",
+                    "format": 0,
+                    "detail": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "sustainableelectronics.org/r2-certified-facilities/",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "fields": {
+                  "url": "https://sustainableelectronics.org/r2-certified-facilities/",
+                  "newTab": true,
+                  "linkType": "custom"
+                }
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "NAID AAA: ",
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 3,
+                "children": [
+                  {
+                    "type": "text",
+                    "format": 0,
+                    "detail": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "naidonline.org/find-a-member/",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "fields": {
+                  "url": "https://www.naidonline.org/find-a-member/",
+                  "newTab": true,
+                  "linkType": "custom"
+                }
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "e-Stewards: ",
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 3,
+                "children": [
+                  {
+                    "type": "text",
+                    "format": 0,
+                    "detail": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "e-stewards.org/find-a-recycler/",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "fields": {
+                  "url": "https://e-stewards.org/find-a-recycler/",
+                  "newTab": true,
+                  "linkType": "custom"
+                }
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ISO certifications: through the named accrediting body (ANAB, UKAS, etc.)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Two things to confirm in the registry: current status (not expired) and scope (which facilities and which services the certification covers). A vendor operating a Texas facility under an expired Ohio-based R2 scope is a vendor telling you they don't take their own compliance seriously.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "One caveat: SOC 2 reports cannot be verified through a public registry. The only way to confirm SOC 2 Type II is to request a redacted copy of the attestation report under NDA. A vendor that refuses to produce one under NDA is a vendor without one.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "2. Data destruction method \u2014 match the method to the media",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "There is no universal \"best\" destruction method. The correct method depends on the storage media, the data classification, and whether the asset will be remarketed or recycled.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "NIST SP 800-88 Rev. 2 defines three categories:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Clear",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 applying logical techniques to user-addressable storage. Appropriate for low-sensitivity data on devices that will be reused internally.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Purge",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 applying techniques that render data recovery infeasible even with laboratory techniques. Cryptographic erase on self-encrypting drives, block-erase commands on flash memory, or multi-pass overwrites on magnetic media. Appropriate for moderate-to-high sensitivity data on devices destined for remarketing.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Destroy",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 physical destruction (shredding, disintegration, melting) rendering the media unusable. Appropriate for high-sensitivity data and for devices that cannot be reliably Purged.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The vendor's capability set should match your media mix. If you are retiring a mix of older HDDs, modern SSDs with self-encryption, and NVMe drives, the vendor needs to handle all three correctly. A vendor that shreds everything is solving the problem with a sledgehammer and is destroying remarketable value in the process. A vendor that wipes everything using a generic \"secure wipe\" utility may not be producing Purge-level sanitization on SSDs and definitely is not producing it on NVMe drives without proper tooling.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The right evaluation question is not \"do you destroy data?\" It is \"which NIST 800-88 Rev. 2 category do you apply to HDDs, SATA SSDs, NVMe SSDs, and self-encrypting drives respectively, and what validation do you provide?\"",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "IEEE 2883",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " is the modern alternative to NIST 800-88 that some vendors now cite, particularly for emerging storage media and reuse-oriented programs. Either standard is acceptable when applied correctly. A vendor that cannot name either is a vendor operating without a standards framework.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "On-site versus off-site destruction.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " On-site destruction (vendor brings the shredder or sanitization equipment to your facility, destroys devices under your observation, removes the remnants) is the highest-security option and eliminates chain-of-custody exposure during transit. It costs more per device. For the highest-sensitivity data \u2014 customer PII at scale, healthcare PHI, classified or controlled unclassified information \u2014 on-site destruction is the correct choice regardless of price.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Off-site destruction is acceptable for moderate-sensitivity data when the vendor's logistics chain is provably secure. \"Provably secure\" means GPS-tracked transport, tamper-evident packaging, serialized inventory at pickup and at receiving, and documented chain-of-custody records at every handoff.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "3. Documentation depth \u2014 the single highest-impact variable",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "If you remember nothing else from this guide, remember this: the vendor's documentation quality is the difference between a defensible ITAD program and an indefensible one.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "During a regulatory audit, a breach investigation, or a discovery production, your organization will be asked three questions:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "number",
+        "start": 1,
+        "tag": "ol",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Where did device serial number X go?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "How was the data on device serial number X destroyed?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "When and by whom was that destruction verified?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "If your vendor's documentation can answer those three questions for every device in the last seven years (the standard retention period for healthcare and financial services), your ITAD program is defensible. If it cannot, your program is a liability.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "What to require:",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Serialized certificates of destruction",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 one per device, with the device serial number, destruction method, destruction date, operator identifier, and vendor signature or digital attestation. Bulk certificates (\"500 hard drives destroyed on 2026-03-15\") do not meet this standard. They prove destruction occurred but fail the traceability test.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Chain-of-custody records",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " covering every handoff from your facility to final material disposition. This includes pickup manifest, transit GPS logs, receiving confirmation at the processing facility, processing log, and final disposition record (recycling, refurbishment, or destruction).",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Settlement reports",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for any assets that were remarketed or resold, including individual asset values, processing costs, and net recovery paid to your organization.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Downstream vendor disclosure",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 a list of every downstream processor your vendor routes material to, along with those processors' certifications. R2v3 requires your vendor to disclose and document this. Many vendors comply minimally. Push for complete disclosure.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 5,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Mass balance reporting",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " for material streams \u2014 how many pounds of plastic, glass, ferrous metal, non-ferrous metal, circuit boards, and hazardous materials were recovered from your retired equipment.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "One test to run during vendor evaluation: ask your shortlisted vendors to produce, for a reference customer (with redactions), the complete documentation package from a single engagement in the last 12 months. Many vendors will decline. Some will produce a bulk certificate and call it complete. A vendor that produces a clean documentation package with serialized certificates, GPS logs, settlement reports, and downstream disclosure is a vendor that actually does this work consistently.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "4. Chain of custody \u2014 end to end or nothing",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Chain of custody is what turns a destruction claim into a defensible destruction record. The phrase is overused; here is what it actually means operationally.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A complete chain of custody captures:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Origin",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 the specific location, date, time, and signing employee when devices left your facility",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Transit",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 the method of transport, GPS track, vehicle ID, driver ID, time in transit, any interim stops",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Receipt",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 date and time of arrival at the processing facility, receiving employee, count reconciliation against the pickup manifest, any discrepancies flagged",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Processing",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 sanitization or destruction step by step, with operator ID, equipment ID, validation method, and timestamps",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 5,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Final disposition",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " \u2014 where each device or material stream ended up, with supporting documentation from downstream processors",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A vendor that describes chain of custody as \"signed handoff at pickup\" is describing one step of five. That is not chain of custody. That is a delivery receipt.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Ask your shortlisted vendors: \"For an engagement completed six months ago, can you show me the complete chain-of-custody documentation for one randomly selected device?\" Their answer, and their willingness to produce it, is a strong signal.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "5. Value recovery \u2014 quantify the opportunity cost of ignoring it",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Enterprise hardware retains significant residual value at end of lease. Industry averages for typical corporate retirement portfolios (3\u20135 year old laptops, servers, networking equipment):",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Current-generation business laptops: 15\u201330% of original purchase price within 90 days of retirement",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Enterprise servers (rack-mount, 2\u20133 generations old): 10\u201320% of original",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Network equipment (switches, firewalls, access points): 5\u201315% of original, higher for premium brands",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Storage arrays and controllers: 8\u201318% of original, highly dependent on age and generation",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A 1,000-seat laptop refresh retiring $1.5M of current-generation equipment has $225,000\u2013$450,000 in recoverable value sitting in it. Over 90 days of storage, that value depreciates 2\u20133% per month. An ITAD engagement delayed by six months has recovered less than half of what it could have.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The value recovery question is not \"do you remarket assets?\" It is \"what is your recovery rate versus secondary market benchmarks, and do you provide itemized settlement reports that let me verify?\"",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Red flags in value recovery proposals:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Gross revenue percentages",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " without itemized detail. \"We return 40% of gross\" is meaningless without knowing the gross. A vendor capturing a 60% margin on the resale does not have interests aligned with yours.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "No benchmarking reference.",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " A vendor that cannot cite secondary market pricing (public auction records, UrbanMineCo indices, DataSpan benchmarks) to justify their recovery quote is operating in an information asymmetry that favors them.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "No pre-engagement value estimate.",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " Vendors should provide a pre-pickup estimate of recoverable value based on your asset inventory. A vendor that will not commit to a range before pickup is a vendor that knows they will capture more value once the assets are off-site and out of your visibility.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Vendors certified to R2v3 Appendix C (Test and Repair) have formalized remarketing capabilities. Not every R2v3 vendor holds Appendix C, and the difference matters for value recovery programs.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "6. Geographic coverage \u2014 match to your operational footprint",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A vendor that operates only in the Northeast cannot credibly serve a company with offices in Dallas, Atlanta, and Seattle. The logistics will either be expensive (cross-country transport for every engagement) or thin (one regional partner doing pickups under your primary vendor's brand, with visibility gaps at every handoff).",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The coverage question has two layers:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Owned facilities.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " These are the vendor's directly operated processing locations. Direct operation means consistent process, consistent documentation, and a single chain of custody throughout. Ask your shortlisted vendors for a map of owned facilities, including what services each facility performs (data destruction, physical destruction, refurbishment, packaging, logistics only).",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Partner network.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Any vendor claiming national or global coverage with only a handful of owned facilities is using partner processors. That is not automatically disqualifying \u2014 the alternative is limiting yourself to vendors with massive capex footprints \u2014 but it shifts the evaluation question. You need to know:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Which partners handle which geographies",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Whether partners hold the same certifications the primary vendor holds",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Whether chain-of-custody documentation carries through the partner handoffs",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "What the primary vendor's liability position is if a partner fails an audit",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "For a company with a distributed workforce, add a third layer: remote device retrieval. If your organization has employees across 30 states or 15 countries, the ITAD vendor's ability to ship prepaid return kits, track returns, and process devices from dispersed origins is a separate capability from traditional enterprise ITAD.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h3",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "7. Cyber insurance alignment \u2014 a recent and often overlooked criterion",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Cyber insurance underwriters have tightened ITAD requirements significantly in the last 24 months. Renewal questionnaires now routinely ask:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Do you use a vendor with documented NIST 800-88 compliance?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Do you hold serialized certificates of destruction for all retired data-bearing assets?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Do you have chain-of-custody records covering the last three years?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Does your vendor carry cyber liability insurance in amounts appropriate to your data exposure?",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "A \"no\" answer to any of these can increase premium, trigger coverage exclusions, or \u2014 in the worst case \u2014 result in policy denial for a claim that stems from ITAD mishandling.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Ask your shortlisted vendors for their cyber liability insurance certificate. Confirm the coverage amount, the named insured, and any exclusions that would affect your engagement. A vendor carrying $1M in cyber liability coverage for a contract where they will handle tens of thousands of your devices is a vendor whose insurance will not meaningfully indemnify you if something goes wrong.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "This is a recent vector and many enterprise ITAD programs have not caught up to it. Raising the question during vendor selection positions your organization ahead of the insurance market's expectations, not behind them.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The evaluation workflow",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "With the seven dimensions defined, the workflow for a rigorous vendor selection is:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 1 \u2014 Longlist (2 weeks).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Compile 8\u201312 candidate vendors. Sources: industry directories (including Compare ITAD), peer references, existing vendor relationships, certification-authority registries. Filter to vendors holding at minimum R2v3, NAID AAA, and ISO 14001, with verified current status in the public registries.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 2 \u2014 Qualification questionnaire (2 weeks).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Send a written questionnaire covering the seven dimensions. Require sample documentation \u2014 certificates, chain-of-custody record for a reference engagement, settlement report template, cyber liability certificate. Score responses on a weighted matrix aligned to your organization's specific requirements (weight compliance higher if you are in regulated industry; weight value recovery higher if your refresh cadence is aggressive).",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 3 \u2014 Shortlist (3 vendors) facility inspection (2 weeks).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Visit each finalist's primary processing facility. This is not optional for enterprise procurement. What you are looking for:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Physical security (badge access, camera coverage, segregated processing areas)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Documentation workflow (paperwork by the device vs. paperwork at end of day)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Downstream vendor segregation (R2v3 requires it; many facilities are sloppy about it)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Staff competence (ask line workers what they do with a drive after processing \u2014 the answer should match what the sales team told you)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 4 \u2014 Reference calls (1 week).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Request references from current enterprise customers in your industry. Ask the references: \"What has gone wrong in your engagement with this vendor, and how did they handle it?\" Every vendor has had something go wrong. A reference that cannot name anything is a reference that was coached, and a coached reference is not a reference.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 5 \u2014 Contract negotiation (2\u20134 weeks).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " The contract is where the evaluation outcomes become enforceable. Terms to push hard on:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Service level agreements for pickup turnaround and documentation delivery",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Liquidated damages for documentation failures (lost certificates, missing serial numbers)",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Audit rights, including unannounced audits and access to downstream facility records",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Subcontractor approval requirements",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 5,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Termination for cause clauses tied to certification lapse or compliance failure",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 6,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Data breach notification requirements and time windows",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Stage 6 \u2014 Pilot engagement (1\u20132 months).",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Start with a limited engagement \u2014 a single office, a single data center row, a single quarterly refresh \u2014 before committing to a multi-year contract. Evaluate actual performance against promised performance. Extend only after the pilot confirms the vendor delivers what they sold.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Full cycle: 10\u201314 weeks. For an enterprise ITAD program with tens of thousands of devices retiring annually, this is appropriate investment. Shortcuts at any stage produce vendor relationships that fail under audit pressure.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The common mistakes that produce bad outcomes",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Patterns we see repeatedly in enterprise ITAD programs that end badly:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Selecting on price alone.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " The cheapest vendor is cheap for a reason. Either they are subsidizing price against margin they will recapture in value recovery opacity, or they are operating without the documentation infrastructure that makes ITAD defensible. A vendor priced 20% below the market is a signal to investigate why, not to sign.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Treating ITAD as a facilities problem rather than a security and compliance problem.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " If your ITAD vendor is managed by facilities or general procurement without security or compliance review, the program will be selected on cost and convenience. Security and compliance should have veto authority in vendor selection.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Not reading the downstream vendor list.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " R2v3 requires disclosure, but many buyers accept a partial list without reviewing it. Your vendor's downstream processor in a country without robust environmental regulation is your company's reputation exposure. Read the list. Ask about the partners that seem unusual.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Assuming \"certified\" means \"compliant.\"",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " A certification is a snapshot. It can lapse, can be scoped to specific facilities or services, and can be revoked. Ongoing compliance depends on the vendor maintaining the certification, not on having obtained it once. Quarterly re-verification against the public registries takes 20 minutes and prevents the specific class of failure where your vendor's certification expired six months ago and no one noticed.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Letting the contract lapse into autopilot.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Multi-year contracts are convenient. They also create inertia that keeps you working with a vendor whose performance has degraded, whose M&A history has changed their operating structure, or whose certification status has slipped. Build contract review points on 12-month intervals at minimum. The ITAD vendor landscape consolidated significantly between 2021 and 2026 \u2014 the company you signed with is not necessarily the company serving you today.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 1,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Not planning for the ITAD vendor's own exit.",
+            "version": 1
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Your vendor could be acquired (likely \u2014 Iron Mountain alone has made three major ITAD acquisitions since 2021, and private equity platforms are rolling up mid-market firms actively). Your vendor could lose certification. Your vendor could experience a breach of its own. Your continuity plan should include documented criteria for triggering a transition and a shortlist of alternative vendors who can step in. Running a full vendor selection cycle after your current vendor has failed is not a good position to be in.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "What to do this week",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "If you are at the beginning of an ITAD vendor selection process, the three highest-leverage actions you can take this week are:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "number",
+        "start": 1,
+        "tag": "ol",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Audit your current documentation.",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " Pull the last 12 months of ITAD engagement records from whoever currently handles your disposal. Ask the three questions from section 3 \u2014 where did device X go, how was it destroyed, when was destruction verified \u2014 for five randomly selected devices. If you cannot answer all three for all five, you have a current-state problem that is larger than your vendor selection.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Verify your current vendor's certifications.",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " Visit the R2v3, NAID AAA, and ISO registries and confirm current status and scope. If anything has lapsed or been scoped down since your last review, that is information you need before starting a formal re-evaluation.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 1,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Run a short internal survey.",
+                "version": 1
+              },
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " Ask your general counsel, compliance officer, CISO, and ESG lead what their respective concerns are about ITAD. The answers usually surface evaluation criteria that the IT procurement team would not have thought to include. Weighting the selection matrix with all stakeholders' priorities produces better decisions than letting procurement drive alone.",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Compare ITAD's Risk Assessment (",
+            "version": 1
+          },
+          {
+            "type": "link",
+            "format": "",
+            "indent": 0,
+            "version": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "compareitad.com/assessment",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "fields": {
+              "url": "https://compareitad.com/assessment",
+              "newTab": true,
+              "linkType": "custom"
+            }
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": ") is a five-minute starting point if you want to benchmark your current program against industry best practice. It will not sell you anything or route you to a vendor unless you explicitly opt in.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "heading",
+        "tag": "h2",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Further reading",
+            "version": 1
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Forthcoming articles in this series cover specific aspects of ITAD vendor selection in depth:",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "list",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "listType": "bullet",
+        "start": 1,
+        "tag": "ul",
+        "children": [
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 1,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "NIST SP 800-88 Rev. 2 in practice: what changed and what your vendor needs to support",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 2,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "The 2026 compliance stack for healthcare: HIPAA, HITECH, and ITAD documentation requirements",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Value recovery benchmarking: what enterprise hardware actually sells for in the secondary market",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 4,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "CMMC 2.0 and media protection: ITAD requirements for defense contractors",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          },
+          {
+            "type": "listitem",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "value": 5,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Scope 3 disclosure and ITAD: preparing for California SB 253 and CSRD reporting",
+                "version": 1
+              }
+            ],
+            "direction": "ltr"
+          }
+        ],
+        "direction": "ltr"
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Subscribe to our monthly newsletter at ",
+            "version": 1
+          },
+          {
+            "type": "link",
+            "format": "",
+            "indent": 0,
+            "version": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 0,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "compareitad.com/newsletter",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "fields": {
+              "url": "https://compareitad.com/newsletter",
+              "newTab": true,
+              "linkType": "custom"
+            }
+          },
+          {
+            "type": "text",
+            "format": 0,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " to receive these as they publish. No vendor pitches.",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      },
+      {
+        "type": "horizontalrule",
+        "version": 1
+      },
+      {
+        "type": "paragraph",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "children": [
+          {
+            "type": "text",
+            "format": 2,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "This article was researched and written by the Compare ITAD editorial team. It does not promote any specific vendor and was not reviewed or paid for by any ITAD vendor. Our methodology and editorial standards are available at ",
+            "version": 1
+          },
+          {
+            "type": "link",
+            "format": "",
+            "indent": 0,
+            "version": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 2,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "compareitad.com/methodology",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "fields": {
+              "url": "https://compareitad.com/methodology",
+              "newTab": true,
+              "linkType": "custom"
+            }
+          },
+          {
+            "type": "text",
+            "format": 2,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " and ",
+            "version": 1
+          },
+          {
+            "type": "link",
+            "format": "",
+            "indent": 0,
+            "version": 3,
+            "children": [
+              {
+                "type": "text",
+                "format": 2,
+                "detail": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "compareitad.com/editorial-standards",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "fields": {
+              "url": "https://compareitad.com/editorial-standards",
+              "newTab": true,
+              "linkType": "custom"
+            }
+          },
+          {
+            "type": "text",
+            "format": 2,
+            "detail": 0,
+            "mode": "normal",
+            "style": "",
+            "text": ". Last reviewed: [PUBLICATION DATE].",
+            "version": 1
+          }
+        ],
+        "direction": "ltr",
+        "textFormat": 0,
+        "textStyle": ""
+      }
+    ],
+    "direction": "ltr"
+  }
+}

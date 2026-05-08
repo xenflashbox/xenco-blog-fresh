@@ -89,6 +89,8 @@ export interface Config {
     restaurants: Restaurant;
     accommodations: Accommodation;
     'winery-events': WineryEvent;
+    specialists: Specialist;
+    regions: Region;
     industries: Industry;
     vendors: Vendor;
     'vendor-certifications': VendorCertification;
@@ -127,6 +129,8 @@ export interface Config {
     restaurants: RestaurantsSelect<false> | RestaurantsSelect<true>;
     accommodations: AccommodationsSelect<false> | AccommodationsSelect<true>;
     'winery-events': WineryEventsSelect<false> | WineryEventsSelect<true>;
+    specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
+    regions: RegionsSelect<false> | RegionsSelect<true>;
     industries: IndustriesSelect<false> | IndustriesSelect<true>;
     vendors: VendorsSelect<false> | VendorsSelect<true>;
     'vendor-certifications': VendorCertificationsSelect<false> | VendorCertificationsSelect<true>;
@@ -267,6 +271,38 @@ export interface Site {
       }[]
     | null;
   isDefault?: boolean | null;
+  /**
+   * Short brand tagline (e.g. "Find your direction.")
+   */
+  tagline?: string | null;
+  /**
+   * Site description for admin reference and SEO defaults
+   */
+  description?: string | null;
+  /**
+   * Primary site logo (SVG or PNG)
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Site favicon (SVG or ICO)
+   */
+  favicon?: (number | null) | Media;
+  /**
+   * Primary brand color hex (e.g. #0F4C5C)
+   */
+  themeColor?: string | null;
+  /**
+   * Background color hex (e.g. #F4EDE0)
+   */
+  backgroundColor?: string | null;
+  /**
+   * Listmonk mailing list ID for newsletter signups on this site
+   */
+  listmonkListId?: string | null;
+  /**
+   * Mautic segment ID for this site
+   */
+  mauticSegmentId?: string | null;
   /**
    * Full URL for on-demand revalidation (e.g., https://resumecoach.me/api/revalidate). Leave empty to skip.
    */
@@ -415,7 +451,18 @@ export interface Tag {
   id: number;
   name: string;
   slug: string;
-  group: 'industry' | 'persona' | 'regulation' | 'certification' | 'topic' | 'media' | 'method' | 'vendor-relationship';
+  group:
+    | 'industry'
+    | 'persona'
+    | 'regulation'
+    | 'certification'
+    | 'topic'
+    | 'media'
+    | 'method'
+    | 'vendor-relationship'
+    | 'diabetes-type'
+    | 'audience'
+    | 'format';
   description?: string | null;
   site: number | Site;
   updatedAt: string;
@@ -429,6 +476,14 @@ export interface Author {
   id: number;
   name: string;
   slug: string;
+  /**
+   * Author role or title (e.g. "Lead Presenter", "Lived-Experience Presenter")
+   */
+  role?: string | null;
+  /**
+   * Contact email for this author persona (forwards to editorial team)
+   */
+  email?: string | null;
   bio?: string | null;
   avatar?: (number | null) | Media;
   /**
@@ -1069,6 +1124,182 @@ export interface WineryEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialists".
+ */
+export interface Specialist {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  type:
+    | 'endocrinologist'
+    | 'cdces'
+    | 'diabetes-clinic'
+    | 'primary-care-with-diabetes-focus'
+    | 'pediatric-endocrinologist';
+  /**
+   * e.g. "MD, FACE" or "RN, CDCES" — displayed after name
+   */
+  credentials?: string | null;
+  /**
+   * National Provider Identifier (10 digits) — used for verification and dedup against NPI Registry
+   */
+  npi?: string | null;
+  /**
+   * Practice or clinic name for individual specialists with an affiliation
+   */
+  practiceName?: string | null;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  yearsInPractice?: number | null;
+  specialties?:
+    | (
+        | 'type-1-diabetes'
+        | 'type-2-diabetes'
+        | 'lada'
+        | 'mody'
+        | 'type-3c'
+        | 'gestational'
+        | 'pediatric'
+        | 'geriatric'
+        | 'insulin-pump-management'
+        | 'cgm-management'
+        | 'diabetic-neuropathy'
+        | 'diabetic-retinopathy'
+        | 'diabetic-kidney-disease'
+        | 'weight-management-glp1'
+      )[]
+    | null;
+  languagesSpoken?:
+    | {
+        language: string;
+        id?: string | null;
+      }[]
+    | null;
+  acceptingNewPatients?: boolean | null;
+  telehealthAvailable?: boolean | null;
+  location: {
+    address1?: string | null;
+    address2?: string | null;
+    city: string;
+    state: string;
+    zipCode: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  };
+  /**
+   * Tag to metro, state, and/or broad region for directory filtering
+   */
+  regions?: (number | Region)[] | null;
+  phone?: string | null;
+  fax?: string | null;
+  websiteUrl?: string | null;
+  bookingUrl?: string | null;
+  insuranceAccepted?:
+    | {
+        plan: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Headshot for individuals, building photo for clinics
+   */
+  photo?: (number | null) | Media;
+  photoGallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  featured?: boolean | null;
+  featuredTier?: ('flagship' | 'featured' | 'standard') | null;
+  /**
+   * Sort order within tier (lower = earlier)
+   */
+  featuredOrder?: number | null;
+  /**
+   * True once the specialist has verified and claimed their listing
+   */
+  claimedByOwner?: boolean | null;
+  /**
+   * When verified against NPI Registry or state board
+   */
+  verifiedDate?: string | null;
+  /**
+   * DiabetesCompass team notes on why this specialist is recommended (visible on flagship/featured listings only)
+   */
+  editorialNote?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Anonymized summary of patient feedback — manual editorial, not user-submitted reviews
+   */
+  patientReviewSummary?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string | null;
+  dataSource?: ('npi-registry' | 'manual-entry' | 'claimed' | 'imported') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions".
+ */
+export interface Region {
+  id: number;
+  site: number | Site;
+  name: string;
+  slug: string;
+  tier: 'state' | 'metro' | 'region';
+  /**
+   * 2-character US state code (e.g. AZ, CA). For state and metro tiers.
+   */
+  stateCode?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "industries".
  */
 export interface Industry {
@@ -1098,6 +1329,163 @@ export interface Vendor {
   founded_year?: number | null;
   employee_count_range?: string | null;
   industries_served?: (number | Industry)[] | null;
+  /**
+   * Editorial assessment section. Owned and maintained by the editorial team. The public profile renders the "Our Take" block only when summary_status is set to "Published". Draft and Needs Review content is never exposed to the frontend.
+   */
+  editorial?: {
+    /**
+     * Single-line descriptor written by editorial. Renders as the subhead under the vendor name on the profile page. NOT the vendor's tagline. Max 120 chars.
+     */
+    canonical_descriptor?: string | null;
+    /**
+     * 100–300 word factual editorial assessment in Marcus's voice. Comparative positioning, strengths, gaps, fit for buyer profile. See the editorial standards doc for register and constraints.
+     */
+    summary?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Controls whether the "Our Take" section renders on the public profile. Frontend renders the section only when status is "Published". Transition to Published also auto-sets Summary Last Reviewed to today's date.
+     */
+    summary_status?: ('draft' | 'published' | 'needs-review') | null;
+    /**
+     * Editorial team member who last reviewed and approved the summary. Should be set before transitioning status to "Published".
+     */
+    summary_reviewer?: (number | null) | User;
+    /**
+     * Auto-set to today when status transitions to "Published". Can be manually updated on re-review without changing status (e.g., after a factual accuracy check).
+     */
+    summary_last_reviewed?: string | null;
+    /**
+     * Optional editorial note about vertical-specific specialization (single paragraph). Renders as a trailing line below the Industries Served section on the public profile.
+     */
+    industry_notes?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  /**
+   * Geographic coverage tiers. Select "Regional — specify states" to enable the Regional States field below for precise state/province listing.
+   */
+  coverage_area?:
+    | ('northeast' | 'southeast' | 'midwest' | 'southwest' | 'west' | 'national' | 'global' | 'regional-specify')[]
+    | null;
+  /**
+   * US states and Canadian provinces served. Activate by selecting "Regional — specify states" in Coverage Area above.
+   */
+  regional_states?:
+    | {
+        state_code:
+          | 'AL'
+          | 'AK'
+          | 'AZ'
+          | 'AR'
+          | 'CA'
+          | 'CO'
+          | 'CT'
+          | 'DE'
+          | 'FL'
+          | 'GA'
+          | 'HI'
+          | 'ID'
+          | 'IL'
+          | 'IN'
+          | 'IA'
+          | 'KS'
+          | 'KY'
+          | 'LA'
+          | 'ME'
+          | 'MD'
+          | 'MA'
+          | 'MI'
+          | 'MN'
+          | 'MS'
+          | 'MO'
+          | 'MT'
+          | 'NE'
+          | 'NV'
+          | 'NH'
+          | 'NJ'
+          | 'NM'
+          | 'NY'
+          | 'NC'
+          | 'ND'
+          | 'OH'
+          | 'OK'
+          | 'OR'
+          | 'PA'
+          | 'RI'
+          | 'SC'
+          | 'SD'
+          | 'TN'
+          | 'TX'
+          | 'UT'
+          | 'VT'
+          | 'VA'
+          | 'WA'
+          | 'WV'
+          | 'WI'
+          | 'WY'
+          | 'DC'
+          | 'AB'
+          | 'BC'
+          | 'MB'
+          | 'NB'
+          | 'NL'
+          | 'NS'
+          | 'ON'
+          | 'PE'
+          | 'QC'
+          | 'SK';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Notable clients. A client renders on the public profile only when "Publicly Disclosed" is checked AND a disclosure source URL is provided. Self-reported client lists without a verifiable source never appear publicly.
+   */
+  notable_clients?:
+    | {
+        /**
+         * Client or organization name.
+         */
+        client_name: string;
+        /**
+         * Check only when the client relationship is confirmed by a public source (press release, case study, public contract, etc.). Do not check for self-reported client lists on vendor websites.
+         */
+        is_publicly_disclosed?: boolean | null;
+        /**
+         * URL of the public source confirming this client relationship. Required for the client to appear on the public profile. Leave blank for self-reported / unverified clients.
+         */
+        disclosure_source_url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Auto-computed. True when one or more vendor-certification records for this vendor have verification_status = "verified". Updated automatically when certifications are saved or deleted. Do not edit manually.
+   */
+  has_verified_certifications?: boolean | null;
   is_published?: boolean | null;
   claim_status?: ('unclaimed' | 'pending-claim' | 'claimed') | null;
   provenance?: {
@@ -1120,7 +1508,7 @@ export interface Vendor {
      */
     awaiting_re_verification?: boolean | null;
     /**
-     * Check when the vendor's website uses aggressive bot protection that limited our automated crawl (e.g., Cloudflare challenges, Blue Star Recycling situation). Profile content is human-verified only. Triggers a footer notice that crawl was limited.
+     * Check when the vendor's website uses aggressive bot protection that limited our automated crawl (e.g., Cloudflare challenges, Blue Star Recycling situation). Profile content is human-verified only. Triggers a footer notice that crawl was limited. Also surfaces as the is_bot_blocked transparency badge on the public profile.
      */
     bot_protection_limited_crawl?: boolean | null;
     /**
@@ -1522,6 +1910,14 @@ export interface PayloadLockedDocument {
         value: number | WineryEvent;
       } | null)
     | ({
+        relationTo: 'specialists';
+        value: number | Specialist;
+      } | null)
+    | ({
+        relationTo: 'regions';
+        value: number | Region;
+      } | null)
+    | ({
         relationTo: 'industries';
         value: number | Industry;
       } | null)
@@ -1693,6 +2089,14 @@ export interface SitesSelect<T extends boolean = true> {
         id?: T;
       };
   isDefault?: T;
+  tagline?: T;
+  description?: T;
+  logo?: T;
+  favicon?: T;
+  themeColor?: T;
+  backgroundColor?: T;
+  listmonkListId?: T;
+  mauticSegmentId?: T;
   revalidateUrl?: T;
   revalidateSecret?: T;
   updatedAt?: T;
@@ -1736,6 +2140,8 @@ export interface ArticlesSelect<T extends boolean = true> {
 export interface AuthorsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  role?: T;
+  email?: T;
   bio?: T;
   avatar?: T;
   avatarUrl?: T;
@@ -2276,6 +2682,85 @@ export interface WineryEventsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialists_select".
+ */
+export interface SpecialistsSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  type?: T;
+  credentials?: T;
+  npi?: T;
+  practiceName?: T;
+  bio?: T;
+  yearsInPractice?: T;
+  specialties?: T;
+  languagesSpoken?:
+    | T
+    | {
+        language?: T;
+        id?: T;
+      };
+  acceptingNewPatients?: T;
+  telehealthAvailable?: T;
+  location?:
+    | T
+    | {
+        address1?: T;
+        address2?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        latitude?: T;
+        longitude?: T;
+      };
+  regions?: T;
+  phone?: T;
+  fax?: T;
+  websiteUrl?: T;
+  bookingUrl?: T;
+  insuranceAccepted?:
+    | T
+    | {
+        plan?: T;
+        id?: T;
+      };
+  photo?: T;
+  photoGallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  featured?: T;
+  featuredTier?: T;
+  featuredOrder?: T;
+  claimedByOwner?: T;
+  verifiedDate?: T;
+  editorialNote?: T;
+  patientReviewSummary?: T;
+  status?: T;
+  publishedAt?: T;
+  dataSource?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions_select".
+ */
+export interface RegionsSelect<T extends boolean = true> {
+  site?: T;
+  name?: T;
+  slug?: T;
+  tier?: T;
+  stateCode?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "industries_select".
  */
 export interface IndustriesSelect<T extends boolean = true> {
@@ -2303,6 +2788,32 @@ export interface VendorsSelect<T extends boolean = true> {
   founded_year?: T;
   employee_count_range?: T;
   industries_served?: T;
+  editorial?:
+    | T
+    | {
+        canonical_descriptor?: T;
+        summary?: T;
+        summary_status?: T;
+        summary_reviewer?: T;
+        summary_last_reviewed?: T;
+        industry_notes?: T;
+      };
+  coverage_area?: T;
+  regional_states?:
+    | T
+    | {
+        state_code?: T;
+        id?: T;
+      };
+  notable_clients?:
+    | T
+    | {
+        client_name?: T;
+        is_publicly_disclosed?: T;
+        disclosure_source_url?: T;
+        id?: T;
+      };
+  has_verified_certifications?: T;
   is_published?: T;
   claim_status?: T;
   provenance?:

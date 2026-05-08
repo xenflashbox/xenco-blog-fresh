@@ -1,10 +1,50 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
+
+// After any certification is saved or deleted, recompute the parent vendor's
+// has_verified_certifications flag. This keeps the badge accurate without
+// requiring a full re-crawl of certs at query time.
+async function syncVerifiedBadge({
+  doc,
+  req,
+}: {
+  doc: { vendor?: number | { id: number } }
+  req: PayloadRequest
+}): Promise<void> {
+  const vendorId = typeof doc.vendor === 'object' ? doc.vendor?.id : doc.vendor
+  if (!vendorId) return
+
+  const result = await req.payload.find({
+    collection: 'vendor-certifications',
+    where: {
+      and: [
+        { vendor: { equals: vendorId } },
+        { verification_status: { equals: 'verified' } },
+      ],
+    },
+    limit: 1,
+    overrideAccess: true,
+  })
+
+  await req.payload.update({
+    collection: 'vendors',
+    id: vendorId,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: { has_verified_certifications: result.totalDocs > 0 } as any,
+    overrideAccess: true,
+  })
+}
 
 export const VendorCertifications: CollectionConfig = {
   slug: 'vendor-certifications',
   admin: {
     useAsTitle: 'certification_name',
-    defaultColumns: ['vendor', 'certification_name', 'certification_body', 'verification_status', 'valid_through'],
+    defaultColumns: [
+      'vendor',
+      'certification_name',
+      'certification_body',
+      'verification_status',
+      'valid_through',
+    ],
     group: 'Compare ITAD',
   },
   access: {
@@ -12,6 +52,18 @@ export const VendorCertifications: CollectionConfig = {
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, req }) => {
+        await syncVerifiedBadge({ doc, req })
+      },
+    ],
+    afterDelete: [
+      async ({ doc, req }) => {
+        await syncVerifiedBadge({ doc, req })
+      },
+    ],
   },
   fields: [
     {
