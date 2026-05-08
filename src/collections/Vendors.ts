@@ -63,12 +63,16 @@ export const Vendors: CollectionConfig = {
     // Owned by the editorial team (Marcus's voice). Fields are nullable until
     // editorial completes the assessment. The 'Our Take' section on the public
     // profile renders only when editorial_summary_status === 'published'.
+    // Write access is restricted to the editor role — admins can read but not edit.
     {
       name: 'editorial',
       type: 'group',
+      access: {
+        update: ({ req: { user } }) => (user as any)?.role === 'editor',
+      },
       admin: {
         description:
-          'Editorial assessment section. Owned and maintained by the editorial team. ' +
+          'Editorial assessment section. Owned and maintained by the editorial team (editor role only). ' +
           'The public profile renders the "Our Take" block only when summary_status is set ' +
           'to "Published". Draft and Needs Review content is never exposed to the frontend.',
       },

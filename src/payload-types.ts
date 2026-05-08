@@ -96,6 +96,7 @@ export interface Config {
     'vendor-certifications': VendorCertification;
     'vendor-facilities': VendorFacility;
     'vendor-services': VendorService;
+    'commercial-relationships': CommercialRelationship;
     leads: Lead;
     series: Series;
     episodes: Episode;
@@ -136,6 +137,7 @@ export interface Config {
     'vendor-certifications': VendorCertificationsSelect<false> | VendorCertificationsSelect<true>;
     'vendor-facilities': VendorFacilitiesSelect<false> | VendorFacilitiesSelect<true>;
     'vendor-services': VendorServicesSelect<false> | VendorServicesSelect<true>;
+    'commercial-relationships': CommercialRelationshipsSelect<false> | CommercialRelationshipsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
     episodes: EpisodesSelect<false> | EpisodesSelect<true>;
@@ -363,6 +365,10 @@ export interface Article {
   site: number | Site;
   status: 'draft' | 'published';
   publishedAt?: string | null;
+  /**
+   * Date this article was last substantively reviewed for accuracy. Renders in the byline strip as "Last reviewed [date]" only when this date is populated AND differs from the published date. Leave blank if the article has not been reviewed since initial publication.
+   */
+  lastReviewed?: string | null;
   /**
    * Custom page <title> for search engines (50-60 chars). Falls back to title + site name.
    */
@@ -1330,7 +1336,7 @@ export interface Vendor {
   employee_count_range?: string | null;
   industries_served?: (number | Industry)[] | null;
   /**
-   * Editorial assessment section. Owned and maintained by the editorial team. The public profile renders the "Our Take" block only when summary_status is set to "Published". Draft and Needs Review content is never exposed to the frontend.
+   * Editorial assessment section. Owned and maintained by the editorial team (editor role only). The public profile renders the "Our Take" block only when summary_status is set to "Published". Draft and Needs Review content is never exposed to the frontend.
    */
   editorial?: {
     /**
@@ -1611,6 +1617,37 @@ export interface VendorService {
     | 'other';
   description?: string | null;
   service_url?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Material commercial connections between Compare ITAD and listed vendors. Every active record renders in the /commercial-model transparency page. Add a record only when a real commercial relationship exists. Set is_active to false to remove from the public table without deleting the audit record.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "commercial-relationships".
+ */
+export interface CommercialRelationship {
+  id: number;
+  /**
+   * The vendor with whom this commercial relationship exists. Must be an active listing in the Compare ITAD directory.
+   */
+  vendor: number | Vendor;
+  /**
+   * The nature of the commercial relationship. Renders verbatim in the Material Connections table on /commercial-model. Use the label that most accurately describes the actual arrangement.
+   */
+  connection_type: 'referral-partner' | 'premium-placement' | 'sponsored-content';
+  /**
+   * The date this commercial relationship took effect. Used for the "effective as of" column on the transparency table. Required.
+   */
+  effective_date: string;
+  /**
+   * Active relationships render on /commercial-model. Uncheck to remove from the public table without losing the audit record. The /commercial-model page queries where[is_active][equals]=true.
+   */
+  is_active?: boolean | null;
+  /**
+   * Internal editorial notes about this relationship. Never rendered publicly. Use to document contract references, review cadences, or escalation contacts.
+   */
+  internal_notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1938,6 +1975,10 @@ export interface PayloadLockedDocument {
         value: number | VendorService;
       } | null)
     | ({
+        relationTo: 'commercial-relationships';
+        value: number | CommercialRelationship;
+      } | null)
+    | ({
         relationTo: 'leads';
         value: number | Lead;
       } | null)
@@ -2121,6 +2162,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   site?: T;
   status?: T;
   publishedAt?: T;
+  lastReviewed?: T;
   metaTitle?: T;
   metaDescription?: T;
   focusKeyword?: T;
@@ -2901,6 +2943,19 @@ export interface VendorServicesSelect<T extends boolean = true> {
   service_type?: T;
   description?: T;
   service_url?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "commercial-relationships_select".
+ */
+export interface CommercialRelationshipsSelect<T extends boolean = true> {
+  vendor?: T;
+  connection_type?: T;
+  effective_date?: T;
+  is_active?: T;
+  internal_notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

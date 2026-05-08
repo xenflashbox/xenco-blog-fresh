@@ -30,6 +30,7 @@ import * as migration_20260427_promos_queryable_fields from './20260427_promos_q
 import * as migration_20260429_add_episodes_author from './20260429_add_episodes_author';
 import * as migration_20260506_add_diabetescompass_collections from './20260506_add_diabetescompass_collections';
 import * as migration_20260508_vendor_profile_reframe_additions from './20260508-vendor-profile-reframe-additions';
+import * as migration_20260508_integration_reconciliation from './20260508-integration-reconciliation';
 
 export const migrations = [
   {
@@ -191,5 +192,10 @@ export const migrations = [
     up: migration_20260508_vendor_profile_reframe_additions.up,
     down: migration_20260508_vendor_profile_reframe_additions.down,
     name: '20260508-vendor-profile-reframe-additions',
+  },
+  {
+    up: migration_20260508_integration_reconciliation.up,
+    down: migration_20260508_integration_reconciliation.down,
+    name: '20260508-integration-reconciliation',
   },
 ];

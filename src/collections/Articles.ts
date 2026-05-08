@@ -695,6 +695,19 @@ export const Articles: CollectionConfig = {
       type: 'date',
       admin: { position: 'sidebar' },
     },
+    {
+      name: 'lastReviewed',
+      type: 'date',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Date this article was last substantively reviewed for accuracy. ' +
+          'Renders in the byline strip as "Last reviewed [date]" only when this ' +
+          'date is populated AND differs from the published date. Leave blank if ' +
+          'the article has not been reviewed since initial publication.',
+        date: { displayFormat: 'MMM d, yyyy' },
+      },
+    },
 
     // ── SEO fields ──
     {

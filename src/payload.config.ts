@@ -37,6 +37,7 @@ import { Vendors } from './collections/Vendors'
 import { VendorCertifications } from './collections/VendorCertifications'
 import { VendorFacilities } from './collections/VendorFacilities'
 import { VendorServices } from './collections/VendorServices'
+import { CommercialRelationships } from './collections/CommercialRelationships'
 import { Leads } from './collections/Leads'
 import { Series } from './collections/Series'
 import { Episodes } from './collections/Episodes'
@@ -210,6 +211,7 @@ export default buildConfig({
     VendorCertifications,
     VendorFacilities,
     VendorServices,
+    CommercialRelationships,
     Leads,
     // Lexi Explains content
     Series,
