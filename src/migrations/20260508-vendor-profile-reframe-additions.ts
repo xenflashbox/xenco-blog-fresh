@@ -64,11 +64,14 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
   // ── vendors_coverage_area — hasMany select ────────────────────────────────────
   // One row per selected coverage tier per vendor.
+  // NOTE: Payload's postgres adapter uses unprefix column names (order, parent_id)
+  // for hasMany select junction tables — NOT the underscore-prefixed convention
+  // used for array field tables (_order, _parent_id).
 
   await db.execute(sql`
     CREATE TABLE "vendors_coverage_area" (
-      "_order"     integer NOT NULL,
-      "_parent_id" integer NOT NULL,
+      "order"      integer NOT NULL,
+      "parent_id"  integer NOT NULL,
       "id"         varchar PRIMARY KEY NOT NULL,
       "value"      "enum_vendors_coverage_area" NOT NULL
     );
@@ -112,7 +115,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
     ALTER TABLE "vendors_coverage_area"
       ADD CONSTRAINT "vendors_coverage_area_parent_fk"
-        FOREIGN KEY ("_parent_id")
+        FOREIGN KEY ("parent_id")
         REFERENCES "public"."vendors"("id")
         ON DELETE cascade ON UPDATE no action;
 
@@ -139,9 +142,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
       ON "vendors" USING btree ("has_verified_certifications");
 
     CREATE INDEX "vendors_coverage_area_order_idx"
-      ON "vendors_coverage_area" USING btree ("_order");
+      ON "vendors_coverage_area" USING btree ("order");
     CREATE INDEX "vendors_coverage_area_parent_idx"
-      ON "vendors_coverage_area" USING btree ("_parent_id");
+      ON "vendors_coverage_area" USING btree ("parent_id");
 
     CREATE INDEX "vendors_regional_states_order_idx"
       ON "vendors_regional_states" USING btree ("_order");
