@@ -28,6 +28,10 @@ import * as migration_20260422_add_categories_tags_editorial_fields from './2026
 import * as migration_20260426_add_lexi_collections from './20260426_add_lexi_collections';
 import * as migration_20260427_promos_queryable_fields from './20260427_promos_queryable_fields';
 import * as migration_20260429_add_episodes_author from './20260429_add_episodes_author';
+import * as migration_20260506_add_diabetescompass_collections from './20260506_add_diabetescompass_collections';
+import * as migration_20260508_integration_reconciliation from './20260508-integration-reconciliation';
+import * as migration_20260508_vendor_profile_reframe_additions from './20260508-vendor-profile-reframe-additions';
+import * as migration_20260511_181928_directory_schema_tier_system from './20260511_181928_directory_schema_tier_system';
 
 export const migrations = [
   {
@@ -148,7 +152,7 @@ export const migrations = [
   {
     up: migration_20260408_041441_add_wineries_hero_image_url.up,
     down: migration_20260408_041441_add_wineries_hero_image_url.down,
-    name: '20260408_041441_add_wineries_hero_image_url'
+    name: '20260408_041441_add_wineries_hero_image_url',
   },
   {
     up: migration_20260419_add_citad_collections.up,
@@ -179,5 +183,25 @@ export const migrations = [
     up: migration_20260429_add_episodes_author.up,
     down: migration_20260429_add_episodes_author.down,
     name: '20260429_add_episodes_author',
+  },
+  {
+    up: migration_20260506_add_diabetescompass_collections.up,
+    down: migration_20260506_add_diabetescompass_collections.down,
+    name: '20260506_add_diabetescompass_collections',
+  },
+  {
+    up: migration_20260508_integration_reconciliation.up,
+    down: migration_20260508_integration_reconciliation.down,
+    name: '20260508-integration-reconciliation',
+  },
+  {
+    up: migration_20260508_vendor_profile_reframe_additions.up,
+    down: migration_20260508_vendor_profile_reframe_additions.down,
+    name: '20260508-vendor-profile-reframe-additions',
+  },
+  {
+    up: migration_20260511_181928_directory_schema_tier_system.up,
+    down: migration_20260511_181928_directory_schema_tier_system.down,
+    name: '20260511_181928_directory_schema_tier_system'
   },
 ];

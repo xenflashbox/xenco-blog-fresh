@@ -85,6 +85,16 @@ export const Authors: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
+    {
+      name: 'role',
+      type: 'text',
+      admin: { description: 'Author role or title (e.g. "Lead Presenter", "Lived-Experience Presenter")' },
+    },
+    {
+      name: 'email',
+      type: 'email',
+      admin: { description: 'Contact email for this author persona (forwards to editorial team)' },
+    },
     { name: 'bio', type: 'textarea' },
 
     // optional quality-of-life

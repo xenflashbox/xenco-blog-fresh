@@ -98,6 +98,10 @@ export const Tags: CollectionConfig = {
         { label: 'Media', value: 'media' },
         { label: 'Method', value: 'method' },
         { label: 'Vendor Relationship', value: 'vendor-relationship' },
+        // DiabetesCompass editorial taxonomy
+        { label: 'Diabetes Type', value: 'diabetes-type' },
+        { label: 'Audience', value: 'audience' },
+        { label: 'Format', value: 'format' },
       ],
     },
     { name: 'description', type: 'textarea' },

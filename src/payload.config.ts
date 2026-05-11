@@ -30,11 +30,14 @@ import { Wines } from './collections/Wines'
 import { Restaurants } from './collections/Restaurants'
 import { Accommodations } from './collections/Accommodations'
 import { WineryEvents } from './collections/WineryEvents'
+import { Specialists } from './collections/Specialists'
+import { Regions } from './collections/Regions'
 import { Industries } from './collections/Industries'
 import { Vendors } from './collections/Vendors'
 import { VendorCertifications } from './collections/VendorCertifications'
 import { VendorFacilities } from './collections/VendorFacilities'
 import { VendorServices } from './collections/VendorServices'
+import { CommercialRelationships } from './collections/CommercialRelationships'
 import { Leads } from './collections/Leads'
 import { Series } from './collections/Series'
 import { Episodes } from './collections/Episodes'
@@ -199,12 +202,16 @@ export default buildConfig({
     Restaurants,
     Accommodations,
     WineryEvents,
+    // DiabetesCompass specialist directory
+    Specialists,
+    Regions,
     // Compare ITAD vendor directory
     Industries,
     Vendors,
     VendorCertifications,
     VendorFacilities,
     VendorServices,
+    CommercialRelationships,
     Leads,
     // Lexi Explains content
     Series,
