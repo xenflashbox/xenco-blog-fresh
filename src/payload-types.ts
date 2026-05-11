@@ -840,6 +840,10 @@ export interface Review {
 export interface DirectoryEntry {
   id: number;
   site: number | Site;
+  /**
+   * Determines content depth, schema, and conversion features. Promote based on GSC impression data or partnership status.
+   */
+  tier: 'tier-1' | 'tier-2' | 'tier-3';
   name: string;
   slug: string;
   description: {
@@ -858,7 +862,7 @@ export interface DirectoryEntry {
     [k: string]: unknown;
   };
   shortDescription?: string | null;
-  category: 'wineries' | 'restaurants' | 'activities' | 'venues';
+  category: 'wineries' | 'restaurants' | 'activities' | 'venues' | 'lodging';
   subcategory?: string | null;
   tags?:
     | {
@@ -889,13 +893,202 @@ export interface DirectoryEntry {
     cuisineType?: string | null;
     capacity?: string | null;
   };
+  /**
+   * Extended content sections required for Tier 2+ entries
+   */
+  extendedContent?: {
+    whatMakesItSpecial?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    whoItsRightFor?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    whatToExpect?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    localContext?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    faqs?:
+      | {
+          question: string;
+          answer: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Photo gallery for Tier 2+ entries. 4-6 photos for Tier 2; 8-15 for Tier 3.
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        alt: string;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Winery-specific fields used for directory filtering and faceting
+   */
+  wineryDetails?: {
+    ava?:
+      | (
+          | 'sonoma-valley'
+          | 'russian-river-valley'
+          | 'dry-creek-valley'
+          | 'alexander-valley'
+          | 'knights-valley'
+          | 'bennett-valley'
+          | 'chalk-hill'
+          | 'rockpile'
+          | 'sonoma-coast'
+          | 'sonoma-mountain'
+          | 'carneros-sonoma'
+          | 'napa-valley'
+          | 'stags-leap'
+          | 'oakville'
+          | 'rutherford'
+          | 'st-helena'
+          | 'calistoga'
+          | 'mount-veeder'
+          | 'howell-mountain'
+          | 'spring-mountain'
+          | 'atlas-peak'
+          | 'diamond-mountain'
+          | 'yountville'
+          | 'oak-knoll'
+          | 'wild-horse-valley'
+          | 'carneros-napa'
+          | 'coombsville'
+        )
+      | null;
+    varietalsProduced?:
+      | {
+          varietal?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    wineryType?: ('boutique' | 'small-estate' | 'mid-size' | 'large') | null;
+    familyOwned?: boolean | null;
+    yearFounded?: number | null;
+    reservationsRequired?: boolean | null;
+    walkInsAccepted?: boolean | null;
+    dogFriendly?: boolean | null;
+    familyFriendly?: boolean | null;
+    picnicFriendly?: boolean | null;
+    walkingDistanceFromSonomaPlaza?: boolean | null;
+  };
+  /**
+   * Commerce 7 integration tracking. The detection script auto-populates `enabled` and `detectedDomain`.
+   */
+  commerce7?: {
+    enabled?: boolean | null;
+    /**
+     * Auto-populated by Commerce 7 detection script
+     */
+    detectedDomain?: string | null;
+    detectedAt?: string | null;
+    confidenceLevel?: ('high' | 'medium' | 'low') | null;
+    partnershipStatus?: ('not-contacted' | 'outreach-sent' | 'in-conversation' | 'active' | 'declined') | null;
+    /**
+     * Commerce 7 shop widget embed code for Tier-3 partners
+     */
+    shopEmbedCode?: string | null;
+    wineClubEmbedCode?: string | null;
+    reservationEmbedCode?: string | null;
+    partnerSince?: string | null;
+    /**
+     * Negotiated percentage (e.g., 20 for 20%). Internal use only.
+     */
+    revenueShareRate?: number | null;
+  };
+  /**
+   * GSC and conversion data for tier promotion decisions. Auto-populated by sync job.
+   */
+  metrics?: {
+    gscImpressions30d?: number | null;
+    gscClicks30d?: number | null;
+    gscAvgPosition?: number | null;
+    lastSyncAt?: string | null;
+  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
   };
+  /**
+   * Cluster articles that link to this directory entry. Bidirectional — update when articles are published.
+   */
+  relatedArticles?: (number | Article)[] | null;
+  /**
+   * Sister entries — nearby wineries, similar restaurants, etc. Surface as "You might also like" on Tier-2+ pages.
+   */
+  relatedDirectoryEntries?: (number | DirectoryEntry)[] | null;
   isFeatured?: boolean | null;
   sortOrder?: number | null;
-  status?: ('published' | 'active' | 'inactive') | null;
+  status?: ('published' | 'active' | 'inactive' | 'draft') | null;
   sourceUrl?: string | null;
   lastCrawledAt?: string | null;
   updatedAt: string;
@@ -2468,6 +2661,7 @@ export interface ReviewsSelect<T extends boolean = true> {
  */
 export interface DirectoryEntriesSelect<T extends boolean = true> {
   site?: T;
+  tier?: T;
   name?: T;
   slug?: T;
   description?: T;
@@ -2509,12 +2703,79 @@ export interface DirectoryEntriesSelect<T extends boolean = true> {
         cuisineType?: T;
         capacity?: T;
       };
+  extendedContent?:
+    | T
+    | {
+        whatMakesItSpecial?: T;
+        whoItsRightFor?: T;
+        whatToExpect?: T;
+        localContext?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+      };
+  gallery?:
+    | T
+    | {
+        image?: T;
+        alt?: T;
+        caption?: T;
+        id?: T;
+      };
+  wineryDetails?:
+    | T
+    | {
+        ava?: T;
+        varietalsProduced?:
+          | T
+          | {
+              varietal?: T;
+              id?: T;
+            };
+        wineryType?: T;
+        familyOwned?: T;
+        yearFounded?: T;
+        reservationsRequired?: T;
+        walkInsAccepted?: T;
+        dogFriendly?: T;
+        familyFriendly?: T;
+        picnicFriendly?: T;
+        walkingDistanceFromSonomaPlaza?: T;
+      };
+  commerce7?:
+    | T
+    | {
+        enabled?: T;
+        detectedDomain?: T;
+        detectedAt?: T;
+        confidenceLevel?: T;
+        partnershipStatus?: T;
+        shopEmbedCode?: T;
+        wineClubEmbedCode?: T;
+        reservationEmbedCode?: T;
+        partnerSince?: T;
+        revenueShareRate?: T;
+      };
+  metrics?:
+    | T
+    | {
+        gscImpressions30d?: T;
+        gscClicks30d?: T;
+        gscAvgPosition?: T;
+        lastSyncAt?: T;
+      };
   seo?:
     | T
     | {
         metaTitle?: T;
         metaDescription?: T;
       };
+  relatedArticles?: T;
+  relatedDirectoryEntries?: T;
   isFeatured?: T;
   sortOrder?: T;
   status?: T;
