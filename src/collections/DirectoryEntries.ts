@@ -10,6 +10,13 @@ export const DirectoryEntries: CollectionConfig = {
   access: {
     read: () => true,
   },
+  // Per-site slug uniqueness: allows same slug on different sites (multi-tenant design)
+  indexes: [
+    {
+      fields: ['site', 'slug'],
+      unique: true,
+    },
+  ],
   fields: [
     {
       name: 'site',
@@ -37,7 +44,7 @@ export const DirectoryEntries: CollectionConfig = {
       },
     },
     { name: 'name', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', type: 'text', required: true, index: true },
     { name: 'description', type: 'richText', required: true },
     { name: 'shortDescription', type: 'textarea' },
     {
