@@ -32,6 +32,7 @@ import * as migration_20260506_add_diabetescompass_collections from './20260506_
 import * as migration_20260508_integration_reconciliation from './20260508-integration-reconciliation';
 import * as migration_20260508_vendor_profile_reframe_additions from './20260508-vendor-profile-reframe-additions';
 import * as migration_20260511_181928_directory_schema_tier_system from './20260511_181928_directory_schema_tier_system';
+import * as migration_20260511_193233_directory_entries_per_site_slug_uniqueness from './20260511_193233_directory_entries_per_site_slug_uniqueness';
 
 export const migrations = [
   {
@@ -203,5 +204,10 @@ export const migrations = [
     up: migration_20260511_181928_directory_schema_tier_system.up,
     down: migration_20260511_181928_directory_schema_tier_system.down,
     name: '20260511_181928_directory_schema_tier_system'
+  },
+  {
+    up: migration_20260511_193233_directory_entries_per_site_slug_uniqueness.up,
+    down: migration_20260511_193233_directory_entries_per_site_slug_uniqueness.down,
+    name: '20260511_193233_directory_entries_per_site_slug_uniqueness'
   },
 ];
