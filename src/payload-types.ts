@@ -1759,9 +1759,13 @@ export interface VendorCertification {
   verification_url?: string | null;
   verification_notes?: string | null;
   /**
-   * Verbatim quote from the vendor's page making this certification claim. Required. A cert record without a source quote fails our provenance requirement and cannot be published. If you cannot find an explicit textual claim on the vendor's site, do not create the cert record — certifications inferred from logos or design cues alone are not self-reports.
+   * Verbatim quote from the vendor's public source page where this certification is claimed. Required for new records to prevent hallucinated certifications. Capture the exact wording, not a paraphrase. The source URL goes in the verification_url field.
    */
-  source_quote: string;
+  source_quote?: string | null;
+  /**
+   * Flagged for editorial review. Set automatically when source_quote is missing. Clear by adding a valid source_quote (20+ chars).
+   */
+  awaiting_re_verification?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -3171,6 +3175,7 @@ export interface VendorCertificationsSelect<T extends boolean = true> {
   verification_url?: T;
   verification_notes?: T;
   source_quote?: T;
+  awaiting_re_verification?: T;
   updatedAt?: T;
   createdAt?: T;
 }

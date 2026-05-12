@@ -34,6 +34,7 @@ import * as migration_20260508_vendor_profile_reframe_additions from './20260508
 import * as migration_20260511_181928_directory_schema_tier_system from './20260511_181928_directory_schema_tier_system';
 import * as migration_20260511_193233_directory_entries_per_site_slug_uniqueness from './20260511_193233_directory_entries_per_site_slug_uniqueness';
 import * as migration_20260511_194525_repair_directory_enums from './20260511_194525_repair_directory_enums';
+import * as migration_20260512_173926_vendor_certifications_source_quote_reverify from './20260512_173926_vendor_certifications_source_quote_reverify';
 
 export const migrations = [
   {
@@ -215,5 +216,10 @@ export const migrations = [
     up: migration_20260511_194525_repair_directory_enums.up,
     down: migration_20260511_194525_repair_directory_enums.down,
     name: '20260511_194525_repair_directory_enums'
+  },
+  {
+    up: migration_20260512_173926_vendor_certifications_source_quote_reverify.up,
+    down: migration_20260512_173926_vendor_certifications_source_quote_reverify.down,
+    name: '20260512_173926_vendor_certifications_source_quote_reverify'
   },
 ];
