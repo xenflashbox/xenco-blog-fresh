@@ -680,6 +680,22 @@ export const Articles: CollectionConfig = {
     },
 
     {
+      // Writing template (BlogCraft Templates collection). Intentionally optional:
+      // ~25 sites of legacy articles predate templates and the Make.com pipeline
+      // creates articles without one. Legacy rows stay NULL and fall back to current
+      // rendering; BlogCraft populates this on new articles. Do NOT mass-backfill.
+      name: 'template',
+      type: 'relationship',
+      relationTo: 'templates',
+      required: false,
+      filterOptions: () => ({ is_active: { equals: true } }),
+      admin: {
+        position: 'sidebar',
+        description: 'Article writing template (selected by BlogCraft or hand-set by editor).',
+      },
+    },
+
+    {
       name: 'status',
       type: 'select',
       options: [

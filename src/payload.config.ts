@@ -42,6 +42,7 @@ import { Leads } from './collections/Leads'
 import { Series } from './collections/Series'
 import { Episodes } from './collections/Episodes'
 import { Promos } from './collections/Promos'
+import { Templates } from './collections/Templates'
 import { reindexArticlesEndpoint } from './endpoints/reindexArticles'
 import { searchArticlesEndpoint } from './endpoints/searchArticles'
 import { backfillArticleSitesEndpoint } from './endpoints/backfillArticleSites'
@@ -217,6 +218,8 @@ export default buildConfig({
     Series,
     Episodes,
     Promos,
+    // BlogCraft writing templates (global, NOT tenant-scoped)
+    Templates,
   ],
 
   endpoints: [
