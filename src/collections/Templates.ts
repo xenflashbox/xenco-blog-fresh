@@ -71,7 +71,19 @@ const afterChange: CollectionAfterChangeHook = async ({ doc, operation, req }) =
       )
       // Do not throw — Payload save succeeded; Neon sync failure is logged for follow-up.
     } else {
-      const result = await response.json().catch(() => ({}))
+      // Honour the loud-on-failure invariant: a 2xx with a non-JSON body
+      // (misconfigured response, proxy injecting HTML) must not pass silently.
+      let result: { operation?: string } | null = null
+      try {
+        result = await response.json()
+      } catch (parseErr) {
+        req.payload.logger.warn(
+          `[templates-sync] WARN slug=${doc.slug} operation=${operation} ` +
+            `status=${response.status} body_parse_failed=${
+              parseErr instanceof Error ? parseErr.message : String(parseErr)
+            }`,
+        )
+      }
       req.payload.logger.info(
         `[templates-sync] OK slug=${doc.slug} operation=${operation} ` +
           `remote_operation=${result?.operation ?? 'unknown'}`,
