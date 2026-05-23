@@ -101,6 +101,7 @@ export interface Config {
     series: Series;
     episodes: Episode;
     promos: Promo;
+    templates: Template;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -142,6 +143,7 @@ export interface Config {
     series: SeriesSelect<false> | SeriesSelect<true>;
     episodes: EpisodesSelect<false> | EpisodesSelect<true>;
     promos: PromosSelect<false> | PromosSelect<true>;
+    templates: TemplatesSelect<false> | TemplatesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -363,6 +365,10 @@ export interface Article {
   tags?: (number | Tag)[] | null;
   author?: (number | null) | Author;
   site: number | Site;
+  /**
+   * Article writing template (selected by BlogCraft or hand-set by editor).
+   */
+  template?: (number | null) | Template;
   status: 'draft' | 'published';
   publishedAt?: string | null;
   /**
@@ -499,6 +505,102 @@ export interface Author {
   website?: string | null;
   site: number | Site;
   isDefault?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * BlogCraft writing templates. Edits here sync automatically to api.blogcraft.app and from there into Neon. Do NOT edit templates directly in Neon — Payload is the source of truth.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "templates".
+ */
+export interface Template {
+  id: number;
+  /**
+   * Template slug — must match BlogCraft’s prompt_key references. Example: pillar-comprehensive-guide. Locked after creation (see beforeChange hook).
+   */
+  slug: string;
+  /**
+   * Human-readable name, shown in admin UI dropdowns.
+   */
+  label: string;
+  /**
+   * High-level template family.
+   */
+  template_type: 'pillar' | 'spoke' | 'single_review' | 'vs_comparison' | 'roundup_review';
+  /**
+   * Specific article subtype. Examples: long_form_guide, listicle, how_to, explainer, buying_guide, product_review, service_review, product_comparison, alternatives_list, top_picks, best_of_roundup, supporting_article.
+   */
+  article_type: string;
+  article_intent: 'informational' | 'commercial' | 'transactional';
+  /**
+   * Key referenced by BlogCraft’s prompt registry. Must match an existing entry in BlogCraft. Do not change without coordinating with BlogCraft prompt updates.
+   */
+  prompt_key: string;
+  /**
+   * Increment when changing required_sections or copy_primitives. Helps track template evolution.
+   */
+  outline_version: number;
+  /**
+   * Array of block primitives BlogCraft uses for this template. Example: ["authority_hook", "stat_proof", "expert_quote"]. Must be valid JSON array of strings.
+   */
+  copy_primitives:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Array of required article sections. Example: ["introduction", "table_of_contents", "what_is", "faq", "conclusion"]. Must be valid JSON array of strings.
+   */
+  required_sections:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Template configuration object. Includes tone, seo_notes, cta_placement, heading_depth, word_count_range, media_suggestions, internal_link_density, optional schema_markup and is_listicle.
+   */
+  template_json:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Active templates are eligible for BlogCraft to write to. Inactive templates remain in storage but won’t be selected for new articles.
+   */
+  is_active?: boolean | null;
+  /**
+   * True for templates that need structured data inputs (e.g. compared_products, roundup_items). BlogCraft validates against payload_schema before writing.
+   */
+  data_required?: boolean | null;
+  /**
+   * JSON Schema (draft-07) describing required data inputs when data_required is true. Used by BlogCraft to validate incoming research data.
+   */
+  payload_schema?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Human-readable message shown when data is missing. Example: “Product review templates require a review_subject with name + vendor + url + specs.”
+   */
+  data_required_message?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2190,6 +2292,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'promos';
         value: number | Promo;
+      } | null)
+    | ({
+        relationTo: 'templates';
+        value: number | Template;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2357,6 +2463,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   tags?: T;
   author?: T;
   site?: T;
+  template?: T;
   status?: T;
   publishedAt?: T;
   lastReviewed?: T;
@@ -3332,6 +3439,28 @@ export interface PromosSelect<T extends boolean = true> {
   startDate?: T;
   endDate?: T;
   site?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "templates_select".
+ */
+export interface TemplatesSelect<T extends boolean = true> {
+  slug?: T;
+  label?: T;
+  template_type?: T;
+  article_type?: T;
+  article_intent?: T;
+  prompt_key?: T;
+  outline_version?: T;
+  copy_primitives?: T;
+  required_sections?: T;
+  template_json?: T;
+  is_active?: T;
+  data_required?: T;
+  payload_schema?: T;
+  data_required_message?: T;
   updatedAt?: T;
   createdAt?: T;
 }
