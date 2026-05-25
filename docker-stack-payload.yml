@@ -45,6 +45,11 @@ services:
       SUPPORT_ADMIN_TOKEN: ${SUPPORT_ADMIN_TOKEN}
       INTERNAL_LINKER_API_KEY: ${INTERNAL_LINKER_API_KEY}
       INTERNAL_LINKER_API_KEY_FILE: /run/secrets/internal_linker_api_key
+      # BlogCraft Templates Sync (afterChange/afterDelete webhook → api.blogcraft.app)
+      # Without this the Templates hooks log a skip and do not sync to Neon.
+      # BLOGCRAFT_API_URL is intentionally omitted: the code defaults to
+      # https://api.blogcraft.app. Add it here (and to .env.production) only to override.
+      TEMPLATES_SYNC_SECRET: ${TEMPLATES_SYNC_SECRET}
       # Redis Caching Configuration
       # Native Redis VM Sentinel Cluster (not Docker) for HA session/auth
       # Sentinel nodes: xenco5 (10.8.8.17), xenco4 (10.8.8.16), xenco3 (10.8.8.15)
