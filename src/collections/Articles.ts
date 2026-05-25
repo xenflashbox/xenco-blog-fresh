@@ -12,11 +12,13 @@ import {
   UploadFeature,
   UnorderedListFeature,
   OrderedListFeature,
+  BlocksFeature,
 } from '@payloadcms/richtext-lexical'
 
 import { upsertArticleToMeili, deleteArticleFromMeili } from '../lib/meili'
 import { resolveSiteForRequest } from '../lib/site'
 import { triggerRevalidation } from '../lib/revalidate'
+import { editorialBlocks } from '../lexical/editorial-blocks'
 
 
 
@@ -586,6 +588,9 @@ export const Articles: CollectionConfig = {
             // Explicitly enable list features
             UnorderedListFeature(),
             OrderedListFeature(),
+            // Editorial Block System v2: register all 37 blocks as Lexical custom
+            // nodes (slash-menu insertable). Source: docs/01-block-system-v2-spec.md §6.2.
+            BlocksFeature({ blocks: editorialBlocks }),
           ]
         },
       }),
@@ -693,6 +698,39 @@ export const Articles: CollectionConfig = {
         position: 'sidebar',
         description: 'Article writing template (selected by BlogCraft or hand-set by editor).',
       },
+    },
+
+    // ── Editorial Block System v2: article-level fields (spec §6.1) ──
+    {
+      // 3-5 bullets surfaced at the article top. minRows:0 (NOT the spec's
+      // minRows:3) so the ~25 sites of legacy articles with zero takeaways still
+      // save when edited — same legacy-safety reasoning as template:required=false.
+      // Divergence from spec §6.1 recorded in docs/03-sprint-b-divergences.md.
+      name: 'top_takeaways',
+      type: 'array',
+      minRows: 0,
+      maxRows: 5,
+      admin: {
+        position: 'sidebar',
+        description:
+          '3-5 bullets surfaced at the article top. Required for templated articles; optional for legacy.',
+      },
+      fields: [{ name: 'text', type: 'text', required: true }],
+    },
+    {
+      name: 'footer_sources',
+      type: 'array',
+      admin: {
+        description:
+          'The article-level sources list. Replaces per-section bibliographic-theater sources blocks.',
+      },
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'publisher', type: 'text' },
+        { name: 'url', type: 'text', required: true },
+        { name: 'date', type: 'date' },
+        { name: 'quote_context', type: 'textarea' },
+      ],
     },
 
     {

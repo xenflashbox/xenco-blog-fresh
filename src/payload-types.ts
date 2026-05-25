@@ -369,6 +369,28 @@ export interface Article {
    * Article writing template (selected by BlogCraft or hand-set by editor).
    */
   template?: (number | null) | Template;
+  /**
+   * 3-5 bullets surfaced at the article top. Required for templated articles; optional for legacy.
+   */
+  top_takeaways?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The article-level sources list. Replaces per-section bibliographic-theater sources blocks.
+   */
+  footer_sources?:
+    | {
+        title: string;
+        publisher?: string | null;
+        url: string;
+        date?: string | null;
+        quote_context?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   status: 'draft' | 'published';
   publishedAt?: string | null;
   /**
@@ -2464,6 +2486,22 @@ export interface ArticlesSelect<T extends boolean = true> {
   author?: T;
   site?: T;
   template?: T;
+  top_takeaways?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  footer_sources?:
+    | T
+    | {
+        title?: T;
+        publisher?: T;
+        url?: T;
+        date?: T;
+        quote_context?: T;
+        id?: T;
+      };
   status?: T;
   publishedAt?: T;
   lastReviewed?: T;
