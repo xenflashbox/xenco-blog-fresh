@@ -499,25 +499,9 @@ export const SeoSnippetBlock: Block = {
   ],
 }
 
-export const SourcesAccordionBlock: Block = {
-  slug: 'sources-accordion',
-  labels: { singular: 'Sources Accordion', plural: 'Sources Accordions' },
-  // Block description (not a Payload Block field): 'NOTE: Most articles will put sources in the article-level footer_sources field, not as ' + 'a block. Use this only when you need an inline sources block mid-article (rare).'
-  fields: [
-    {
-      name: 'sources',
-      type: 'array',
-      required: true,
-      fields: [
-        { name: 'title', type: 'text', required: true },
-        { name: 'publisher', type: 'text' },
-        { name: 'url', type: 'text', required: true },
-        { name: 'date', type: 'date' },
-        { name: 'quote_context', type: 'textarea' },
-      ],
-    },
-  ],
-}
+// SourcesAccordionBlock REMOVED in Sprint D v1.2: sources are now an article-level
+// field (footer_sources, added in Sprint B), not a body block. The front-end
+// SourcesAccordion React component stays as a field renderer.
 
 export const MethodologyNoteBlock: Block = {
   slug: 'methodology-note',
@@ -666,7 +650,53 @@ export const CategoryBadgeBlock: Block = {
   ],
 }
 
-// All 37 blocks, ordered by spec section (§4.1 → §4.8).
+// ── Sprint D v1.2 additions ─────────────────────────────────────────────────
+// Bare markdown table (distinct from the richer ComparisonTableBlock). Target for
+// the converter's plain-table auto-promotion.
+export const TableBlock: Block = {
+  slug: 'table',
+  labels: { singular: 'Table', plural: 'Tables' },
+  fields: [
+    {
+      name: 'headers',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [{ name: 'label', type: 'text', required: true }],
+    },
+    {
+      name: 'rows',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        {
+          name: 'values',
+          type: 'array',
+          required: true,
+          minRows: 1,
+          fields: [{ name: 'value', type: 'text', required: true }],
+        },
+      ],
+    },
+  ],
+}
+
+// Directive-form image emitted by the reformat flattener, with mediaId preserved
+// across LLM passes (distinct from ImageWithCaptionBlock's URL-based src).
+export const ImageBlock: Block = {
+  slug: 'image',
+  labels: { singular: 'Image (Reformat)', plural: 'Images (Reformat)' },
+  fields: [
+    { name: 'mediaId', type: 'number', required: true },
+    { name: 'alt', type: 'text', required: true },
+    { name: 'width', type: 'number', required: true },
+    { name: 'height', type: 'number', required: true },
+    { name: 'caption', type: 'text' },
+  ],
+}
+
+// 38 blocks total (Sprint D: −sources-accordion, +table, +image), spec §4.1 → §4.8.
 export const editorialBlocks: Block[] = [
   // 4.1 Structural
   TopTakeawaysBlock,
@@ -701,7 +731,6 @@ export const editorialBlocks: Block[] = [
   // 4.7 Reference-and-trust
   FaqBlock,
   SeoSnippetBlock,
-  SourcesAccordionBlock,
   MethodologyNoteBlock,
   ImageWithCaptionBlock,
   TimelineBlock,
@@ -713,4 +742,7 @@ export const editorialBlocks: Block[] = [
   ItemComparisonRowBlock,
   PricingSummaryBlock,
   CategoryBadgeBlock,
+  // Sprint D v1.2 additions
+  TableBlock,
+  ImageBlock,
 ]
