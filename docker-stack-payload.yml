@@ -37,6 +37,9 @@ services:
       # Support API Keys
       REINDEX_API_KEY: ${REINDEX_API_KEY}
       SUPPORT_SLACK_WEBHOOK_URL: ${SUPPORT_SLACK_WEBHOOK_URL}
+      # Growth alerts channel — second webhook for signup/sale alerts (added 2026-06-03).
+      # Required by src/lib/slack-heartbeat.ts; without it, growth-channel heartbeats are skipped.
+      GROWTH_SLACK_WEBHOOK_URL: ${GROWTH_SLACK_WEBHOOK_URL}
       SUPPORT_HEALTH_TOKEN: ${SUPPORT_HEALTH_TOKEN}
       PAYLOAD_ADMIN_API_KEY: ${PAYLOAD_ADMIN_API_KEY}
       SUPPORT_RATE_LIMIT_ENABLED: "true"
