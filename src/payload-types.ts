@@ -1883,11 +1883,11 @@ export interface VendorCertification {
   verification_url?: string | null;
   verification_notes?: string | null;
   /**
-   * Verbatim quote from the vendor's public source page where this certification is claimed. Required for new records to prevent hallucinated certifications. Capture the exact wording, not a paraphrase. The source URL goes in the verification_url field.
+   * Verbatim quote from the vendor's public source page where this certification is claimed. Required for new records (min 10 characters) to prevent hallucinated certifications. Capture the exact wording, not a paraphrase. The source URL goes in the verification_url field.
    */
   source_quote?: string | null;
   /**
-   * Flagged for editorial review. Set automatically when source_quote is missing. Clear by adding a valid source_quote (20+ chars).
+   * Flagged for editorial review. Set automatically when source_quote is missing. Clear by adding a valid source_quote (10+ chars).
    */
   awaiting_re_verification?: boolean | null;
   updatedAt: string;

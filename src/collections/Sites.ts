@@ -21,8 +21,13 @@ function normalizeDomainPreserveSubdomain(raw: string): string | null {
   return value || null
 }
 
-const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc }) => {
+const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc, context }) => {
   if (!data) return data
+
+  // Nested unset-other-defaults updates (below) must not re-enter the
+  // default-enforcement logic: at that point the outer save is uncommitted, so
+  // the find() would see no default and force isDefault back to true.
+  if (context?.skipSiteDefaultChecks) return data
 
   // Normalize domains while preserving subdomains.
   // This keeps explicit entries like `cms.example.com` and `www.example.com`
@@ -118,6 +123,10 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc
           id: String(site.id),
           data: { isDefault: false },
           overrideAccess: true,
+          // Same transaction (prevents the second-session lock-wait pattern that
+          // deadlocked vendor-certifications) + skip re-entrant default checks.
+          req,
+          context: { skipSiteDefaultChecks: true },
         })
       }
     }

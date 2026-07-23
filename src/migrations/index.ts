@@ -37,6 +37,7 @@ import * as migration_20260511_194525_repair_directory_enums from './20260511_19
 import * as migration_20260512_173926_vendor_certifications_source_quote_reverify from './20260512_173926_vendor_certifications_source_quote_reverify';
 import * as migration_20260522_233042_add_templates_collection from './20260522_233042_add_templates_collection';
 import * as migration_20260525_164300_add_editorial_blocks_lexical_registration from './20260525_164300_add_editorial_blocks_lexical_registration';
+import * as migration_20260709_fix_hasmany_select_id_drift from './20260709_fix_hasmany_select_id_drift';
 
 export const migrations = [
   {
@@ -233,5 +234,10 @@ export const migrations = [
     up: migration_20260525_164300_add_editorial_blocks_lexical_registration.up,
     down: migration_20260525_164300_add_editorial_blocks_lexical_registration.down,
     name: '20260525_164300_add_editorial_blocks_lexical_registration'
+  },
+  {
+    up: migration_20260709_fix_hasmany_select_id_drift.up,
+    down: migration_20260709_fix_hasmany_select_id_drift.down,
+    name: '20260709_fix_hasmany_select_id_drift'
   },
 ];
