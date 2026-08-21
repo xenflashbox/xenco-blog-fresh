@@ -35,7 +35,9 @@ DB_NAME="payload"
 TRAEFIK_SSH="xenco7.xenco.lan"
 TRAEFIK_FILE="/home/xen/traefik-prod/dynamic/payload-cms.yml"
 
-BACKEND_URL="http://10.8.8.10:3000"
+# LAN DNS name, not a 10.8.8.x literal (xenco.lan zone; traefik-prod resolves it
+# via Docker's embedded resolver -> OPNsense Unbound). Survives payload moving hosts.
+BACKEND_URL="http://payload.xenco.lan:3000"
 HEALTH_PATH="/api/support/uptime"
 SENTINEL_HOST="cms.xencolabs.com"
 
@@ -126,13 +128,19 @@ new_hosts=$(printf '%s\n' "${hosts[@]}")
 added=$(comm -13 <(printf '%s\n' "$live_hosts") <(printf '%s\n' "$new_hosts") | grep -v '^$' || true)
 removed=$(comm -23 <(printf '%s\n' "$live_hosts") <(printf '%s\n' "$new_hosts") | grep -v '^$' || true)
 
-if [[ -z "$added" && -z "$removed" ]]; then
-  echo "In sync: ${count} hosts, no changes needed."
+# Compare the WHOLE file, not just the host list: backend URL, health check and
+# TLS resolver changes must not slip through silently.
+if diff -q "$LIVE" "$GENERATED" >/dev/null 2>&1; then
+  echo "In sync: ${count} hosts, file identical, no changes needed."
   exit 0
 fi
 
 [[ -n "$added" ]]   && { echo "Hosts to ADD:";    sed 's/^/  + /' <<<"$added"; }
 [[ -n "$removed" ]] && { echo "Hosts to REMOVE:"; sed 's/^/  - /' <<<"$removed"; }
+if [[ -z "$added" && -z "$removed" ]]; then
+  echo "Host list unchanged; other config differs:"
+  diff "$LIVE" "$GENERATED" | sed 's/^/  /' || true
+fi
 
 if [[ -n "$removed" && "$ALLOW_REMOVALS" -ne 1 ]]; then
   echo "ERROR: removals detected but --allow-removals not set." >&2
