@@ -19,6 +19,7 @@ import { upsertArticleToMeili, deleteArticleFromMeili } from '../lib/meili'
 import { resolveSiteForRequest } from '../lib/site'
 import { triggerRevalidation } from '../lib/revalidate'
 import { editorialBlocks } from '../lexical/editorial-blocks'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 
 
@@ -516,7 +517,7 @@ export const Articles: CollectionConfig = {
     listSearchableFields: ['title', 'slug', 'excerpt'],
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => true,
     update: () => true,
     delete: () => true,

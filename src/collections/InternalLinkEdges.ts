@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const InternalLinkEdges: CollectionConfig = {
   slug: 'internal_link_edges',
@@ -9,7 +10,7 @@ export const InternalLinkEdges: CollectionConfig = {
     group: 'SEO',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => false,
     update: () => false,
     delete: () => false,

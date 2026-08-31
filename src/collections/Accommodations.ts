@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const Accommodations: CollectionConfig = {
   slug: "accommodations",
@@ -7,7 +8,7 @@ export const Accommodations: CollectionConfig = {
     defaultColumns: ["name", "city", "type", "isOwned", "featuredTier"],
     group: "Wine Country Corner",
   },
-  access: { read: () => true },
+  access: { read: siteScopedRead },
   fields: [
     {
       name: "site",

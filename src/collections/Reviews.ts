@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
@@ -8,7 +9,7 @@ export const Reviews: CollectionConfig = {
     group: 'Content',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
   },
   fields: [
     {

@@ -1,6 +1,7 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { resolveSiteForRequest } from '../lib/site'
 import { ensureUniqueSlugForSite } from '../lib/uniqueSlug'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 function slugify(input: string): string {
   return input
@@ -74,7 +75,7 @@ export const Categories: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'url_segment', 'sort_order', 'site'],
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => true,
     update: () => true,
     delete: () => true,

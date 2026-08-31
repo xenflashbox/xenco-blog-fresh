@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const InternalLinkRuns: CollectionConfig = {
   slug: 'internal_link_runs',
@@ -10,7 +11,7 @@ export const InternalLinkRuns: CollectionConfig = {
       'Run internal linker manually via endpoint: POST /api/internal-links/run?mode=dry_run|apply&site=all|<id>',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => false,
     update: () => false,
     delete: () => false,

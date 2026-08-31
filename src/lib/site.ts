@@ -99,6 +99,42 @@ async function findSiteByDomain(
   return { id: String(site.id), slug: site.slug }
 }
 
+const hostSiteCache = new Map<string, { id: string | null; at: number }>()
+const HOST_SITE_TTL_MS = 60_000
+
+/**
+ * Host -> site id with no default-site fallback: returns null when the Host
+ * header matches no site. Read scoping needs that distinction, because
+ * "unrecognised host" and "the default site" are very different answers.
+ * Cached because this runs on every read request.
+ */
+export async function resolveSiteIdStrict(
+  payload: PayloadLike,
+  headers: Headers | Record<string, string> | any,
+): Promise<string | null> {
+  const host = normalizeDomain(getHostFromHeaders(headers))
+  if (!host) return null
+
+  const now = Date.now()
+  const hit = hostSiteCache.get(host)
+  if (hit && now - hit.at < HOST_SITE_TTL_MS) return hit.id
+
+  const noWww = host.startsWith('www.') ? host.slice(4) : host
+  const candidates = Array.from(new Set([host, noWww, `www.${noWww}`]))
+
+  let id: string | null = null
+  for (const candidate of candidates) {
+    const site = await findSiteByDomain(payload, candidate)
+    if (site) {
+      id = site.id
+      break
+    }
+  }
+
+  hostSiteCache.set(host, { id, at: now })
+  return id
+}
+
 export async function resolveSiteForRequest(
   payload: PayloadLike,
   headers: Headers | Record<string, string> | any,

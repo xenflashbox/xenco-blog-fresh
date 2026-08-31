@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const DirectoryEntries: CollectionConfig = {
   slug: 'directory-entries',
@@ -8,7 +9,7 @@ export const DirectoryEntries: CollectionConfig = {
     group: 'Content',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
   },
   // Per-site slug uniqueness: allows same slug on different sites (multi-tenant design)
   indexes: [

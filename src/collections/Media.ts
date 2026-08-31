@@ -1,5 +1,6 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { resolveSiteForRequest } from '../lib/site'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   if (!data) return data
@@ -21,7 +22,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    read: () => true,
+    read: siteScopedRead,
   },
   // Sharp is enabled globally in payload.config.ts; these options actually generate variants in R2.
   upload: {

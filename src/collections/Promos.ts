@@ -1,5 +1,6 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { resolveSiteForRequest } from '../lib/site'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc }) => {
   if (!data) return data
@@ -39,7 +40,7 @@ export const Promos: CollectionConfig = {
     group: 'Lexi Explains',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => true,
     update: () => true,
     delete: () => true,

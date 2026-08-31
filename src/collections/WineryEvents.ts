@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { siteScopedRead } from '../access/siteScopedRead'
 
 export const WineryEvents: CollectionConfig = {
   slug: "winery-events",
@@ -7,7 +8,7 @@ export const WineryEvents: CollectionConfig = {
     defaultColumns: ["title", "winery", "eventType", "startDate"],
     group: "Wine Country Corner",
   },
-  access: { read: () => true },
+  access: { read: siteScopedRead },
   fields: [
     {
       name: "site",

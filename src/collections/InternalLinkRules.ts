@@ -1,4 +1,5 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload'
+import { siteScopedRead } from '../access/siteScopedRead'
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, originalDoc }) => {
   if (!data) return data
@@ -42,7 +43,7 @@ export const InternalLinkRules: CollectionConfig = {
     group: 'SEO',
   },
   access: {
-    read: () => true,
+    read: siteScopedRead,
     create: () => true,
     update: () => true,
     delete: () => true,
