@@ -39,6 +39,7 @@ import * as migration_20260522_233042_add_templates_collection from './20260522_
 import * as migration_20260525_164300_add_editorial_blocks_lexical_registration from './20260525_164300_add_editorial_blocks_lexical_registration';
 import * as migration_20260709_fix_hasmany_select_id_drift from './20260709_fix_hasmany_select_id_drift';
 import * as migration_20260905_wine_bottle_fields_and_winery_meta from './20260905_wine_bottle_fields_and_winery_meta';
+import * as migration_20260906_drop_citad_directory_collections from './20260906_drop_citad_directory_collections';
 
 export const migrations = [
   {
@@ -245,5 +246,10 @@ export const migrations = [
     up: migration_20260905_wine_bottle_fields_and_winery_meta.up,
     down: migration_20260905_wine_bottle_fields_and_winery_meta.down,
     name: '20260905_wine_bottle_fields_and_winery_meta'
+  },
+  {
+    up: migration_20260906_drop_citad_directory_collections.up,
+    down: migration_20260906_drop_citad_directory_collections.down,
+    name: '20260906_drop_citad_directory_collections'
   },
 ];

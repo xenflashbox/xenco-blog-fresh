@@ -91,13 +91,7 @@ export interface Config {
     'winery-events': WineryEvent;
     specialists: Specialist;
     regions: Region;
-    industries: Industry;
-    vendors: Vendor;
-    'vendor-certifications': VendorCertification;
-    'vendor-facilities': VendorFacility;
-    'vendor-services': VendorService;
     'commercial-relationships': CommercialRelationship;
-    leads: Lead;
     series: Series;
     episodes: Episode;
     promos: Promo;
@@ -133,13 +127,7 @@ export interface Config {
     'winery-events': WineryEventsSelect<false> | WineryEventsSelect<true>;
     specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
     regions: RegionsSelect<false> | RegionsSelect<true>;
-    industries: IndustriesSelect<false> | IndustriesSelect<true>;
-    vendors: VendorsSelect<false> | VendorsSelect<true>;
-    'vendor-certifications': VendorCertificationsSelect<false> | VendorCertificationsSelect<true>;
-    'vendor-facilities': VendorFacilitiesSelect<false> | VendorFacilitiesSelect<true>;
-    'vendor-services': VendorServicesSelect<false> | VendorServicesSelect<true>;
     'commercial-relationships': CommercialRelationshipsSelect<false> | CommercialRelationshipsSelect<true>;
-    leads: LeadsSelect<false> | LeadsSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
     episodes: EpisodesSelect<false> | EpisodesSelect<true>;
     promos: PromosSelect<false> | PromosSelect<true>;
@@ -1324,6 +1312,8 @@ export interface Winery {
     lng?: number | null;
   };
   partnerSince?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1337,15 +1327,67 @@ export interface Wine {
   name: string;
   slug: string;
   winery?: (number | null) | Winery;
+  /**
+   * Compact label for cards and nav, e.g. "Cabernet 2019".
+   */
+  shortName?: string | null;
   varietal?: string | null;
   vintage?: number | null;
+  /**
+   * American Viticultural Area.
+   */
+  ava?: string | null;
+  /**
+   * Composition, e.g. "92% Cabernet, 8% Merlot".
+   */
+  blend?: string | null;
+  aging?: string | null;
+  abv?: number | null;
+  description?: string | null;
   tastingNotes?: string | null;
+  /**
+   * e.g. "2026–2038".
+   */
+  drinkWindow?: string | null;
+  pairings?:
+    | {
+        pairing: string;
+        id?: string | null;
+      }[]
+    | null;
   price?: number | null;
+  /**
+   * Qualifier shown beside the price, e.g. "per 3-bottle set".
+   */
+  priceNote?: string | null;
+  /**
+   * Cases produced.
+   */
+  cases?: number | null;
+  /**
+   * Critic score, e.g. 95. Use this rather than Rating.
+   */
+  points?: number | null;
+  /**
+   * Who scored it, e.g. "Wine Enthusiast".
+   */
+  pointsSource?: string | null;
+  pointsQuote?: string | null;
   priceTier?: ('under-50' | '50-100' | '100-200' | 'over-200') | null;
   rating?: number | null;
   purchaseUrl?: string | null;
+  /**
+   * Button text for the purchase link, e.g. "Join the list".
+   */
+  ctaLabel?: string | null;
   image?: (number | null) | Media;
+  /**
+   * Fallback bottle image URL for wines without an uploaded media object.
+   */
+  imageUrl?: string | null;
   featured?: boolean | null;
+  memberOnly?: boolean | null;
+  soldOut?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1622,326 +1664,6 @@ export interface Region {
   createdAt: string;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries".
- */
-export interface Industry {
-  id: number;
-  display_name: string;
-  slug: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendors".
- */
-export interface Vendor {
-  id: number;
-  name: string;
-  slug: string;
-  website?: string | null;
-  description?: string | null;
-  logo?: (number | null) | Media;
-  hq_city?: string | null;
-  hq_state?: string | null;
-  hq_country?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  founded_year?: number | null;
-  employee_count_range?: string | null;
-  industries_served?: (number | Industry)[] | null;
-  /**
-   * Editorial assessment section. Owned and maintained by the editorial team (editor role only). The public profile renders the "Our Take" block only when summary_status is set to "Published". Draft and Needs Review content is never exposed to the frontend.
-   */
-  editorial?: {
-    /**
-     * Single-line descriptor written by editorial. Renders as the subhead under the vendor name on the profile page. NOT the vendor's tagline. Max 120 chars.
-     */
-    canonical_descriptor?: string | null;
-    /**
-     * 100–300 word factual editorial assessment in Marcus's voice. Comparative positioning, strengths, gaps, fit for buyer profile. See the editorial standards doc for register and constraints.
-     */
-    summary?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * Controls whether the "Our Take" section renders on the public profile. Frontend renders the section only when status is "Published". Transition to Published also auto-sets Summary Last Reviewed to today's date.
-     */
-    summary_status?: ('draft' | 'published' | 'needs-review') | null;
-    /**
-     * Editorial team member who last reviewed and approved the summary. Should be set before transitioning status to "Published".
-     */
-    summary_reviewer?: (number | null) | User;
-    /**
-     * Auto-set to today when status transitions to "Published". Can be manually updated on re-review without changing status (e.g., after a factual accuracy check).
-     */
-    summary_last_reviewed?: string | null;
-    /**
-     * Optional editorial note about vertical-specific specialization (single paragraph). Renders as a trailing line below the Industries Served section on the public profile.
-     */
-    industry_notes?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-  };
-  /**
-   * Geographic coverage tiers. Select "Regional — specify states" to enable the Regional States field below for precise state/province listing.
-   */
-  coverage_area?:
-    | ('northeast' | 'southeast' | 'midwest' | 'southwest' | 'west' | 'national' | 'global' | 'regional-specify')[]
-    | null;
-  /**
-   * US states and Canadian provinces served. Activate by selecting "Regional — specify states" in Coverage Area above.
-   */
-  regional_states?:
-    | {
-        state_code:
-          | 'AL'
-          | 'AK'
-          | 'AZ'
-          | 'AR'
-          | 'CA'
-          | 'CO'
-          | 'CT'
-          | 'DE'
-          | 'FL'
-          | 'GA'
-          | 'HI'
-          | 'ID'
-          | 'IL'
-          | 'IN'
-          | 'IA'
-          | 'KS'
-          | 'KY'
-          | 'LA'
-          | 'ME'
-          | 'MD'
-          | 'MA'
-          | 'MI'
-          | 'MN'
-          | 'MS'
-          | 'MO'
-          | 'MT'
-          | 'NE'
-          | 'NV'
-          | 'NH'
-          | 'NJ'
-          | 'NM'
-          | 'NY'
-          | 'NC'
-          | 'ND'
-          | 'OH'
-          | 'OK'
-          | 'OR'
-          | 'PA'
-          | 'RI'
-          | 'SC'
-          | 'SD'
-          | 'TN'
-          | 'TX'
-          | 'UT'
-          | 'VT'
-          | 'VA'
-          | 'WA'
-          | 'WV'
-          | 'WI'
-          | 'WY'
-          | 'DC'
-          | 'AB'
-          | 'BC'
-          | 'MB'
-          | 'NB'
-          | 'NL'
-          | 'NS'
-          | 'ON'
-          | 'PE'
-          | 'QC'
-          | 'SK';
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Notable clients. A client renders on the public profile only when "Publicly Disclosed" is checked AND a disclosure source URL is provided. Self-reported client lists without a verifiable source never appear publicly.
-   */
-  notable_clients?:
-    | {
-        /**
-         * Client or organization name.
-         */
-        client_name: string;
-        /**
-         * Check only when the client relationship is confirmed by a public source (press release, case study, public contract, etc.). Do not check for self-reported client lists on vendor websites.
-         */
-        is_publicly_disclosed?: boolean | null;
-        /**
-         * URL of the public source confirming this client relationship. Required for the client to appear on the public profile. Leave blank for self-reported / unverified clients.
-         */
-        disclosure_source_url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Auto-computed. True when one or more vendor-certification records for this vendor have verification_status = "verified". Updated automatically when certifications are saved or deleted. Do not edit manually.
-   */
-  has_verified_certifications?: boolean | null;
-  is_published?: boolean | null;
-  claim_status?: ('unclaimed' | 'pending-claim' | 'claimed') | null;
-  provenance?: {
-    primary_source_url?: string | null;
-    crawled_at?: string | null;
-    last_verified_at?: string | null;
-    crawler_version?: string | null;
-    verification_notes?: string | null;
-  };
-  /**
-   * Public-facing data quality context. These flags render in the provenance footer on the profile page so readers understand why a profile has less information than others.
-   */
-  data_quality_flags?: {
-    /**
-     * Check when the vendor's public website provides minimal self-reported data (e.g., OEM ITAD arms with marketing-heavy pages). Triggers a footer notice explaining why this profile is thinner than others.
-     */
-    sparse_data?: boolean | null;
-    /**
-     * Check when the profile's last_verified_at is older than 90 days or when editorial is aware of pending vendor changes. Triggers a footer notice that the profile is pending review.
-     */
-    awaiting_re_verification?: boolean | null;
-    /**
-     * Check when the vendor's website uses aggressive bot protection that limited our automated crawl (e.g., Cloudflare challenges, Blue Star Recycling situation). Profile content is human-verified only. Triggers a footer notice that crawl was limited. Also surfaces as the is_bot_blocked transparency badge on the public profile.
-     */
-    bot_protection_limited_crawl?: boolean | null;
-    /**
-     * Optional editor-written note that appears in the footer when any of the above flags are true. Example: "This profile reflects publicly available information from the vendor's corporate website. Extended service details were not available on the pages crawled."
-     */
-    editor_note?: string | null;
-  };
-  /**
-   * Set when this vendor is a known subsidiary of another ITAD company.
-   */
-  parent_company?: (number | null) | Vendor;
-  /**
-   * Populate once parent_company is set.
-   */
-  acquisition?: {
-    acquired_date?: string | null;
-    announcement_url?: string | null;
-    subsidiary_status?: ('operating-as-brand' | 'merged-into-parent' | 'winding-down') | null;
-    acquired_entity_notes?: string | null;
-  };
-  /**
-   * For cases where the parent company is NOT in the Compare ITAD directory (e.g., a non-ITAD conglomerate parent like SK Group owning SK Tes). Use this instead of parent_company when the parent should not be a clickable directory link. If both fields are populated, parent_company (the relationship) takes precedence in the UI.
-   */
-  parent_company_text?: string | null;
-  /**
-   * Context for the parent_company_text relationship. Example: "SK Group is a South Korean industrial conglomerate; SK Tes is the ITAD operating unit following SK Ecoplant's acquisition of TES in 2022." This renders below the parent company name on the profile page.
-   */
-  parent_company_text_notes?: string | null;
-  seo?: {
-    meta_title?: string | null;
-    meta_description?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-certifications".
- */
-export interface VendorCertification {
-  id: number;
-  vendor: number | Vendor;
-  certification_name: string;
-  certification_body?: string | null;
-  cert_number?: string | null;
-  valid_from?: string | null;
-  valid_through?: string | null;
-  verification_status?: ('self-reported' | 'verified' | 'expired' | 'unverifiable') | null;
-  verification_url?: string | null;
-  verification_notes?: string | null;
-  /**
-   * Verbatim quote from the vendor's public source page where this certification is claimed. Required for new records (min 10 characters) to prevent hallucinated certifications. Capture the exact wording, not a paraphrase. The source URL goes in the verification_url field.
-   */
-  source_quote?: string | null;
-  /**
-   * Flagged for editorial review. Set automatically when source_quote is missing. Clear by adding a valid source_quote (10+ chars).
-   */
-  awaiting_re_verification?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-facilities".
- */
-export interface VendorFacility {
-  id: number;
-  vendor: number | Vendor;
-  facility_name?: string | null;
-  address?: string | null;
-  city: string;
-  state?: string | null;
-  country?: string | null;
-  postal_code?: string | null;
-  lat?: number | null;
-  lng?: number | null;
-  ownership?: ('owned' | 'leased' | 'partner') | null;
-  is_headquarters?: boolean | null;
-  sq_footage?: number | null;
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-services".
- */
-export interface VendorService {
-  id: number;
-  vendor: number | Vendor;
-  service_type:
-    | 'itad'
-    | 'media-destruction'
-    | 'data-wiping'
-    | 'remarketing'
-    | 'recycling'
-    | 'refurbishment'
-    | 'logistics'
-    | 'leased-equipment-return'
-    | 'itam'
-    | 'cod'
-    | 'on-site'
-    | 'cloud-decommission'
-    | 'other';
-  description?: string | null;
-  service_url?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * Material commercial connections between Compare ITAD and listed vendors. Every active record renders in the /commercial-model transparency page. Add a record only when a real commercial relationship exists. Set is_active to false to remove from the public table without deleting the audit record.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1950,9 +1672,9 @@ export interface VendorService {
 export interface CommercialRelationship {
   id: number;
   /**
-   * The vendor with whom this commercial relationship exists. Must be an active listing in the Compare ITAD directory.
+   * Name of the vendor with whom this commercial relationship exists, exactly as it appears in the Compare ITAD directory.
    */
-  vendor: number | Vendor;
+  vendor: string;
   /**
    * The nature of the commercial relationship. Renders verbatim in the Material Connections table on /commercial-model. Use the label that most accurately describes the actual arrangement.
    */
@@ -1969,31 +1691,6 @@ export interface CommercialRelationship {
    * Internal editorial notes about this relationship. Never rendered publicly. Use to document contract references, review cadences, or escalation contacts.
    */
   internal_notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads".
- */
-export interface Lead {
-  id: number;
-  first_name?: string | null;
-  last_name?: string | null;
-  email: string;
-  phone?: string | null;
-  company?: string | null;
-  vendor?: (number | null) | Vendor;
-  message?: string | null;
-  source?: string | null;
-  utm?: {
-    source?: string | null;
-    medium?: string | null;
-    campaign?: string | null;
-    term?: string | null;
-    content?: string | null;
-  };
-  status?: ('new' | 'contacted' | 'qualified' | 'closed') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2276,32 +1973,8 @@ export interface PayloadLockedDocument {
         value: number | Region;
       } | null)
     | ({
-        relationTo: 'industries';
-        value: number | Industry;
-      } | null)
-    | ({
-        relationTo: 'vendors';
-        value: number | Vendor;
-      } | null)
-    | ({
-        relationTo: 'vendor-certifications';
-        value: number | VendorCertification;
-      } | null)
-    | ({
-        relationTo: 'vendor-facilities';
-        value: number | VendorFacility;
-      } | null)
-    | ({
-        relationTo: 'vendor-services';
-        value: number | VendorService;
-      } | null)
-    | ({
         relationTo: 'commercial-relationships';
         value: number | CommercialRelationship;
-      } | null)
-    | ({
-        relationTo: 'leads';
-        value: number | Lead;
       } | null)
     | ({
         relationTo: 'series';
@@ -3014,6 +2687,8 @@ export interface WineriesSelect<T extends boolean = true> {
         lng?: T;
       };
   partnerSince?: T;
+  metaTitle?: T;
+  metaDescription?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3026,15 +2701,37 @@ export interface WinesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   winery?: T;
+  shortName?: T;
   varietal?: T;
   vintage?: T;
+  ava?: T;
+  blend?: T;
+  aging?: T;
+  abv?: T;
+  description?: T;
   tastingNotes?: T;
+  drinkWindow?: T;
+  pairings?:
+    | T
+    | {
+        pairing?: T;
+        id?: T;
+      };
   price?: T;
+  priceNote?: T;
+  cases?: T;
+  points?: T;
+  pointsSource?: T;
+  pointsQuote?: T;
   priceTier?: T;
   rating?: T;
   purchaseUrl?: T;
+  ctaLabel?: T;
   image?: T;
+  imageUrl?: T;
   featured?: T;
+  memberOnly?: T;
+  soldOut?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3213,152 +2910,6 @@ export interface RegionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries_select".
- */
-export interface IndustriesSelect<T extends boolean = true> {
-  display_name?: T;
-  slug?: T;
-  description?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendors_select".
- */
-export interface VendorsSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  website?: T;
-  description?: T;
-  logo?: T;
-  hq_city?: T;
-  hq_state?: T;
-  hq_country?: T;
-  phone?: T;
-  email?: T;
-  founded_year?: T;
-  employee_count_range?: T;
-  industries_served?: T;
-  editorial?:
-    | T
-    | {
-        canonical_descriptor?: T;
-        summary?: T;
-        summary_status?: T;
-        summary_reviewer?: T;
-        summary_last_reviewed?: T;
-        industry_notes?: T;
-      };
-  coverage_area?: T;
-  regional_states?:
-    | T
-    | {
-        state_code?: T;
-        id?: T;
-      };
-  notable_clients?:
-    | T
-    | {
-        client_name?: T;
-        is_publicly_disclosed?: T;
-        disclosure_source_url?: T;
-        id?: T;
-      };
-  has_verified_certifications?: T;
-  is_published?: T;
-  claim_status?: T;
-  provenance?:
-    | T
-    | {
-        primary_source_url?: T;
-        crawled_at?: T;
-        last_verified_at?: T;
-        crawler_version?: T;
-        verification_notes?: T;
-      };
-  data_quality_flags?:
-    | T
-    | {
-        sparse_data?: T;
-        awaiting_re_verification?: T;
-        bot_protection_limited_crawl?: T;
-        editor_note?: T;
-      };
-  parent_company?: T;
-  acquisition?:
-    | T
-    | {
-        acquired_date?: T;
-        announcement_url?: T;
-        subsidiary_status?: T;
-        acquired_entity_notes?: T;
-      };
-  parent_company_text?: T;
-  parent_company_text_notes?: T;
-  seo?:
-    | T
-    | {
-        meta_title?: T;
-        meta_description?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-certifications_select".
- */
-export interface VendorCertificationsSelect<T extends boolean = true> {
-  vendor?: T;
-  certification_name?: T;
-  certification_body?: T;
-  cert_number?: T;
-  valid_from?: T;
-  valid_through?: T;
-  verification_status?: T;
-  verification_url?: T;
-  verification_notes?: T;
-  source_quote?: T;
-  awaiting_re_verification?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-facilities_select".
- */
-export interface VendorFacilitiesSelect<T extends boolean = true> {
-  vendor?: T;
-  facility_name?: T;
-  address?: T;
-  city?: T;
-  state?: T;
-  country?: T;
-  postal_code?: T;
-  lat?: T;
-  lng?: T;
-  ownership?: T;
-  is_headquarters?: T;
-  sq_footage?: T;
-  notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "vendor-services_select".
- */
-export interface VendorServicesSelect<T extends boolean = true> {
-  vendor?: T;
-  service_type?: T;
-  description?: T;
-  service_url?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "commercial-relationships_select".
  */
 export interface CommercialRelationshipsSelect<T extends boolean = true> {
@@ -3367,32 +2918,6 @@ export interface CommercialRelationshipsSelect<T extends boolean = true> {
   effective_date?: T;
   is_active?: T;
   internal_notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads_select".
- */
-export interface LeadsSelect<T extends boolean = true> {
-  first_name?: T;
-  last_name?: T;
-  email?: T;
-  phone?: T;
-  company?: T;
-  vendor?: T;
-  message?: T;
-  source?: T;
-  utm?:
-    | T
-    | {
-        source?: T;
-        medium?: T;
-        campaign?: T;
-        term?: T;
-        content?: T;
-      };
-  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

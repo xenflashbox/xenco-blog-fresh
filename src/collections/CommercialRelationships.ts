@@ -30,14 +30,14 @@ export const CommercialRelationships: CollectionConfig = {
   },
   fields: [
     {
+      // Was a relationship to `vendors`, which moved to Neon. The directory is no
+      // longer in Payload to relate to, so the vendor is named rather than linked.
       name: 'vendor',
-      type: 'relationship',
-      relationTo: 'vendors',
+      type: 'text',
       required: true,
-      index: true,
       admin: {
         description:
-          'The vendor with whom this commercial relationship exists. Must be an active listing in the Compare ITAD directory.',
+          'Name of the vendor with whom this commercial relationship exists, exactly as it appears in the Compare ITAD directory.',
       },
     },
     {
