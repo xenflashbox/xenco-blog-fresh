@@ -1,6 +1,25 @@
-import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
+import type { Access, CollectionConfig, CollectionBeforeChangeHook, PayloadRequest } from 'payload'
 import { resolveSiteForRequest } from '../lib/site'
 import { siteScopedRead } from '../access/siteScopedRead'
+
+const pathnameOf = (req: PayloadRequest): string => {
+  const raw = (req as { url?: string }).url || ''
+  try {
+    return new URL(raw, 'http://internal').pathname
+  } catch {
+    return raw
+  }
+}
+
+// Host scoping is right for the list endpoint but wrong for the binary route at
+// /api/media/file/<filename>: pages that legitimately embed another property's
+// image began 403ing once reads became host-scoped. Serving the bytes requires
+// already knowing the exact filename, so exempting it enumerates nothing —
+// listing, searching and filtering media stay scoped.
+const mediaRead: Access = (args) => {
+  if (/\/media\/file\//.test(pathnameOf(args.req))) return true
+  return siteScopedRead(args)
+}
 
 const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   if (!data) return data
@@ -22,7 +41,7 @@ const beforeChange: CollectionBeforeChangeHook = async ({ data, req, operation, 
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    read: siteScopedRead,
+    read: mediaRead,
   },
   // Sharp is enabled globally in payload.config.ts; these options actually generate variants in R2.
   upload: {

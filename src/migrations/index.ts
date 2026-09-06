@@ -38,6 +38,7 @@ import * as migration_20260512_173926_vendor_certifications_source_quote_reverif
 import * as migration_20260522_233042_add_templates_collection from './20260522_233042_add_templates_collection';
 import * as migration_20260525_164300_add_editorial_blocks_lexical_registration from './20260525_164300_add_editorial_blocks_lexical_registration';
 import * as migration_20260709_fix_hasmany_select_id_drift from './20260709_fix_hasmany_select_id_drift';
+import * as migration_20260905_wine_bottle_fields_and_winery_meta from './20260905_wine_bottle_fields_and_winery_meta';
 
 export const migrations = [
   {
@@ -239,5 +240,10 @@ export const migrations = [
     up: migration_20260709_fix_hasmany_select_id_drift.up,
     down: migration_20260709_fix_hasmany_select_id_drift.down,
     name: '20260709_fix_hasmany_select_id_drift'
+  },
+  {
+    up: migration_20260905_wine_bottle_fields_and_winery_meta.up,
+    down: migration_20260905_wine_bottle_fields_and_winery_meta.down,
+    name: '20260905_wine_bottle_fields_and_winery_meta'
   },
 ];

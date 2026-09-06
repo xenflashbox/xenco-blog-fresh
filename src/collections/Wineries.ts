@@ -162,6 +162,18 @@ export const Wineries: CollectionConfig = {
       type: "date",
       label: "Partner Since",
     },
+    {
+      name: "metaTitle",
+      type: "text",
+      label: "Meta Title",
+      admin: { position: "sidebar" },
+    },
+    {
+      name: "metaDescription",
+      type: "textarea",
+      label: "Meta Description",
+      admin: { position: "sidebar" },
+    },
   ],
   timestamps: true,
 }

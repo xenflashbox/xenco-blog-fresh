@@ -7,6 +7,7 @@ import { migrations } from './migrations'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -170,6 +171,24 @@ export default buildConfig({
   // serverURL is only needed in Payload config for email links — not used here.
 
   cors: allowedOrigins,
+
+  // Transactional email (password reset). Left undefined when SMTP_HOST is unset so
+  // local and CI builds do not require live mailbox credentials.
+  email: process.env.SMTP_HOST
+    ? nodemailerAdapter({
+        defaultFromAddress: process.env.SMTP_FROM_ADDRESS || process.env.SMTP_USER || '',
+        defaultFromName: process.env.SMTP_FROM_NAME || 'Xenco Labs CMS',
+        transportOptions: {
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT || 465),
+          secure: Number(process.env.SMTP_PORT || 465) === 465,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        },
+      })
+    : undefined,
 
   admin: {
     user: Users.slug,

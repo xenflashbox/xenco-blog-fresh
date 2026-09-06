@@ -68,3 +68,6 @@ pgbouncer/*.key
 
 # Environment files with secrets
 .env.production
+
+# Apple config profiles embed plaintext mailbox passwords
+*.mobileconfig
