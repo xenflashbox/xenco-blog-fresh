@@ -19,7 +19,7 @@ This document provides the correct configuration for connecting to the **Native 
 
 *Master role changes dynamically via Sentinel failover
 
-**Password:** `redis_secure_password_2025`
+**Password:** `REPLACE_WITH_REDIS_PASSWORD`
 **Sentinel Master Name:** `mymaster`
 
 ---
@@ -34,7 +34,7 @@ This is the **correct** way to achieve true high availability. The client librar
 ```env
 REDIS_SENTINEL_HOSTS=10.8.8.17:26379,10.8.8.16:26379,10.8.8.15:26379
 REDIS_SENTINEL_MASTER=mymaster
-REDIS_PASSWORD=redis_secure_password_2025
+REDIS_PASSWORD=REPLACE_WITH_REDIS_PASSWORD
 ```
 
 #### Node.js (ioredis)
@@ -49,8 +49,8 @@ const redis = new Redis({
     { host: '10.8.8.15', port: 26379 }
   ],
   name: 'mymaster',
-  password: 'redis_secure_password_2025',
-  sentinelPassword: 'redis_secure_password_2025',
+  password: 'REPLACE_WITH_REDIS_PASSWORD',
+  sentinelPassword: 'REPLACE_WITH_REDIS_PASSWORD',
   // Recommended settings
   retryDelayOnFailover: 100,
   maxRetriesPerRequest: 3,
@@ -76,21 +76,21 @@ sentinel = Sentinel(
         ('10.8.8.15', 26379)
     ],
     socket_timeout=0.5,
-    password='redis_secure_password_2025',
-    sentinel_kwargs={'password': 'redis_secure_password_2025'}
+    password='REPLACE_WITH_REDIS_PASSWORD',
+    sentinel_kwargs={'password': 'REPLACE_WITH_REDIS_PASSWORD'}
 )
 
 # Get master connection (auto-discovers current master)
 master = sentinel.master_for(
     'mymaster',
-    password='redis_secure_password_2025',
+    password='REPLACE_WITH_REDIS_PASSWORD',
     socket_timeout=0.5
 )
 
 # Get replica for read operations (optional, for read scaling)
 replica = sentinel.slave_for(
     'mymaster',
-    password='redis_secure_password_2025',
+    password='REPLACE_WITH_REDIS_PASSWORD',
     socket_timeout=0.5
 )
 
@@ -117,8 +117,8 @@ func main() {
             "10.8.8.16:26379",
             "10.8.8.15:26379",
         },
-        Password:         "redis_secure_password_2025",
-        SentinelPassword: "redis_secure_password_2025",
+        Password:         "REPLACE_WITH_REDIS_PASSWORD",
+        SentinelPassword: "REPLACE_WITH_REDIS_PASSWORD",
 
         // Connection pool settings
         PoolSize:     10,
@@ -149,7 +149,7 @@ $options = [
     'replication' => 'sentinel',
     'service' => 'mymaster',
     'parameters' => [
-        'password' => 'redis_secure_password_2025',
+        'password' => 'REPLACE_WITH_REDIS_PASSWORD',
     ],
 ];
 
@@ -171,7 +171,7 @@ sentinels.add("10.8.8.15:26379");
 JedisSentinelPool pool = new JedisSentinelPool(
     "mymaster",
     sentinels,
-    "redis_secure_password_2025"
+    "REPLACE_WITH_REDIS_PASSWORD"
 );
 
 try (Jedis jedis = pool.getResource()) {
@@ -194,7 +194,7 @@ Docker Service → redis-sentinel_redis-1:6379 → HAProxy (3 replicas) → Nati
 #### Connection Details
 - **Host:** `redis-sentinel_redis-1` or `redis` or `redis-1`
 - **Port:** `6379`
-- **Password:** `redis_secure_password_2025`
+- **Password:** `REPLACE_WITH_REDIS_PASSWORD`
 - **Network:** `redis-sentinel_redis-network`
 
 #### Docker Compose Example
@@ -205,7 +205,7 @@ services:
     environment:
       - REDIS_HOST=redis-sentinel_redis-1
       - REDIS_PORT=6379
-      - REDIS_PASSWORD=redis_secure_password_2025
+      - REDIS_PASSWORD=REPLACE_WITH_REDIS_PASSWORD
     networks:
       - redis-sentinel_redis-network
 
@@ -230,7 +230,7 @@ services:
     environment:
       - REDIS_SENTINEL_HOSTS=10.8.8.17:26379,10.8.8.16:26379,10.8.8.15:26379
       - REDIS_SENTINEL_MASTER=mymaster
-      - REDIS_PASSWORD=redis_secure_password_2025
+      - REDIS_PASSWORD=REPLACE_WITH_REDIS_PASSWORD
 ```
 
 **Pros:** True HA, direct Sentinel access
@@ -243,21 +243,21 @@ services:
 ### Check Current Master
 ```bash
 # From any node with redis-cli
-redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel get-master-addr-by-name mymaster
+redis-cli -h 10.8.8.17 -p 26379 -a REPLACE_WITH_REDIS_PASSWORD sentinel get-master-addr-by-name mymaster
 ```
 
 ### Test Connection
 ```bash
 # Direct to current master (query Sentinel first)
-MASTER=$(redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel get-master-addr-by-name mymaster | head -1)
-redis-cli -h $MASTER -p 6379 -a redis_secure_password_2025 ping
+MASTER=$(redis-cli -h 10.8.8.17 -p 26379 -a REPLACE_WITH_REDIS_PASSWORD sentinel get-master-addr-by-name mymaster | head -1)
+redis-cli -h $MASTER -p 6379 -a REPLACE_WITH_REDIS_PASSWORD ping
 ```
 
 ### Check Cluster Health
 ```bash
 # From xenco2/xenco3/xenco5
-redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel master mymaster
-redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel replicas mymaster
+redis-cli -h 10.8.8.17 -p 26379 -a REPLACE_WITH_REDIS_PASSWORD sentinel master mymaster
+redis-cli -h 10.8.8.17 -p 26379 -a REPLACE_WITH_REDIS_PASSWORD sentinel replicas mymaster
 ```
 
 ---
@@ -287,7 +287,7 @@ When the master fails:
 ### Sentinel Returns Wrong Master
 ```bash
 # Force Sentinel to re-check
-redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel reset mymaster
+redis-cli -h 10.8.8.17 -p 26379 -a REPLACE_WITH_REDIS_PASSWORD sentinel reset mymaster
 ```
 
 ### Connection Refused
@@ -296,7 +296,7 @@ redis-cli -h 10.8.8.17 -p 26379 -a redis_secure_password_2025 sentinel reset mym
 3. Verify Redis is running: `systemctl status redis-server`
 
 ### Auth Failed
-- Password is `redis_secure_password_2025` (same for Redis and Sentinel)
+- Password is `REPLACE_WITH_REDIS_PASSWORD` (same for Redis and Sentinel)
 - Both `password` and `sentinelPassword` must be set in client config
 
 ---
