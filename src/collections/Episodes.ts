@@ -2,6 +2,7 @@ import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { resolveSiteForRequest } from '../lib/site'
 import { ensureUniqueSlugForSite } from '../lib/uniqueSlug'
 import { siteScopedReadWith } from '../access/siteScopedRead'
+import { authenticatedWrite } from '../access/authenticatedWrite'
 
 function slugify(input: string): string {
   return input
@@ -90,9 +91,9 @@ export const Episodes: CollectionConfig = {
     // Scoped to the requesting host's site; unauthenticated callers
     // (frontend / API) additionally only see published episodes.
     read: siteScopedReadWith({ status: { equals: 'published' } }),
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    create: authenticatedWrite,
+    update: authenticatedWrite,
+    delete: authenticatedWrite,
   },
   hooks: {
     beforeChange: [beforeChange],

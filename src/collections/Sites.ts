@@ -6,6 +6,7 @@ import type {
 } from 'payload'
 import { normalizeDomain } from '../lib/site'
 import { syncDomainsAfterChange, syncDomainsAfterDelete } from '../hooks/syncDomainsToTraefik'
+import { authenticatedWrite } from '../access/authenticatedWrite'
 
 function normalizeDomainPreserveSubdomain(raw: string): string | null {
   const value = String(raw || '')
@@ -202,9 +203,9 @@ export const Sites: CollectionConfig = {
   admin: { useAsTitle: 'name' },
   access: {
     read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    create: authenticatedWrite,
+    update: authenticatedWrite,
+    delete: authenticatedWrite,
   },
   hooks: {
     beforeChange: [beforeChange],

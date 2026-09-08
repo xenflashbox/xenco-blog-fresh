@@ -7,6 +7,7 @@ import type {
   CollectionAfterDeleteHook,
 } from 'payload'
 import { upsertSupportToMeili, deleteSupportFromMeili } from '../lib/meiliSupport'
+import { authenticatedWrite } from '../access/authenticatedWrite'
 
 const COLLECTION_SLUG = 'support_playbooks'
 
@@ -50,9 +51,9 @@ export const SupportPlaybooks: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
+    create: authenticatedWrite,
+    update: authenticatedWrite,
+    delete: authenticatedWrite,
   },
   hooks: {
     afterChange: [afterChange],
