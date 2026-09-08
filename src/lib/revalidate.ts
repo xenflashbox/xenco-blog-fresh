@@ -93,6 +93,14 @@ export async function triggerRevalidation(
   }
   url.searchParams.set('slug', slug)
 
+  // Logged in place of the real URL: the secret travels as a query parameter, so
+  // logging url.toString() writes it to stdout and into anything shipping logs.
+  const safeUrl = new URL(url)
+  if (safeUrl.searchParams.has('secret')) {
+    safeUrl.searchParams.set('secret', 'REDACTED')
+  }
+  const loggedUrl = safeUrl.toString()
+
   // Fire-and-forget: don't await, don't block the CMS response
   // Use void to explicitly mark this as intentionally not awaited
   void (async () => {
@@ -109,18 +117,18 @@ export async function triggerRevalidation(
       if (!response.ok) {
         const text = await response.text().catch(() => '')
         payload.logger.warn(
-          { url: url.toString(), status: response.status, body: text.slice(0, 200) },
+          { url: loggedUrl, status: response.status, body: text.slice(0, 200) },
           'Revalidation request failed',
         )
       } else {
         payload.logger.info(
-          { url: url.toString(), slug, siteName: site?.name },
+          { url: loggedUrl, slug, siteName: site?.name },
           'Revalidation triggered successfully',
         )
       }
     } catch (err) {
       // Network errors, timeouts, etc - log but don't fail
-      payload.logger.warn({ err, url: url.toString() }, 'Revalidation request error')
+      payload.logger.warn({ err, url: loggedUrl }, 'Revalidation request error')
     }
   })()
 }
