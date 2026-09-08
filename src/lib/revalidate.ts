@@ -37,24 +37,31 @@ export async function triggerRevalidation(
     return
   }
 
-  // Resolve the site - it might be an ID or a populated object
+  // Always resolve the site through the Local API rather than trusting the site
+  // object embedded in `doc`. revalidateSecret is hidden from unauthenticated
+  // reads by field-level access, so an embedded copy can arrive without it — and
+  // a missing secret fails silently below, producing a stale front-end with no
+  // error anywhere. The Local API defaults to overrideAccess: true, so this
+  // always sees the real value.
+  const siteId =
+    typeof article.site === 'object' && article.site !== null
+      ? (article.site as Site).id
+      : (article.site as string | number | undefined)
+
   let site: Site | null = null
 
-  if (typeof article.site === 'object' && article.site !== null) {
-    site = article.site as Site
-  } else if (article.site) {
-    // Need to fetch the site
+  if (siteId) {
     try {
       const siteDoc = await payload.findByID({
         collection: 'sites',
-        id: String(article.site),
+        id: String(siteId),
         depth: 0,
       })
       if (siteDoc) {
         site = siteDoc as unknown as Site
       }
     } catch (err) {
-      payload.logger.warn({ err, siteId: article.site }, 'Failed to fetch site for revalidation')
+      payload.logger.warn({ err, siteId }, 'Failed to fetch site for revalidation')
       return
     }
   }
@@ -76,6 +83,13 @@ export async function triggerRevalidation(
   const url = new URL(revalidateUrl)
   if (revalidateSecret) {
     url.searchParams.set('secret', revalidateSecret)
+  } else {
+    // A configured revalidateUrl with no secret gets rejected by the front end,
+    // which would otherwise look like a silently stale cache.
+    payload.logger.warn(
+      { siteId: site.id, articleId: article.id },
+      'Site has revalidateUrl but no revalidateSecret; revalidation will likely be rejected',
+    )
   }
   url.searchParams.set('slug', slug)
 

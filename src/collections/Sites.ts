@@ -2,6 +2,7 @@ import type {
   CollectionConfig,
   CollectionBeforeChangeHook,
   CollectionBeforeDeleteHook,
+  FieldAccess,
 } from 'payload'
 import { normalizeDomain } from '../lib/site'
 import { syncDomainsAfterChange, syncDomainsAfterDelete } from '../hooks/syncDomainsToTraefik'
@@ -189,6 +190,13 @@ const beforeDelete: CollectionBeforeDeleteHook = async ({ id, req }) => {
   }
 }
 
+// Sites is embedded in every article response — as `site`, `featuredImage.site`
+// and `author.site` — so anything readable here is readable anonymously from
+// /api/articles. Payload omits a field entirely when its read access denies,
+// which keeps the relation expansion intact for the consumers that rely on it.
+// Server-side callers use the Local API (overrideAccess: true) and are unaffected.
+const authenticatedFieldRead: FieldAccess = ({ req }) => Boolean(req.user)
+
 export const Sites: CollectionConfig = {
   slug: 'sites',
   admin: { useAsTitle: 'name' },
@@ -261,12 +269,14 @@ export const Sites: CollectionConfig = {
       name: 'listmonkListId',
       type: 'text',
       label: 'Listmonk List ID',
+      access: { read: authenticatedFieldRead },
       admin: { description: 'Listmonk mailing list ID for newsletter signups on this site' },
     },
     {
       name: 'mauticSegmentId',
       type: 'text',
       label: 'Mautic Segment ID',
+      access: { read: authenticatedFieldRead },
       admin: { description: 'Mautic segment ID for this site' },
     },
 
@@ -274,6 +284,7 @@ export const Sites: CollectionConfig = {
     {
       name: 'revalidateUrl',
       type: 'text',
+      access: { read: authenticatedFieldRead },
       admin: {
         description:
           'Full URL for on-demand revalidation (e.g., https://resumecoach.me/api/revalidate). Leave empty to skip.',
@@ -282,6 +293,7 @@ export const Sites: CollectionConfig = {
     {
       name: 'revalidateSecret',
       type: 'text',
+      access: { read: authenticatedFieldRead },
       admin: {
         description: 'Secret token for the revalidation endpoint (passed as ?secret=...)',
       },
