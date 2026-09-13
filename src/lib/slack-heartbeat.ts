@@ -1,23 +1,39 @@
 // src/lib/slack-heartbeat.ts
-// Slack alert-channel health check. Every 6h, POST a heartbeat to both
-// SUPPORT_SLACK_WEBHOOK_URL and GROWTH_SLACK_WEBHOOK_URL, then record the
-// outcome in support_events. Built in response to the 2026-05-04 -> 2026-06-03
-// dark-window outage: had this existed, the dead webhook would have been
-// caught the next day, not 30 days later.
+// Slack DELIVERY heartbeat. This proves the webhook still delivers. It is NOT
+// a site or application health check and must never be described as one — it
+// says nothing about whether any service is up.
+//
+// Once a day, POST to every configured webhook and record the outcome in
+// support_events. Built in response to the 2026-05-04 -> 2026-06-03 dark-window
+// outage: had this existed, the dead webhook would have been caught the next
+// day, not 30 days later.
+//
+// Why the growth webhook is still pinged, even though growth-alerts is meant
+// for signups and payments only: GROWTH_SLACK_WEBHOOK_URL is the same webhook
+// that delivers the signup and payment notifications. A heartbeat sent
+// somewhere else would prove nothing about that path, and a silently dead
+// growth webhook means silently missed revenue alerts — precisely the
+// original outage. One [OPS] line a day is the cost of knowing it works.
 //
 // Monitor query (any container or operator can run):
 //   SELECT MAX(created_at) FROM support_events
 //   WHERE event_type='slack_heartbeat_ok' AND event_data->>'webhook'='support';
-// If older than 8h, the channel is dead.
+// If older than 32h, the channel is dead.
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 // Uses the pg package bundled with @payloadcms/db-postgres (matches repo convention).
 const { Pool } = require('pg')
 
-type Channel = 'support' | 'growth'
+type Channel = 'support' | 'growth' | 'ops'
 
-const INTERVAL_MS = 6 * 60 * 60 * 1000 // 6 hours
+const INTERVAL_MS = 24 * 60 * 60 * 1000 // daily
 const BOOT_DELAY_MS = 30 * 1000 // 30s after boot, so startup spikes settle
+
+const CHANNEL_LABELS: Record<Channel, string> = {
+  support: 'support-alerts',
+  growth: 'growth-alerts',
+  ops: 'ops-alerts',
+}
 
 let started = false
 let pool: any = null
@@ -57,11 +73,10 @@ async function recordEvent(
 
 async function pingOne(channel: Channel, webhookUrl: string) {
   const ts = new Date().toISOString()
-  const channelLabel =
-    channel === 'support' ? 'support-alerts' : 'growth-alerts'
+  const channelLabel = CHANNEL_LABELS[channel]
   const text =
-    `:heart_decoration: Slack alert health check — channel ${channelLabel}, ` +
-    `payload-swarm OK, ${ts}. If you see this, alerting works.`
+    `[OPS] :heart_decoration: Slack delivery heartbeat — ${channelLabel} webhook ` +
+    `reachable from payload-app, ${ts}. Delivery only; says nothing about service health.`
 
   try {
     const r = await fetch(webhookUrl, {
@@ -86,13 +101,21 @@ async function pingOne(channel: Channel, webhookUrl: string) {
   }
 }
 
+// Every configured webhook is pinged. `ops` is optional: set
+// OPS_SLACK_WEBHOOK_URL and its delivery gets proved too, with no code change.
+const WEBHOOK_ENV: Record<Channel, string> = {
+  support: 'SUPPORT_SLACK_WEBHOOK_URL',
+  growth: 'GROWTH_SLACK_WEBHOOK_URL',
+  ops: 'OPS_SLACK_WEBHOOK_URL',
+}
+
 async function tick() {
-  const support = process.env.SUPPORT_SLACK_WEBHOOK_URL
-  const growth = process.env.GROWTH_SLACK_WEBHOOK_URL
-  if (support) await pingOne('support', support)
-  else console.warn('[slack-heartbeat] SUPPORT_SLACK_WEBHOOK_URL not set; skipping support tick')
-  if (growth) await pingOne('growth', growth)
-  else console.warn('[slack-heartbeat] GROWTH_SLACK_WEBHOOK_URL not set; skipping growth tick')
+  for (const channel of Object.keys(WEBHOOK_ENV) as Channel[]) {
+    const envName = WEBHOOK_ENV[channel]
+    const url = process.env[envName]
+    if (url) await pingOne(channel, url)
+    else console.warn(`[slack-heartbeat] ${envName} not set; skipping ${channel} tick`)
+  }
 }
 
 export function startHeartbeat() {
