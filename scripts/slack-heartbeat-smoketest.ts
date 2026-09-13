@@ -1,7 +1,7 @@
 // scripts/slack-heartbeat-smoketest.ts
 // Manual one-shot: triggers the slack-heartbeat tick once and exits.
-// Use to verify both webhooks deliver and both support_events rows land,
-// without waiting 30s+6h for the in-app scheduler.
+// Use to verify every configured webhook delivers and its support_events row
+// lands, without waiting 30s+24h for the in-app scheduler.
 import { __testables } from '../src/lib/slack-heartbeat'
 
 async function main() {
