@@ -80,8 +80,11 @@ export const PullQuoteBlock: Block = {
     {
       name: 'attribution',
       type: 'text',
-      required: true,
-      admin: { description: 'Name of the person being quoted.' },
+      admin: {
+        description:
+          'Who said it (optional). A named person, or a document the quote is drawn from. ' +
+          'Leave empty when the article is quoting itself for emphasis — do not invent a source.',
+      },
     },
     {
       name: 'title',
